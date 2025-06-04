@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { WelcomeCreator } from './components/WelcomeCreator';
+import { Header } from './components/Header';
 import ChatInput from './components/ChatInput';
 import { colors } from './theme/theme';
 
@@ -15,6 +16,7 @@ export default function App() {
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <StatusBar style="auto" />
         <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+          <Header />
           <WelcomeCreator />
         </SafeAreaView>
         <SafeAreaView edges={['bottom']}>
