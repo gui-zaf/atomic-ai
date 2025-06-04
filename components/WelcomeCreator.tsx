@@ -34,7 +34,7 @@ export const WelcomeCreator = () => {
         ]}
       >
         <Ionicons name="sparkles" size={42} color={colors.primary} />
-        <Text style={styles.title}>What you will create?</Text>
+        <Text style={styles.title}>What will you create?</Text>
       </Animated.View>
     </View>
   );

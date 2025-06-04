@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: 12,
+    fontSize: 18,
     color: colors.text,
     opacity: 0.7,
     fontWeight: 'bold',

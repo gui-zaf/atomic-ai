@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TextInput,
@@ -18,6 +18,23 @@ interface ChatInputProps {
 const ChatInput = ({ onSend }: ChatInputProps) => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, []);
 
   const handleSend = () => {
     if (message.trim()) {
@@ -38,7 +55,10 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[
+      styles.container,
+      isKeyboardVisible && styles.containerKeyboardOpen
+    ]}>
       <View style={styles.inputContainer}>
         <TouchableOpacity
           style={[styles.bulbButton]}
@@ -91,6 +111,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.1)',
     backgroundColor: colors.background,
+  },
+  containerKeyboardOpen: {
+    marginBottom: -34,
   },
   inputContainer: {
     flexDirection: 'row',
