@@ -6,6 +6,7 @@ interface Message {
   id: string;
   text: string;
   isUser: boolean;
+  image?: string;
 }
 
 interface ChatMessagesProps {
@@ -52,6 +53,7 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
           key={message.id}
           message={message.text}
           isUser={message.isUser}
+          image={message.image}
         />
       ))}
     </ScrollView>
