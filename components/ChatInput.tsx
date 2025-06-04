@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Platform,
   Keyboard,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/theme';
@@ -17,7 +16,6 @@ interface ChatInputProps {
 
 const ChatInput = ({ onSend }: ChatInputProps) => {
   const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -40,17 +38,13 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
     if (message.trim()) {
       onSend(message.trim());
       setMessage('');
-      Keyboard.dismiss();
     }
   };
 
   const handleSuggestion = async () => {
-    setIsLoading(true);
-    
     // Simulating a delay for the loading effect
     setTimeout(() => {
       setMessage("What about creating something amazing today?");
-      setIsLoading(false);
     }, 1500);
   };
 
@@ -63,17 +57,12 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         <TouchableOpacity
           style={[styles.bulbButton]}
           onPress={handleSuggestion}
-          disabled={isLoading}
         >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : (
-            <Ionicons
-              name="bulb"
-              size={20}
-              color={colors.primary}
-            />
-          )}
+          <Ionicons
+            name="bulb"
+            size={20}
+            color={colors.primary}
+          />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
