@@ -7,9 +7,11 @@ import {
   Platform,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/theme';
+import { getAmazeSuggestion } from '../services/amazeService';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -45,11 +47,14 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
   const handleSuggestion = async () => {
     setIsLoading(true);
-    // Simulating a delay for the loading effect
-    setTimeout(() => {
-      setMessage("What about creating something amazing today?");
+    try {
+      const suggestion = await getAmazeSuggestion();
+      setMessage(suggestion);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to get suggestion. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
