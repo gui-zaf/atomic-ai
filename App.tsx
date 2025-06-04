@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { WelcomeCreator } from './components/WelcomeCreator';
 import { Header } from './components/Header';
@@ -39,20 +39,22 @@ export default function App() {
         style={{ flex: 1 }} 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={{ flex: 1, backgroundColor: colors.background }}>
-          <StatusBar style="auto" />
-          <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-            <Header />
-            {messages.length === 0 ? (
-              <WelcomeCreator />
-            ) : (
-              <ChatMessages messages={messages} />
-            )}
-          </SafeAreaView>
-          <SafeAreaView edges={['bottom']}>
-            <ChatInput onSend={handleSendMessage} />
-          </SafeAreaView>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={{ flex: 1, backgroundColor: colors.background }}>
+            <StatusBar style="auto" />
+            <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+              <Header />
+              {messages.length === 0 ? (
+                <WelcomeCreator />
+              ) : (
+                <ChatMessages messages={messages} />
+              )}
+            </SafeAreaView>
+            <SafeAreaView edges={['bottom']}>
+              <ChatInput onSend={handleSendMessage} />
+            </SafeAreaView>
+          </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaProvider>
   );

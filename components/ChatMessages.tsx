@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, Keyboard } from 'react-native';
 import { ChatBubble } from './ChatBubble';
 
 interface Message {
@@ -17,6 +17,9 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
     <ScrollView 
       style={styles.container}
       contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      onScrollBeginDrag={Keyboard.dismiss}
+      onTouchStart={Keyboard.dismiss}
     >
       {messages.map((message) => (
         <ChatBubble
