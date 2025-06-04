@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { colors } from '../theme/theme';
 
 interface ChatBubbleProps {
@@ -8,14 +8,36 @@ interface ChatBubbleProps {
 }
 
 export const ChatBubble = ({ message, isUser }: ChatBubbleProps) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <View style={[
       styles.container,
       isUser ? styles.userContainer : styles.aiContainer
     ]}>
-      <View style={[
+      <Animated.View style={[
         styles.bubble,
-        isUser ? styles.userBubble : styles.aiBubble
+        isUser ? styles.userBubble : styles.aiBubble,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY }],
+        }
       ]}>
         <Text style={[
           styles.text,
@@ -23,7 +45,7 @@ export const ChatBubble = ({ message, isUser }: ChatBubbleProps) => {
         ]}>
           {message}
         </Text>
-      </View>
+      </Animated.View>
     </View>
   );
 };
