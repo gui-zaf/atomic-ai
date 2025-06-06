@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Modal,
   View,
@@ -18,17 +18,20 @@ interface ImageViewerProps {
   onClose: () => void;
   imageSource: any;
   message?: string;
+  isLiked: boolean;
+  onToggleLike: () => void;
 }
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-export const ImageViewer = ({ isVisible, onClose, imageSource, message }: ImageViewerProps) => {
-  const [isLiked, setIsLiked] = useState(false);
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-  };
-
+export const ImageViewer = ({ 
+  isVisible, 
+  onClose, 
+  imageSource, 
+  message,
+  isLiked,
+  onToggleLike 
+}: ImageViewerProps) => {
   const handleShare = async () => {
     try {
       await Share.share({
@@ -76,7 +79,7 @@ export const ImageViewer = ({ isVisible, onClose, imageSource, message }: ImageV
             <View style={styles.leftActions}>
               <TouchableOpacity 
                 style={styles.actionButton}
-                onPress={handleLike}
+                onPress={onToggleLike}
               >
                 <Ionicons 
                   name={isLiked ? "heart" : "heart-outline"} 

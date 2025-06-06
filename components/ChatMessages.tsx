@@ -11,9 +11,11 @@ interface Message {
 
 interface ChatMessagesProps {
   messages: Message[];
+  likedMessages: Set<string>;
+  onToggleLike: (messageId: string) => void;
 }
 
-export const ChatMessages = ({ messages }: ChatMessagesProps) => {
+export const ChatMessages = ({ messages, likedMessages, onToggleLike }: ChatMessagesProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Scroll to bottom when keyboard opens
@@ -54,6 +56,8 @@ export const ChatMessages = ({ messages }: ChatMessagesProps) => {
           message={message.text}
           isUser={message.isUser}
           image={message.image}
+          isLiked={likedMessages.has(message.id)}
+          onToggleLike={() => onToggleLike(message.id)}
         />
       ))}
     </ScrollView>

@@ -9,11 +9,12 @@ interface ChatBubbleProps {
   message: string;
   isUser: boolean;
   image?: string;
+  isLiked: boolean;
+  onToggleLike: () => void;
 }
 
-export const ChatBubble = ({ message, isUser, image }: ChatBubbleProps) => {
+export const ChatBubble = ({ message, isUser, image, isLiked, onToggleLike }: ChatBubbleProps) => {
   const [isImageViewerVisible, setImageViewerVisible] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
 
@@ -33,10 +34,6 @@ export const ChatBubble = ({ message, isUser, image }: ChatBubbleProps) => {
   }, []);
 
   const imageSource = image ? require('../assets/carousel/sample-01.jpeg') : null;
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-  };
 
   const handleShare = async () => {
     try {
@@ -82,7 +79,7 @@ export const ChatBubble = ({ message, isUser, image }: ChatBubbleProps) => {
                 <View style={styles.leftActions}>
                   <TouchableOpacity 
                     style={styles.actionButton}
-                    onPress={handleLike}
+                    onPress={onToggleLike}
                   >
                     <Ionicons 
                       name={isLiked ? "heart" : "heart-outline"} 
@@ -129,6 +126,8 @@ export const ChatBubble = ({ message, isUser, image }: ChatBubbleProps) => {
           onClose={() => setImageViewerVisible(false)}
           imageSource={imageSource}
           message={message}
+          isLiked={isLiked}
+          onToggleLike={onToggleLike}
         />
       )}
     </>

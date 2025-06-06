@@ -17,6 +17,19 @@ interface Message {
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
+
+  const handleToggleLike = (messageId: string) => {
+    setLikedMessages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(messageId)) {
+        newSet.delete(messageId);
+      } else {
+        newSet.add(messageId);
+      }
+      return newSet;
+    });
+  };
 
   const handleSendMessage = (message: string) => {
     // Add user message
@@ -61,7 +74,11 @@ export default function App() {
               {messages.length === 0 ? (
                 <WelcomeCreator />
               ) : (
-                <ChatMessages messages={messages} />
+                <ChatMessages 
+                  messages={messages} 
+                  likedMessages={likedMessages}
+                  onToggleLike={handleToggleLike}
+                />
               )}
             </SafeAreaView>
             <SafeAreaView edges={['bottom']}>
