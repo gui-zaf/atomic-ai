@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   ActionSheetIOS,
   Platform,
-} from 'react-native';
-import { colors } from '../theme/theme';
+} from "react-native";
+import { colors } from "../theme/theme";
 
 interface ImageActionSheetProps {
   onLike: () => void;
@@ -15,13 +15,17 @@ interface ImageActionSheetProps {
   onDownload: () => void;
 }
 
-export const showImageActionSheet = ({ onLike, onShare, onDownload }: ImageActionSheetProps) => {
-  if (Platform.OS === 'ios') {
+export const showImageActionSheet = ({
+  onLike,
+  onShare,
+  onDownload,
+}: ImageActionSheetProps) => {
+  if (Platform.OS === "ios") {
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        options: ['Like', 'Share', 'Download', 'Cancel'],
+        options: ["Like", "Share", "Download", "Cancel"],
         cancelButtonIndex: 3,
-        userInterfaceStyle: 'light',
+        userInterfaceStyle: "light",
       },
       (buttonIndex) => {
         switch (buttonIndex) {
@@ -35,9 +39,9 @@ export const showImageActionSheet = ({ onLike, onShare, onDownload }: ImageActio
             onDownload();
             break;
         }
-      }
+      },
     );
   } else {
     // For Android, we'll implement this later if needed
   }
-}; 
+};

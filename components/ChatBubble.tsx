@@ -1,9 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Image, TouchableOpacity, Share } from 'react-native';
-import { colors } from '../theme/theme';
-import { ImageViewer } from './ImageViewer';
-import * as FileSystem from 'expo-file-system';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Image,
+  TouchableOpacity,
+  Share,
+} from "react-native";
+import { colors } from "../theme/theme";
+import { ImageViewer } from "./ImageViewer";
+import * as FileSystem from "expo-file-system";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ChatBubbleProps {
   message: string;
@@ -13,7 +21,13 @@ interface ChatBubbleProps {
   onToggleLike: () => void;
 }
 
-export const ChatBubble = ({ message, isUser, image, isLiked, onToggleLike }: ChatBubbleProps) => {
+export const ChatBubble = ({
+  message,
+  isUser,
+  image,
+  isLiked,
+  onToggleLike,
+}: ChatBubbleProps) => {
   const [isImageViewerVisible, setImageViewerVisible] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
@@ -33,15 +47,17 @@ export const ChatBubble = ({ message, isUser, image, isLiked, onToggleLike }: Ch
     ]).start();
   }, []);
 
-  const imageSource = image ? require('../assets/carousel/sample-01.jpeg') : null;
+  const imageSource = image
+    ? require("../assets/carousel/sample-01.jpeg")
+    : null;
 
   const handleShare = async () => {
     try {
       await Share.share({
-        message: 'Check out this amazing image!',
+        message: "Check out this amazing image!",
       });
     } catch (error) {
-      console.log('Error sharing:', error);
+      console.log("Error sharing:", error);
     }
   };
 
@@ -51,25 +67,29 @@ export const ChatBubble = ({ message, isUser, image, isLiked, onToggleLike }: Ch
 
   return (
     <>
-      <View style={[
-        styles.container,
-        isUser ? styles.userContainer : styles.aiContainer
-      ]}>
-        <Animated.View style={[
-          styles.bubble,
-          isUser ? styles.userBubble : styles.aiBubble,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY }],
-          }
-        ]}>
+      <View
+        style={[
+          styles.container,
+          isUser ? styles.userContainer : styles.aiContainer,
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.bubble,
+            isUser ? styles.userBubble : styles.aiBubble,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY }],
+            },
+          ]}
+        >
           {image && (
             <>
               <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => setImageViewerVisible(true)}
               >
-                <Image 
+                <Image
                   source={imageSource}
                   style={styles.image}
                   resizeMode="cover"
@@ -77,44 +97,43 @@ export const ChatBubble = ({ message, isUser, image, isLiked, onToggleLike }: Ch
               </TouchableOpacity>
               <View style={styles.actionBar}>
                 <View style={styles.leftActions}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.actionButton}
                     onPress={onToggleLike}
                   >
-                    <Ionicons 
-                      name={isLiked ? "heart" : "heart-outline"} 
-                      size={22} 
-                      color={isLiked ? colors.error : (isUser ? '#FFF' : colors.text)} 
+                    <Ionicons
+                      name={isLiked ? "heart" : "heart-outline"}
+                      size={22}
+                      color={
+                        isLiked ? colors.error : isUser ? "#FFF" : colors.text
+                      }
                     />
                   </TouchableOpacity>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={[styles.actionButton, styles.lastLeftButton]}
                     onPress={handleDownload}
                   >
-                    <Ionicons 
-                      name="download-outline" 
-                      size={22} 
-                      color={isUser ? '#FFF' : colors.text} 
+                    <Ionicons
+                      name="download-outline"
+                      size={22}
+                      color={isUser ? "#FFF" : colors.text}
                     />
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={[styles.actionButton, styles.shareButton]}
                   onPress={handleShare}
                 >
-                  <Ionicons 
-                    name="share-outline" 
-                    size={22} 
-                    color={isUser ? '#FFF' : colors.text} 
+                  <Ionicons
+                    name="share-outline"
+                    size={22}
+                    color={isUser ? "#FFF" : colors.text}
                   />
                 </TouchableOpacity>
               </View>
             </>
           )}
-          <Text style={[
-            styles.text,
-            isUser ? styles.userText : styles.aiText
-          ]}>
+          <Text style={[styles.text, isUser ? styles.userText : styles.aiText]}>
             {message}
           </Text>
         </Animated.View>
@@ -138,20 +157,20 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 4,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   userContainer: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   aiContainer: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   bubble: {
-    maxWidth: '80%',
+    maxWidth: "80%",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   userBubble: {
     backgroundColor: colors.primary,
@@ -166,27 +185,27 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   userText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   aiText: {
     color: colors.text,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 200,
     borderRadius: 12,
     marginBottom: 12,
   },
   actionBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
     marginTop: -4,
   },
   leftActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   actionButton: {
@@ -198,4 +217,4 @@ const styles = StyleSheet.create({
   shareButton: {
     marginRight: 0,
   },
-}); 
+});

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/theme';
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../theme/theme";
 
 export const WelcomeCreator = () => {
   const fadeAnim = new Animated.Value(0);
@@ -24,13 +24,13 @@ export const WelcomeCreator = () => {
 
   return (
     <View style={styles.container}>
-      <Animated.View 
+      <Animated.View
         style={[
           styles.content,
           {
             opacity: fadeAnim,
             transform: [{ translateY }],
-          }
+          },
         ]}
       >
         <Ionicons name="sparkles" size={42} color={colors.primary} />
@@ -44,19 +44,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     opacity: 0.7,
     paddingBottom: 28,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 16,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
-}); 
+});

@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
-import { StyleSheet, ScrollView, Keyboard, Platform } from 'react-native';
-import { ChatBubble } from './ChatBubble';
+import React, { useRef, useEffect } from "react";
+import { StyleSheet, ScrollView, Keyboard, Platform } from "react-native";
+import { ChatBubble } from "./ChatBubble";
 
 interface Message {
   id: string;
@@ -15,18 +15,22 @@ interface ChatMessagesProps {
   onToggleLike: (messageId: string) => void;
 }
 
-export const ChatMessages = ({ messages, likedMessages, onToggleLike }: ChatMessagesProps) => {
+export const ChatMessages = ({
+  messages,
+  likedMessages,
+  onToggleLike,
+}: ChatMessagesProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Scroll to bottom when keyboard opens
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => {
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
-      }
+      },
     );
 
     return () => {
@@ -42,7 +46,7 @@ export const ChatMessages = ({ messages, likedMessages, onToggleLike }: ChatMess
   }, [messages]);
 
   return (
-    <ScrollView 
+    <ScrollView
       ref={scrollViewRef}
       style={styles.scrollView}
       contentContainerStyle={styles.content}
@@ -71,4 +75,4 @@ const styles = StyleSheet.create({
   content: {
     paddingVertical: 16,
   },
-}); 
+});

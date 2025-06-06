@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -8,28 +8,28 @@ import {
   Keyboard,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/theme';
-import { getAmazeSuggestion } from '../services/amazeService';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../theme/theme";
+import { getAmazeSuggestion } from "../services/amazeService";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
 }
 
 const ChatInput = ({ onSend }: ChatInputProps) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const keyboardWillShowListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => setKeyboardVisible(true)
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setKeyboardVisible(true),
     );
     const keyboardWillHideListener = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardVisible(false)
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardVisible(false),
     );
 
     return () => {
@@ -41,7 +41,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   const handleSend = () => {
     if (message.trim()) {
       onSend(message.trim());
-      setMessage('');
+      setMessage("");
     }
   };
 
@@ -51,17 +51,19 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       const suggestion = await getAmazeSuggestion();
       setMessage(suggestion);
     } catch (error) {
-      Alert.alert('Error', 'Failed to get suggestion. Please try again.');
+      Alert.alert("Error", "Failed to get suggestion. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={[
-      styles.container,
-      isKeyboardVisible && styles.containerKeyboardOpen
-    ]}>
+    <View
+      style={[
+        styles.container,
+        isKeyboardVisible && styles.containerKeyboardOpen,
+      ]}
+    >
       <View style={styles.inputContainer}>
         <TouchableOpacity
           style={[styles.bulbButton]}
@@ -71,11 +73,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
           {isLoading ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
-            <Ionicons
-              name="bulb"
-              size={20}
-              color={colors.primary}
-            />
+            <Ionicons name="bulb" size={20} color={colors.primary} />
           )}
         </TouchableOpacity>
         <TextInput
@@ -91,7 +89,9 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         <TouchableOpacity
           style={[
             styles.sendButton,
-            message.trim() ? styles.sendButtonActive : styles.sendButtonInactive,
+            message.trim()
+              ? styles.sendButtonActive
+              : styles.sendButtonInactive,
           ]}
           onPress={handleSend}
           disabled={!message.trim()}
@@ -99,7 +99,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
           <Ionicons
             name="arrow-up"
             size={20}
-            color={message.trim() ? '#fff' : colors.subtext}
+            color={message.trim() ? "#fff" : colors.subtext}
           />
         </TouchableOpacity>
       </View>
@@ -112,15 +112,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+    borderTopColor: "rgba(0, 0, 0, 0.1)",
     backgroundColor: colors.background,
   },
   containerKeyboardOpen: {
     marginBottom: -34,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
     gap: 8,
   },
   input: {
@@ -143,15 +143,15 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   bulbButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: colors.surface,
   },
   sendButtonActive: {
@@ -162,4 +162,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatInput; 
+export default ChatInput;
