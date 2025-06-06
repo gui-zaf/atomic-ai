@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     borderRadius: 12,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   actionBar: {
     flexDirection: 'row',
@@ -188,10 +188,10 @@ const styles = StyleSheet.create({
   leftActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
   actionButton: {
     padding: 4,
-    marginRight: 8,
   },
   lastLeftButton: {
     marginRight: 0,
