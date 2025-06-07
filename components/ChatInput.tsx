@@ -47,6 +47,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
   const handleSuggestion = async () => {
     setIsLoading(true);
+    setMessage("");
     try {
       const suggestion = await getAmazeSuggestion();
       setMessage(suggestion);
