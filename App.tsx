@@ -13,6 +13,7 @@ import { ChatMessages } from "./components/ChatMessages";
 import ChatInput from "./components/ChatInput";
 import { colors } from "./theme/theme";
 import { useState } from "react";
+import { TokenProvider } from "./context/TokenContext";
 
 interface Message {
   id: string;
@@ -66,33 +67,35 @@ export default function App() {
   };
 
   return (
-    <SafeAreaProvider>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <View style={{ flex: 1 }}>
-            <StatusBar style="auto" />
-            <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-              <Header />
-              {messages.length === 0 ? (
-                <WelcomeCreator />
-              ) : (
-                <ChatMessages
-                  messages={messages}
-                  likedMessages={likedMessages}
-                  onToggleLike={handleToggleLike}
-                />
-              )}
-            </SafeAreaView>
-            <SafeAreaView edges={["bottom"]}>
-              <ChatInput onSend={handleSendMessage} />
-            </SafeAreaView>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaProvider>
+    <TokenProvider>
+      <SafeAreaProvider>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={{ flex: 1 }}>
+              <StatusBar style="auto" />
+              <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+                <Header />
+                {messages.length === 0 ? (
+                  <WelcomeCreator />
+                ) : (
+                  <ChatMessages
+                    messages={messages}
+                    likedMessages={likedMessages}
+                    onToggleLike={handleToggleLike}
+                  />
+                )}
+              </SafeAreaView>
+              <SafeAreaView edges={["bottom"]}>
+                <ChatInput onSend={handleSendMessage} />
+              </SafeAreaView>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </SafeAreaProvider>
+    </TokenProvider>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/theme";
+import TokenPill from "./TokenPill";
 
 export const Header = () => {
   return (
@@ -13,18 +14,11 @@ export const Header = () => {
           color={colors.text}
           style={styles.icon}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> 
 
       <Text style={styles.title}>Atomic Chat</Text>
 
-      <TouchableOpacity style={styles.iconButton}>
-        <Ionicons
-          name="flash"
-          size={24}
-          color={colors.primary}
-          style={styles.icon}
-        />
-      </TouchableOpacity>
+      <TokenPill />
     </View>
   );
 };

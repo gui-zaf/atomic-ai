@@ -12,6 +12,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/theme";
 import { getAmazeSuggestion } from "../services/amazeService";
+import { useTokens } from "../context/TokenContext";
+import RechargeTimer from "./RechargeTimer";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -21,6 +23,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { decrementToken } = useTokens();
 
   useEffect(() => {
     const keyboardWillShowListener = Keyboard.addListener(
@@ -40,8 +43,16 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 
   const handleSend = () => {
     if (message.trim()) {
-      onSend(message.trim());
-      setMessage("");
+      if (decrementToken()) {
+        onSend(message.trim());
+        setMessage("");
+      } else {
+        Alert.alert(
+          "Tokens Esgotados",
+          "Seus tokens gratuitos acabaram. Aguarde a recarga ou adquira mais tokens.",
+          [{ text: "OK" }]
+        );
+      }
     }
   };
 
@@ -59,52 +70,55 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        isKeyboardVisible && styles.containerKeyboardOpen,
-      ]}
-    >
-      <View style={styles.inputContainer}>
-        <TouchableOpacity
-          style={[styles.bulbButton]}
-          onPress={handleSuggestion}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : (
-            <Ionicons name="bulb" size={20} color={colors.primary} />
-          )}
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder="Message"
-          placeholderTextColor={colors.subtext}
-          value={message}
-          onChangeText={setMessage}
-          multiline
-          returnKeyType="send"
-          onSubmitEditing={handleSend}
-        />
-        <TouchableOpacity
-          style={[
-            styles.sendButton,
-            message.trim()
-              ? styles.sendButtonActive
-              : styles.sendButtonInactive,
-          ]}
-          onPress={handleSend}
-          disabled={!message.trim()}
-        >
-          <Ionicons
-            name="arrow-up"
-            size={20}
-            color={message.trim() ? "#fff" : colors.subtext}
+    <>
+      <RechargeTimer />
+      <View
+        style={[
+          styles.container,
+          isKeyboardVisible && styles.containerKeyboardOpen,
+        ]}
+      >
+        <View style={styles.inputContainer}>
+          <TouchableOpacity
+            style={[styles.bulbButton]}
+            onPress={handleSuggestion}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Ionicons name="bulb" size={20} color={colors.primary} />
+            )}
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Message"
+            placeholderTextColor={colors.subtext}
+            value={message}
+            onChangeText={setMessage}
+            multiline
+            returnKeyType="send"
+            onSubmitEditing={handleSend}
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sendButton,
+              message.trim()
+                ? styles.sendButtonActive
+                : styles.sendButtonInactive,
+            ]}
+            onPress={handleSend}
+            disabled={!message.trim()}
+          >
+            <Ionicons
+              name="arrow-up"
+              size={20}
+              color={message.trim() ? "#fff" : colors.subtext}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
