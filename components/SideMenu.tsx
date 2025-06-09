@@ -304,7 +304,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: 20,
-    borderTopWidth: 2,
   },
   profileContainer: {
     flexDirection: 'row',
