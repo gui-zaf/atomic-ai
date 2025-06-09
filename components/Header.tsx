@@ -1,16 +1,18 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../theme/theme";
 import TokenPill from "./TokenPill";
+import { useTheme } from "../context/ThemeContext";
 
 interface HeaderProps {
   onMenuPress: () => void;
 }
 
 export const Header = ({ onMenuPress }: HeaderProps) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity style={styles.iconButton} onPress={onMenuPress}>
         <Ionicons
           name="menu"
@@ -20,7 +22,7 @@ export const Header = ({ onMenuPress }: HeaderProps) => {
         />
       </TouchableOpacity> 
 
-      <Text style={styles.title}>Atomic Chat</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Atomic Chat</Text>
 
       <TokenPill />
     </View>
@@ -31,16 +33,12 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0, 0, 0, 0.1)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   title: {
     fontSize: 18,
-    color: colors.text,
     opacity: 0.7,
     fontWeight: "bold",
     flex: 1,

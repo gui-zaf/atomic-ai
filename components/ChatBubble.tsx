@@ -8,10 +8,9 @@ import {
   TouchableOpacity,
   Share,
 } from "react-native";
-import { colors } from "../theme/theme";
-import { ImageViewer } from "./ImageViewer";
-import * as FileSystem from "expo-file-system";
 import { Ionicons } from "@expo/vector-icons";
+import { ImageViewer } from "./ImageViewer";
+import { useTheme } from "../context/ThemeContext";
 
 interface ChatBubbleProps {
   message: string;
@@ -28,6 +27,7 @@ export const ChatBubble = ({
   isLiked,
   onToggleLike,
 }: ChatBubbleProps) => {
+  const { colors } = useTheme();
   const [isImageViewerVisible, setImageViewerVisible] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
@@ -76,7 +76,9 @@ export const ChatBubble = ({
         <Animated.View
           style={[
             styles.bubble,
-            isUser ? styles.userBubble : styles.aiBubble,
+            isUser 
+              ? [styles.userBubble, { backgroundColor: colors.primary }]
+              : [styles.aiBubble, { backgroundColor: colors.surface }],
             {
               opacity: fadeAnim,
               transform: [{ translateY }],
@@ -133,7 +135,14 @@ export const ChatBubble = ({
               </View>
             </>
           )}
-          <Text style={[styles.text, isUser ? styles.userText : styles.aiText]}>
+          <Text 
+            style={[
+              styles.text, 
+              isUser 
+                ? styles.userText 
+                : { color: colors.text }
+            ]}
+          >
             {message}
           </Text>
         </Animated.View>
@@ -173,11 +182,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   userBubble: {
-    backgroundColor: colors.primary,
     borderTopRightRadius: 4,
   },
   aiBubble: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 4,
   },
   text: {
@@ -186,9 +193,6 @@ const styles = StyleSheet.create({
   },
   userText: {
     color: "#FFFFFF",
-  },
-  aiText: {
-    color: colors.text,
   },
   image: {
     width: "100%",

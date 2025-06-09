@@ -11,7 +11,7 @@ import {
   Text,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../theme/theme";
+import { useTheme } from "../context/ThemeContext";
 
 interface ImageViewerProps {
   isVisible: boolean;
@@ -32,6 +32,8 @@ export const ImageViewer = ({
   isLiked,
   onToggleLike,
 }: ImageViewerProps) => {
+  const { colors } = useTheme();
+  
   const handleShare = async () => {
     try {
       await Share.share({

@@ -10,9 +10,9 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../theme/theme";
 import { getAmazeSuggestion } from "../services/amazeService";
 import { useTokens } from "../context/TokenContext";
+import { useTheme } from "../context/ThemeContext";
 import RechargeTimer from "./RechargeTimer";
 
 interface ChatInputProps {
@@ -20,6 +20,7 @@ interface ChatInputProps {
 }
 
 const ChatInput = ({ onSend }: ChatInputProps) => {
+  const { colors } = useTheme();
   const [message, setMessage] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -75,12 +76,15 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       <View
         style={[
           styles.container,
+          {
+            backgroundColor: colors.background,
+          },
           isKeyboardVisible && styles.containerKeyboardOpen,
         ]}
       >
         <View style={styles.inputContainer}>
           <TouchableOpacity
-            style={[styles.bulbButton]}
+            style={[styles.bulbButton, { backgroundColor: colors.surface }]}
             onPress={handleSuggestion}
             disabled={isLoading}
           >
@@ -91,7 +95,13 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
             )}
           </TouchableOpacity>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input, 
+              { 
+                backgroundColor: colors.surface,
+                color: colors.text
+              }
+            ]}
             placeholder="Message"
             placeholderTextColor={colors.subtext}
             value={message}
@@ -104,8 +114,8 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
             style={[
               styles.sendButton,
               message.trim()
-                ? styles.sendButtonActive
-                : styles.sendButtonInactive,
+                ? [styles.sendButtonActive, { backgroundColor: colors.primary }]
+                : [styles.sendButtonInactive, { backgroundColor: colors.surface }],
             ]}
             onPress={handleSend}
             disabled={!message.trim()}
@@ -126,9 +136,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0, 0, 0, 0.1)",
-    backgroundColor: colors.background,
   },
   containerKeyboardOpen: {
     marginBottom: -34,
@@ -144,7 +151,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     paddingRight: 40,
-    backgroundColor: colors.surface,
     borderRadius: 20,
     maxHeight: 100,
     minHeight: 36,
@@ -167,14 +173,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.surface,
   },
-  sendButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  sendButtonInactive: {
-    backgroundColor: colors.surface,
-  },
+  sendButtonActive: {},
+  sendButtonInactive: {},
 });
 
 export default ChatInput;

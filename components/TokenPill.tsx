@@ -1,26 +1,35 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/theme';
 import { useTokens } from '../context/TokenContext';
+import { useTheme } from '../context/ThemeContext';
 
 const TokenPill = () => {
   const { tokens } = useTokens();
+  const { colors } = useTheme();
   const isZero = tokens === 0;
+  
+  // Error colors for light/dark mode
+  const errorColor = colors.error;
+  const errorBgColor = colors.text === '#FFFFFF' 
+    ? 'rgba(255, 69, 58, 0.2)' 
+    : 'rgba(255, 59, 48, 0.1)';
 
   return (
     <View style={[
       styles.tokenPill,
-      isZero && styles.tokenPillEmpty
+      { backgroundColor: colors.surface },
+      isZero && { backgroundColor: errorBgColor }
     ]}>
       <Ionicons
         name="flash"
         size={16}
-        color={isZero ? '#ff3b30' : colors.primary}
+        color={isZero ? errorColor : colors.primary}
       />
       <Text style={[
         styles.tokenCount,
-        isZero && styles.tokenCountEmpty
+        { color: colors.primary },
+        isZero && { color: errorColor }
       ]}>
         {tokens}
       </Text>
@@ -32,23 +41,15 @@ const styles = StyleSheet.create({
   tokenPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 16,
     gap: 4,
   },
-  tokenPillEmpty: {
-    backgroundColor: 'rgba(255, 59, 48, 0.1)',
-  },
   tokenCount: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.primary,
-  },
-  tokenCountEmpty: {
-    color: '#ff3b30',
-  },
+  }
 });
 
 export default TokenPill; 

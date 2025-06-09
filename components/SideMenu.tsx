@@ -11,8 +11,8 @@ import {
   PanResponder,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../context/ThemeContext';
 
 interface SideMenuProps {
   isVisible: boolean;
@@ -32,6 +32,7 @@ const SideMenu = ({
   darkMode = false,
   onToggleDarkMode = () => {},
 }: SideMenuProps) => {
+  const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const [menuPosition, setMenuPosition] = React.useState(-MENU_WIDTH);
@@ -125,6 +126,9 @@ const SideMenu = ({
     return null;
   }
 
+  // Get background color based on dark mode
+  const menuBackgroundColor = darkMode && colors.menuBackground ? colors.menuBackground : colors.background;
+
   return (
     <View style={[
       styles.container,
@@ -137,7 +141,11 @@ const SideMenu = ({
       <Animated.View
         style={[
           styles.menu,
-          { transform: [{ translateX: slideAnim }], width: MENU_WIDTH },
+          { 
+            transform: [{ translateX: slideAnim }], 
+            width: MENU_WIDTH,
+            backgroundColor: menuBackgroundColor
+          },
         ]}
         {...panResponder.panHandlers}
       >
@@ -145,75 +153,90 @@ const SideMenu = ({
           {/* Header */}
           <View style={styles.header}>
             <Ionicons name="sparkles-outline" size={24} color={colors.primary} />
-            <Text style={styles.headerText}>Atomic AI</Text>
+            <Text style={[styles.headerText, { color: colors.text }]}>Atomic AI</Text>
           </View>
 
           {/* Quick Actions Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Quick Actions</Text>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="add-circle-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>New Chat</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>New Chat</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="images-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>Gallery</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Gallery</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>History</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>History</Text>
             </TouchableOpacity>
           </View>
 
           {/* Store Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Store</Text>
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Store</Text>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="flash-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>Buy Tokens</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Buy Tokens</Text>
             </TouchableOpacity>
           </View>
 
           {/* Adjusts Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Settings</Text>
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Settings</Text>
             
             <View style={styles.menuItem}>
-              <Ionicons name="moon-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>Dark Mode</Text>
+              <Ionicons 
+                name={darkMode ? "sunny-outline" : "moon-outline"} 
+                size={24} 
+                color={colors.text} 
+              />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                {darkMode ? "Light Mode" : "Dark Mode"}
+              </Text>
               <View style={styles.spacer} />
               <Switch
                 value={darkMode}
                 onValueChange={onToggleDarkMode}
-                trackColor={{ false: colors.surface, true: colors.primary }}
-                thumbColor={colors.background}
+                trackColor={{ 
+                  false: colors.surface, 
+                  true: darkMode ? colors.switchTrack || "#181818" : colors.primary 
+                }}
+                thumbColor={darkMode ? colors.primary : undefined}
               />
             </View>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="information-circle-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>About</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="code-outline" size={24} color={colors.text} />
-              <Text style={styles.menuItemText}>Developers</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Developers</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.spacer} />
 
           {/* Profile Section in Footer */}
-          <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+          <View style={[
+            styles.footer, 
+            { 
+              paddingBottom: insets.bottom + 16,
+              borderTopColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+            }
+          ]}>
             <View style={styles.profileContainer}>
-              <View style={styles.avatarContainer}>
+              <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
                 <Text style={styles.avatarText}>{getUserInitials(userName)}</Text>
               </View>
-              <Text style={styles.userName}>{userName}</Text>
+              <Text style={[styles.userName, { color: colors.text }]}>{userName}</Text>
             </View>
           </View>
         </View>
@@ -233,7 +256,6 @@ const styles = StyleSheet.create({
   },
   menu: {
     height: '100%',
-    backgroundColor: colors.background,
     borderTopRightRadius: 16,
     borderBottomRightRadius: 16,
     shadowColor: '#000',
@@ -255,7 +277,6 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: '600',
-    color: colors.text,
   },
   section: {
     marginBottom: 32,
@@ -264,7 +285,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: colors.subtext,
     textTransform: 'uppercase',
     marginBottom: 16,
     letterSpacing: 0.5,
@@ -277,7 +297,6 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: colors.text,
     marginLeft: 16,
   },
   spacer: {
@@ -285,6 +304,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: 20,
+    borderTopWidth: 2,
   },
   profileContainer: {
     flexDirection: 'row',
@@ -296,19 +316,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: colors.background,
+    color: '#FFFFFF',
   },
   userName: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
 });
 

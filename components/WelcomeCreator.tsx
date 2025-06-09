@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../theme/theme";
+import { useTheme } from "../context/ThemeContext";
 
 export const WelcomeCreator = () => {
+  const { colors } = useTheme();
   const fadeAnim = new Animated.Value(0);
   const translateY = new Animated.Value(20);
 
@@ -23,7 +24,7 @@ export const WelcomeCreator = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Animated.View
         style={[
           styles.content,
@@ -34,7 +35,7 @@ export const WelcomeCreator = () => {
         ]}
       >
         <Ionicons name="sparkles" size={42} color={colors.primary} />
-        <Text style={styles.title}>What will you create?</Text>
+        <Text style={[styles.title, { color: colors.text }]}>What will you create?</Text>
       </Animated.View>
     </View>
   );
@@ -43,10 +44,8 @@ export const WelcomeCreator = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     justifyContent: "center",
     alignItems: "center",
-    opacity: 0.7,
     paddingBottom: 28,
   },
   content: {
@@ -56,7 +55,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.text,
     textAlign: "center",
   },
 });

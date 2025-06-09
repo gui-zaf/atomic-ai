@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/theme';
 import { useTokens } from '../context/TokenContext';
+import { useTheme } from '../context/ThemeContext';
 
 const formatTimeRemaining = (milliseconds: number) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -13,18 +13,19 @@ const formatTimeRemaining = (milliseconds: number) => {
 
 const RechargeTimer = () => {
   const { isRecharging, rechargeTimeRemaining } = useTokens();
+  const { colors } = useTheme();
   
   if (!isRecharging) return null;
   
   return (
     <View style={styles.container}>
-      <View style={styles.timerPill}>
+      <View style={[styles.timerPill, { backgroundColor: colors.surface }]}>
         <Ionicons
           name="time-outline"
           size={16}
           color={colors.text}
         />
-        <Text style={styles.timerText}>
+        <Text style={[styles.timerText, { color: colors.text }]}>
           {formatTimeRemaining(rechargeTimeRemaining)}
         </Text>
       </View>
@@ -42,7 +43,6 @@ const styles = StyleSheet.create({
   timerPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.text,
   }
 });
 

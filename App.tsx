@@ -16,6 +16,7 @@ import ChatInput from "./components/ChatInput";
 import { colors } from "./theme/theme";
 import { useState, useRef } from "react";
 import { TokenProvider } from "./context/TokenContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import SideMenu from "./components/SideMenu";
 
 interface Message {
@@ -25,11 +26,11 @@ interface Message {
   image?: string;
 }
 
-export default function App() {
+const AppContent = () => {
+  const { isDarkMode, toggleTheme, colors } = useTheme();
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   
   // Gesture handling for swipe to open menu
   const panResponder = useRef(
@@ -104,46 +105,55 @@ export default function App() {
     setMenuVisible(false);
   };
 
-  const handleToggleDarkMode = (value: boolean) => {
-    setDarkMode(value);
-    // Implement dark mode logic here
-  };
-
   return (
-    <TokenProvider>
-      <SafeAreaProvider>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-        >
-          <View style={{ flex: 1 }} {...panResponder.panHandlers}>
-            <StatusBar style="auto" />
-            <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-              <Header onMenuPress={toggleMenu} />
-              {messages.length === 0 ? (
-                <WelcomeCreator />
-              ) : (
-                <ChatMessages
-                  messages={messages}
-                  likedMessages={likedMessages}
-                  onToggleLike={handleToggleLike}
-                />
-              )}
-            </SafeAreaView>
-            <SafeAreaView edges={["bottom"]}>
-              <ChatInput onSend={handleSendMessage} />
-            </SafeAreaView>
-            
-            <SideMenu 
-              isVisible={menuVisible} 
-              onClose={handleCloseMenu}
-              darkMode={darkMode}
-              onToggleDarkMode={handleToggleDarkMode}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaProvider>
-    </TokenProvider>
+    <View 
+      style={{ 
+        flex: 1, 
+        backgroundColor: colors.background 
+      }} 
+      {...panResponder.panHandlers}
+    >
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+        <Header onMenuPress={toggleMenu} />
+        {messages.length === 0 ? (
+          <WelcomeCreator />
+        ) : (
+          <ChatMessages
+            messages={messages}
+            likedMessages={likedMessages}
+            onToggleLike={handleToggleLike}
+          />
+        )}
+      </SafeAreaView>
+      <SafeAreaView edges={["bottom"]}>
+        <ChatInput onSend={handleSendMessage} />
+      </SafeAreaView>
+      
+      <SideMenu 
+        isVisible={menuVisible} 
+        onClose={handleCloseMenu}
+        darkMode={isDarkMode}
+        onToggleDarkMode={toggleTheme}
+      />
+    </View>
+  );
+};
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <TokenProvider>
+        <SafeAreaProvider>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+          >
+            <AppContent />
+          </KeyboardAvoidingView>
+        </SafeAreaProvider>
+      </TokenProvider>
+    </ThemeProvider>
   );
 }
