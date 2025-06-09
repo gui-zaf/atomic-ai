@@ -7,6 +7,7 @@ import {
   Keyboard,
   GestureResponderEvent,
   PanResponder,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { WelcomeCreator } from "./components/WelcomeCreator";
@@ -14,7 +15,7 @@ import { Header } from "./components/Header";
 import { ChatMessages } from "./components/ChatMessages";
 import ChatInput from "./components/ChatInput";
 import { colors } from "./theme/theme";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { TokenProvider } from "./context/TokenContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import SideMenu from "./components/SideMenu";
@@ -99,36 +100,45 @@ const AppContent = () => {
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
+    // Close keyboard when opening menu
+    Keyboard.dismiss();
   };
 
   const handleCloseMenu = () => {
     setMenuVisible(false);
   };
-
+  
   return (
     <View 
-      style={{ 
-        flex: 1, 
-        backgroundColor: colors.background 
-      }} 
+      style={[
+        styles.container, 
+        { backgroundColor: colors.background }
+      ]} 
       {...panResponder.panHandlers}
     >
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-        <Header onMenuPress={toggleMenu} />
-        {messages.length === 0 ? (
-          <WelcomeCreator />
-        ) : (
-          <ChatMessages
-            messages={messages}
-            likedMessages={likedMessages}
-            onToggleLike={handleToggleLike}
-          />
-        )}
-      </SafeAreaView>
-      <SafeAreaView edges={["bottom"]}>
-        <ChatInput onSend={handleSendMessage} />
-      </SafeAreaView>
+      
+      {/* This wrapper ensures tapping anywhere dismisses keyboard */}
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+        <View style={styles.container}>
+          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+            <Header onMenuPress={toggleMenu} />
+            {messages.length === 0 ? (
+              <WelcomeCreator />
+            ) : (
+              <ChatMessages
+                messages={messages}
+                likedMessages={likedMessages}
+                onToggleLike={handleToggleLike}
+              />
+            )}
+          </SafeAreaView>
+          
+          <SafeAreaView edges={["bottom"]}>
+            <ChatInput onSend={handleSendMessage} />
+          </SafeAreaView>
+        </View>
+      </TouchableWithoutFeedback>
       
       <SideMenu 
         isVisible={menuVisible} 
@@ -139,6 +149,12 @@ const AppContent = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default function App() {
   return (

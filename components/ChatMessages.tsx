@@ -52,7 +52,6 @@ export const ChatMessages = ({
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
-      onScrollBeginDrag={() => Keyboard.dismiss()}
     >
       {messages.map((message) => (
         <ChatBubble
@@ -73,6 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingVertical: 16,
+    padding: 16,
+    paddingTop: 8,
   },
 });

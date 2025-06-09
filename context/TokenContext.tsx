@@ -6,6 +6,7 @@ interface TokenContextType {
   isRecharging: boolean;
   rechargeTimeRemaining: number;
   decrementToken: () => boolean;
+  resetTokens: () => void;
 }
 
 const INITIAL_TOKENS = 10;
@@ -89,12 +90,30 @@ export const TokenProvider = ({ children }: { children: React.ReactNode }) => {
     return true;
   };
 
+  const resetTokens = () => {
+    // Reset cooldown and give 10 tokens
+    const newTokens = tokens + 10;
+    setTokens(newTokens);
+    
+    // Reset recharge state if needed
+    if (isRecharging) {
+      setIsRecharging(false);
+      setRechargeTimeRemaining(0);
+      setRechargeEndTime(null);
+      AsyncStorage.removeItem('rechargeEndTime');
+    }
+    
+    // Save to storage
+    AsyncStorage.setItem('tokens', newTokens.toString());
+  };
+
   return (
     <TokenContext.Provider value={{ 
       tokens, 
       isRecharging, 
       rechargeTimeRemaining, 
-      decrementToken 
+      decrementToken,
+      resetTokens 
     }}>
       {children}
     </TokenContext.Provider>

@@ -8,6 +8,8 @@ import {
   Keyboard,
   ActivityIndicator,
   Alert,
+  NativeSyntheticEvent,
+  TextInputSubmitEditingEventData
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getAmazeSuggestion } from "../services/amazeService";
@@ -22,28 +24,19 @@ interface ChatInputProps {
 const ChatInput = ({ onSend }: ChatInputProps) => {
   const { colors } = useTheme();
   const [message, setMessage] = useState("");
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { decrementToken } = useTokens();
-
-  useEffect(() => {
-    const keyboardWillShowListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      () => setKeyboardVisible(true),
-    );
-    const keyboardWillHideListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => setKeyboardVisible(false),
-    );
-
-    return () => {
-      keyboardWillShowListener.remove();
-      keyboardWillHideListener.remove();
-    };
-  }, []);
+  const { decrementToken, tokens, resetTokens } = useTokens();
 
   const handleSend = () => {
     if (message.trim()) {
+      // Check for /tokens command
+      if (message.trim().toLowerCase() === "/tokens") {
+        // Add tokens and show alert
+        handleTokenCommand();
+        setMessage("");
+        return;
+      }
+      
       if (decrementToken()) {
         onSend(message.trim());
         setMessage("");
@@ -55,6 +48,17 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         );
       }
     }
+  };
+
+  const handleTokenCommand = () => {
+    // Reset tokens and cooldown
+    resetTokens();
+    // Show alert with information about tokens
+    Alert.alert(
+      "Tokens Refreshed",
+      "You received 10 additional tokens and cooldown has been reset!",
+      [{ text: "OK" }]
+    );
   };
 
   const handleSuggestion = async () => {
@@ -70,16 +74,23 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
     }
   };
 
+  // Handle submit event to send message
+  const handleSubmitEditing = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+    // Prevent default behavior and send message
+    if (Platform.OS === 'ios') {
+      e.preventDefault?.();
+    }
+    handleSend();
+    return false;
+  };
+
   return (
     <>
       <RechargeTimer />
       <View
         style={[
           styles.container,
-          {
-            backgroundColor: colors.background,
-          },
-          isKeyboardVisible && styles.containerKeyboardOpen,
+          { backgroundColor: colors.background }
         ]}
       >
         <View style={styles.inputContainer}>
@@ -106,9 +117,10 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
             placeholderTextColor={colors.subtext}
             value={message}
             onChangeText={setMessage}
-            multiline
+            multiline={Platform.OS !== 'ios'}
             returnKeyType="send"
-            onSubmitEditing={handleSend}
+            blurOnSubmit={false}
+            onSubmitEditing={handleSubmitEditing}
           />
           <TouchableOpacity
             style={[
@@ -136,9 +148,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-  },
-  containerKeyboardOpen: {
-    marginBottom: -34,
   },
   inputContainer: {
     flexDirection: "row",
