@@ -4,10 +4,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../theme/theme";
 import TokenPill from "./TokenPill";
 
-export const Header = () => {
+interface HeaderProps {
+  onMenuPress: () => void;
+}
+
+export const Header = ({ onMenuPress }: HeaderProps) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.iconButton}>
+      <TouchableOpacity style={styles.iconButton} onPress={onMenuPress}>
         <Ionicons
           name="menu"
           size={24}
