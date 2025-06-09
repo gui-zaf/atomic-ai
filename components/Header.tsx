@@ -19,9 +19,9 @@ export const Header = () => {
 
       <TouchableOpacity style={styles.iconButton}>
         <Ionicons
-          name="time-outline"
+          name="flash"
           size={24}
-          color={colors.text}
+          color={colors.primary}
           style={styles.icon}
         />
       </TouchableOpacity>
