@@ -120,7 +120,6 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       e.preventDefault?.();
     }
     handleSend();
-    return false;
   };
 
   return (
@@ -160,10 +159,12 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
             placeholderTextColor={colors.subtext}
             value={message}
             onChangeText={setMessage}
-            multiline={Platform.OS !== "ios"}
+            multiline={true}
             returnKeyType="send"
             blurOnSubmit={false}
             onSubmitEditing={handleSubmitEditing}
+            scrollEnabled={true}
+            enablesReturnKeyAutomatically={true}
           />
           <TouchableOpacity
             style={[
@@ -210,8 +211,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingRight: 40,
     borderRadius: 20,
-    maxHeight: 100,
+    maxHeight: 96,
     minHeight: 36,
+    textAlignVertical: 'center',
   },
   sendButton: {
     width: 32,
