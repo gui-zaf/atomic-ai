@@ -21,7 +21,7 @@ const AppContent = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
-  
+
   // Gesture handling for swipe to open menu - ONLY for the main content area
   const mainContentPanResponder = useRef(
     PanResponder.create({
@@ -31,10 +31,12 @@ const AppContent = () => {
       },
       onMoveShouldSetPanResponder: (_, gestureState) => {
         // Only respond to significant horizontal movements from the left edge
+        // AND ensure we don't interfere with vertical scrolling
         return (
           !menuVisible &&
           gestureState.dx > 20 &&
-          Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 &&
+          gestureState.dx > 0
         );
       },
       onPanResponderMove: (_, gestureState) => {
@@ -46,6 +48,8 @@ const AppContent = () => {
       onPanResponderRelease: () => {
         // No additional handling needed
       },
+      onPanResponderTerminationRequest: () => true,
+      onShouldBlockNativeResponder: () => false,
     })
   ).current;
 
@@ -75,11 +79,11 @@ const AppContent = () => {
     if (message.toLowerCase().startsWith("/image")) {
       // Get the prompt from the message
       const prompt = message.substring(6).trim();
-      
+
       // Random sample image for demo purposes
       const randomImage =
         sampleImages[Math.floor(Math.random() * sampleImages.length)];
-      
+
       aiMessage = {
         id: (Date.now() + 1).toString(),
         text: prompt
@@ -109,11 +113,11 @@ const AppContent = () => {
   const handleCloseMenu = () => {
     setMenuVisible(false);
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      
+
       {/* This wrapper ensures tapping anywhere dismisses keyboard */}
       <TouchableWithoutFeedback
         onPress={() => Keyboard.dismiss()}
@@ -138,7 +142,7 @@ const AppContent = () => {
               )}
             </View>
           </SafeAreaView>
-          
+
           <SafeAreaView edges={["bottom"]}>
             {/* 
               Input area that handles its own gestures.
@@ -152,9 +156,9 @@ const AppContent = () => {
           </SafeAreaView>
         </View>
       </TouchableWithoutFeedback>
-      
-      <SideMenu 
-        isVisible={menuVisible} 
+
+      <SideMenu
+        isVisible={menuVisible}
         onClose={handleCloseMenu}
         darkMode={isDarkMode}
         onToggleDarkMode={toggleTheme}
@@ -172,4 +176,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AppContent; 
+export default AppContent;

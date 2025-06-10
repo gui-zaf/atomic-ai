@@ -46,6 +46,10 @@ export const ChatMessages = ({
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
+      scrollEnabled={true}
+      alwaysBounceVertical={true}
+      bounces={true}
+      directionalLockEnabled={true}
     >
       {messages.map((message) => (
         <ChatBubble
