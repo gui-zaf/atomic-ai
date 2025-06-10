@@ -1,13 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { StyleSheet, ScrollView, Keyboard, Platform } from "react-native";
 import { ChatBubble } from "./ChatBubble";
-
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-  image?: string;
-}
+import { Message } from "../types";
 
 interface ChatMessagesProps {
   messages: Message[];
