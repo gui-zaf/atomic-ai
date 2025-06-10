@@ -16,6 +16,7 @@ import { getAmazeSuggestion } from "../services/amazeService";
 import { useTokens } from "../context/TokenContext";
 import { useTheme } from "../context/ThemeContext";
 import RechargeTimer from "./RechargeTimer";
+import SuggestionCarousel from "./SuggestionCarousel";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -25,7 +26,34 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   const { colors } = useTheme();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const { decrementToken, tokens, resetTokens } = useTokens();
+
+  // Track keyboard visibility
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+        // Hide suggestions when keyboard opens
+        setShowSuggestions(false);
+      }
+    );
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+        // Show suggestions when keyboard closes
+        setShowSuggestions(true);
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, []);
 
   const handleSend = () => {
     if (message.trim()) {
@@ -74,6 +102,15 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
     }
   };
 
+  const handleSelectSuggestion = (suggestion: string) => {
+    // Use the full description as a regular message
+    setMessage(suggestion);
+    // Focus the input to allow user to edit if needed
+    setTimeout(() => {
+      Keyboard.dismiss();
+    }, 100);
+  };
+
   // Handle submit event to send message
   const handleSubmitEditing = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
     // Prevent default behavior and send message
@@ -90,9 +127,13 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       <View
         style={[
           styles.container,
-          { backgroundColor: colors.background }
+          { backgroundColor: colors.background },
+          isKeyboardVisible && styles.containerKeyboardOpen
         ]}
       >
+        {showSuggestions && (
+          <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
+        )}
         <View style={styles.inputContainer}>
           <TouchableOpacity
             style={[styles.bulbButton, { backgroundColor: colors.surface }]}
@@ -149,6 +190,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
+  containerKeyboardOpen: {
+    marginBottom: -20,
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -163,11 +207,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     maxHeight: 100,
     minHeight: 36,
-    ...Platform.select({
-      ios: {
-        paddingTop: 8,
-      },
-    }),
   },
   sendButton: {
     width: 32,

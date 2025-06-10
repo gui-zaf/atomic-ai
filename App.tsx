@@ -27,6 +27,11 @@ interface Message {
   image?: string;
 }
 
+// Sample images for demo purposes
+const sampleImages = [
+  'sample01', 'sample02', 'sample03', 'sample04'
+];
+
 const AppContent = () => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -80,14 +85,25 @@ const AppContent = () => {
 
     let aiMessage: Message;
 
-    if (message.toLowerCase() === "/image") {
+    // Check if this is an image generation command
+    if (message.toLowerCase().startsWith("/image")) {
+      // Get the prompt from the message
+      const prompt = message.substring(6).trim();
+      
+      // Random sample image for demo purposes
+      const randomImage = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+      
       aiMessage = {
         id: (Date.now() + 1).toString(),
-        text: "Here's a black cat wearing a neon collar at a unicorn-themed party with rainbows! 🐱🌈✨",
+        text: prompt ? 
+          `Here's your "${prompt}" image! ✨` : 
+          "Here's your generated image! ✨",
         isUser: false,
-        image: "sample01",
+        image: randomImage,
       };
-    } else {
+    } 
+    else {
+      // For all other messages, including suggestion messages, just send a regular text response
       aiMessage = {
         id: (Date.now() + 1).toString(),
         text: "This is a simulated AI response. You can replace this with actual AI responses.",
