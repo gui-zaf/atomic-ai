@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTokens } from '../context/TokenContext';
-import { useTheme } from '../context/ThemeContext';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useTokens } from "../context/TokenContext";
+import { useTheme } from "../context/ThemeContext";
 
 const formatTimeRemaining = (milliseconds: number) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -14,17 +14,13 @@ const formatTimeRemaining = (milliseconds: number) => {
 const RechargeTimer = () => {
   const { isRecharging, rechargeTimeRemaining } = useTokens();
   const { colors } = useTheme();
-  
+
   if (!isRecharging) return null;
-  
+
   return (
     <View style={styles.container}>
       <View style={[styles.timerPill, { backgroundColor: colors.surface }]}>
-        <Ionicons
-          name="time-outline"
-          size={16}
-          color={colors.text}
-        />
+        <Ionicons name="time-outline" size={16} color={colors.text} />
         <Text style={[styles.timerText, { color: colors.text }]}>
           {formatTimeRemaining(rechargeTimeRemaining)}
         </Text>
@@ -35,14 +31,14 @@ const RechargeTimer = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 16,
     paddingBottom: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   timerPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -50,8 +46,8 @@ const styles = StyleSheet.create({
   },
   timerText: {
     fontSize: 14,
-    fontWeight: '500',
-  }
+    fontWeight: "500",
+  },
 });
 
-export default RechargeTimer; 
+export default RechargeTimer;

@@ -33,7 +33,7 @@ export const ImageViewer = ({
   onToggleLike,
 }: ImageViewerProps) => {
   const { colors } = useTheme();
-  
+
   const handleShare = async () => {
     try {
       await Share.share({

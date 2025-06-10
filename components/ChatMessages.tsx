@@ -30,7 +30,7 @@ export const ChatMessages = ({
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
-      },
+      }
     );
 
     return () => {

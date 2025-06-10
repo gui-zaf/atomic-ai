@@ -61,10 +61,6 @@ export const ChatBubble = ({
     }
   };
 
-  const handleDownload = async () => {
-    // Implementar download aqui
-  };
-
   return (
     <>
       <View
@@ -76,7 +72,7 @@ export const ChatBubble = ({
         <Animated.View
           style={[
             styles.bubble,
-            isUser 
+            isUser
               ? [styles.userBubble, { backgroundColor: colors.primary }]
               : [styles.aiBubble, { backgroundColor: colors.surface }],
             {
@@ -113,7 +109,7 @@ export const ChatBubble = ({
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.actionButton, styles.lastLeftButton]}
-                    onPress={handleDownload}
+                    onPress={() => {}}
                   >
                     <Ionicons
                       name="download-outline"
@@ -135,12 +131,10 @@ export const ChatBubble = ({
               </View>
             </>
           )}
-          <Text 
+          <Text
             style={[
-              styles.text, 
-              isUser 
-                ? styles.userText 
-                : { color: colors.text }
+              styles.text,
+              isUser ? styles.userText : { color: colors.text },
             ]}
           >
             {message}

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,10 @@ import {
   Switch,
   TouchableWithoutFeedback,
   PanResponder,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '../context/ThemeContext';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "../context/ThemeContext";
 
 interface SideMenuProps {
   isVisible: boolean;
@@ -22,13 +22,13 @@ interface SideMenuProps {
   onToggleDarkMode?: (value: boolean) => void;
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const MENU_WIDTH = width * 0.8;
 
-const SideMenu = ({ 
-  isVisible, 
-  onClose, 
-  userName = 'Guilherme Ferraz',
+const SideMenu = ({
+  isVisible,
+  onClose,
+  userName = "Guilherme Ferraz",
   darkMode = false,
   onToggleDarkMode = () => {},
 }: SideMenuProps) => {
@@ -49,9 +49,9 @@ const SideMenu = ({
 
   const getUserInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
       .toUpperCase()
       .substring(0, 2);
   };
@@ -127,13 +127,15 @@ const SideMenu = ({
   }
 
   // Get background color based on dark mode
-  const menuBackgroundColor = darkMode && colors.menuBackground ? colors.menuBackground : colors.background;
+  const menuBackgroundColor =
+    darkMode && colors.menuBackground
+      ? colors.menuBackground
+      : colors.background;
 
   return (
-    <View style={[
-      styles.container,
-      { pointerEvents: isVisible ? 'auto' : 'none' }
-    ]}>
+    <View
+      style={[styles.container, { pointerEvents: isVisible ? "auto" : "none" }]}
+    >
       <TouchableWithoutFeedback onPress={closeMenu}>
         <Animated.View style={[styles.backdrop, { opacity: opacityAnim }]} />
       </TouchableWithoutFeedback>
@@ -141,10 +143,10 @@ const SideMenu = ({
       <Animated.View
         style={[
           styles.menu,
-          { 
-            transform: [{ translateX: slideAnim }], 
+          {
+            transform: [{ translateX: slideAnim }],
             width: MENU_WIDTH,
-            backgroundColor: menuBackgroundColor
+            backgroundColor: menuBackgroundColor,
           },
         ]}
         {...panResponder.panHandlers}
@@ -152,49 +154,73 @@ const SideMenu = ({
         <View style={[styles.content, { paddingTop: insets.top + 20 }]}>
           {/* Header */}
           <View style={styles.header}>
-            <Ionicons name="sparkles-outline" size={24} color={colors.primary} />
-            <Text style={[styles.headerText, { color: colors.text }]}>Atomic AI</Text>
+            <Ionicons
+              name="sparkles-outline"
+              size={24}
+              color={colors.primary}
+            />
+            <Text style={[styles.headerText, { color: colors.text }]}>
+              Atomic AI
+            </Text>
           </View>
 
           {/* Quick Actions Section */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Quick Actions</Text>
-            
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
+              Quick Actions
+            </Text>
+
             <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="add-circle-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>New Chat</Text>
+              <Ionicons
+                name="add-circle-outline"
+                size={24}
+                color={colors.text}
+              />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                New Chat
+              </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="images-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>Gallery</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                Gallery
+              </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>History</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                History
+              </Text>
             </TouchableOpacity>
           </View>
 
           {/* Store Section */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Store</Text>
-            
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
+              Store
+            </Text>
+
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="flash-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>Buy Tokens</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                Buy Tokens
+              </Text>
             </TouchableOpacity>
           </View>
 
           {/* Adjusts Section */}
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>Settings</Text>
-            
+            <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
+              Settings
+            </Text>
+
             <View style={styles.menuItem}>
-              <Ionicons 
-                name={darkMode ? "sunny-outline" : "moon-outline"} 
-                size={24} 
-                color={colors.text} 
+              <Ionicons
+                name={darkMode ? "sunny-outline" : "moon-outline"}
+                size={24}
+                color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 {darkMode ? "Light Mode" : "Dark Mode"}
@@ -203,40 +229,63 @@ const SideMenu = ({
               <Switch
                 value={darkMode}
                 onValueChange={onToggleDarkMode}
-                trackColor={{ 
-                  false: colors.surface, 
-                  true: darkMode ? colors.switchTrack || "#181818" : colors.primary 
+                trackColor={{
+                  false: colors.surface,
+                  true: darkMode
+                    ? colors.switchTrack || "#181818"
+                    : colors.primary,
                 }}
                 thumbColor={darkMode ? colors.primary : undefined}
               />
             </View>
-            
+
             <TouchableOpacity style={styles.menuItem}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
+              <Ionicons
+                name="information-circle-outline"
+                size={24}
+                color={colors.text}
+              />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                About
+              </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.menuItem}>
               <Ionicons name="code-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>Developers</Text>
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                Developers
+              </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.spacer} />
 
           {/* Profile Section in Footer */}
-          <View style={[
-            styles.footer, 
-            { 
-              paddingBottom: insets.bottom + 16,
-              borderTopColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
-            }
-          ]}>
+          <View
+            style={[
+              styles.footer,
+              {
+                paddingBottom: insets.bottom + 16,
+                borderTopColor: darkMode
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)",
+              },
+            ]}
+          >
             <View style={styles.profileContainer}>
-              <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
-                <Text style={styles.avatarText}>{getUserInitials(userName)}</Text>
+              <View
+                style={[
+                  styles.avatarContainer,
+                  { backgroundColor: colors.primary },
+                ]}
+              >
+                <Text style={styles.avatarText}>
+                  {getUserInitials(userName)}
+                </Text>
               </View>
-              <Text style={[styles.userName, { color: colors.text }]}>{userName}</Text>
+              <Text style={[styles.userName, { color: colors.text }]}>
+                {userName}
+              </Text>
             </View>
           </View>
         </View>
@@ -252,13 +301,13 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'black',
+    backgroundColor: "black",
   },
   menu: {
-    height: '100%',
+    height: "100%",
     borderTopRightRadius: 16,
     borderBottomRightRadius: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -268,15 +317,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     paddingHorizontal: 24,
     marginBottom: 40,
   },
   headerText: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   section: {
     marginBottom: 32,
@@ -284,14 +333,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontWeight: "700",
+    textTransform: "uppercase",
     marginBottom: 16,
     letterSpacing: 0.5,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     marginBottom: 8,
   },
@@ -306,8 +355,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     paddingTop: 24,
   },
@@ -315,18 +364,18 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   avatarText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   userName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 
-export default SideMenu; 
+export default SideMenu;

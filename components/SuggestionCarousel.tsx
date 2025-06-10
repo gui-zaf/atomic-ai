@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  GestureResponderEvent,
-  PanResponderGestureState,
-  PanResponder
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -32,44 +29,9 @@ const { width } = Dimensions.get('window');
 
 const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => {
   const { colors } = useTheme();
-  const isScrolling = useRef(false);
-  
-  // Create a pan responder to handle all touch interactions in the carousel
-  const panResponder = useRef(
-    PanResponder.create({
-      // Claim responder when touch starts
-      onStartShouldSetPanResponder: () => true,
-      
-      // Claim responder during movement
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        // If horizontal movement is detected, claim the responder
-        if (Math.abs(gestureState.dx) > 5) {
-          isScrolling.current = true;
-          return true;
-        }
-        return false;
-      },
-      
-      // Track when scrolling ends
-      onPanResponderRelease: () => {
-        // Add small delay before resetting scroll state
-        setTimeout(() => {
-          isScrolling.current = false;
-        }, 50);
-      },
-      
-      // Handle termination (in case of interruption)
-      onPanResponderTerminate: () => {
-        isScrolling.current = false;
-      },
-      
-      // Don't block native components like ScrollView
-      onShouldBlockNativeResponder: () => false,
-    })
-  ).current;
   
   return (
-    <View style={styles.container} {...panResponder.panHandlers}>
+    <View style={styles.container}>
       <Text style={[styles.sectionHeader, { color: colors.subtext }]}>
         Suggestions
       </Text>

@@ -24,7 +24,9 @@ export const WelcomeCreator = () => {
   }, []);
 
   // Use header style text color in dark mode (with 0.7 opacity like in Header)
-  const textColor = isDarkMode ? { color: colors.text, opacity: 0.7 } : { color: colors.text };
+  const textColor = isDarkMode
+    ? { color: colors.text, opacity: 0.7 }
+    : { color: colors.text };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

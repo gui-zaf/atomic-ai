@@ -20,7 +20,7 @@ export const Header = ({ onMenuPress }: HeaderProps) => {
           color={colors.text}
           style={styles.icon}
         />
-      </TouchableOpacity> 
+      </TouchableOpacity>
 
       <Text style={[styles.title, { color: colors.text }]}>Atomic Chat</Text>
 

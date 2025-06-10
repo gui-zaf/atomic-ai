@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   NativeSyntheticEvent,
-  TextInputSubmitEditingEventData
+  TextInputSubmitEditingEventData,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getAmazeSuggestion } from "../services/amazeService";
@@ -28,7 +28,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const { decrementToken, tokens, resetTokens } = useTokens();
+  const { decrementToken, resetTokens } = useTokens();
 
   // Track keyboard visibility
   useEffect(() => {
@@ -64,7 +64,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         setMessage("");
         return;
       }
-      
+
       if (decrementToken()) {
         onSend(message.trim());
         setMessage("");
@@ -112,9 +112,11 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   };
 
   // Handle submit event to send message
-  const handleSubmitEditing = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+  const handleSubmitEditing = (
+    e: NativeSyntheticEvent<TextInputSubmitEditingEventData>
+  ) => {
     // Prevent default behavior and send message
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       e.preventDefault?.();
     }
     handleSend();
@@ -128,7 +130,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         style={[
           styles.container,
           { backgroundColor: colors.background },
-          isKeyboardVisible && styles.containerKeyboardOpen
+          isKeyboardVisible && styles.containerKeyboardOpen,
         ]}
       >
         {showSuggestions && (
@@ -148,17 +150,17 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
           </TouchableOpacity>
           <TextInput
             style={[
-              styles.input, 
-              { 
+              styles.input,
+              {
                 backgroundColor: colors.surface,
-                color: colors.text
-              }
+                color: colors.text,
+              },
             ]}
             placeholder="Message"
             placeholderTextColor={colors.subtext}
             value={message}
             onChangeText={setMessage}
-            multiline={Platform.OS !== 'ios'}
+            multiline={Platform.OS !== "ios"}
             returnKeyType="send"
             blurOnSubmit={false}
             onSubmitEditing={handleSubmitEditing}
@@ -168,7 +170,10 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
               styles.sendButton,
               message.trim()
                 ? [styles.sendButtonActive, { backgroundColor: colors.primary }]
-                : [styles.sendButtonInactive, { backgroundColor: colors.surface }],
+                : [
+                    styles.sendButtonInactive,
+                    { backgroundColor: colors.surface },
+                  ],
             ]}
             onPress={handleSend}
             disabled={!message.trim()}

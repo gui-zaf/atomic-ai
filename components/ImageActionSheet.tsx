@@ -1,13 +1,7 @@
-import React from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   ActionSheetIOS,
   Platform,
 } from "react-native";
-import { colors } from "../theme/theme";
 
 interface ImageActionSheetProps {
   onLike: () => void;

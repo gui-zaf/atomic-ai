@@ -5,7 +5,6 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  GestureResponderEvent,
   PanResponder,
   StyleSheet,
 } from "react-native";
@@ -14,11 +13,11 @@ import { WelcomeCreator } from "./components/WelcomeCreator";
 import { Header } from "./components/Header";
 import { ChatMessages } from "./components/ChatMessages";
 import ChatInput from "./components/ChatInput";
-import { colors } from "./theme/theme";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { TokenProvider } from "./context/TokenContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import SideMenu from "./components/SideMenu";
+import React from "react";
 
 interface Message {
   id: string;
@@ -38,8 +37,8 @@ const AppContent = () => {
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
   
-  // Gesture handling for swipe to open menu
-  const panResponder = useRef(
+  // Gesture handling for swipe to open menu - ONLY for the main content area
+  const mainContentPanResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: (evt) => {
         // Only activate for touches at the left edge of the screen
@@ -129,8 +128,7 @@ const AppContent = () => {
       style={[
         styles.container, 
         { backgroundColor: colors.background }
-      ]} 
-      {...panResponder.panHandlers}
+      ]}
     >
       <StatusBar style={isDarkMode ? "light" : "dark"} />
       
@@ -138,20 +136,31 @@ const AppContent = () => {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
         <View style={styles.container}>
           <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-            <Header onMenuPress={toggleMenu} />
-            {messages.length === 0 ? (
-              <WelcomeCreator />
-            ) : (
-              <ChatMessages
-                messages={messages}
-                likedMessages={likedMessages}
-                onToggleLike={handleToggleLike}
-              />
-            )}
+            {/* Main content area where menu swipe gestures work */}
+            <View style={styles.mainContentArea} {...mainContentPanResponder.panHandlers}>
+              <Header onMenuPress={toggleMenu} />
+              {messages.length === 0 ? (
+                <WelcomeCreator />
+              ) : (
+                <ChatMessages
+                  messages={messages}
+                  likedMessages={likedMessages}
+                  onToggleLike={handleToggleLike}
+                />
+              )}
+            </View>
           </SafeAreaView>
           
           <SafeAreaView edges={["bottom"]}>
-            <ChatInput onSend={handleSendMessage} />
+            {/* 
+              Input area that handles its own gestures.
+              pointerEvents="box-none" means this View doesn't receive touch events,
+              but its children do. This prevents the parent's pan responder from
+              interfering with the carousel's scroll.
+            */}
+            <View pointerEvents="box-none">
+              <ChatInput onSend={handleSendMessage} />
+            </View>
           </SafeAreaView>
         </View>
       </TouchableWithoutFeedback>
@@ -168,6 +177,9 @@ const AppContent = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  mainContentArea: {
     flex: 1,
   },
 });
