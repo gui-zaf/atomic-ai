@@ -136,15 +136,19 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
           style={styles.blurContainer}
         />
         
+        {/* Suggestions with higher z-index */}
+        {showSuggestions && (
+          <View style={styles.suggestionsWrapper}>
+            <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
+          </View>
+        )}
+        
         <View
           style={[
             styles.container,
             isKeyboardVisible && styles.containerKeyboardOpen,
           ]}
         >
-          {showSuggestions && (
-            <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
-          )}
           <View style={styles.inputContainer}>
             <TouchableOpacity
               style={[styles.bulbButton, { backgroundColor: colors.surface }]}
@@ -154,7 +158,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
               {isLoading ? (
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
-                <Ionicons name="bulb" size={20} color={colors.primary} />
+                <Ionicons name="bulb" size={22} color={colors.primary} />
               )}
             </TouchableOpacity>
             <TextInput
@@ -193,7 +197,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
             >
               <Ionicons
                 name="arrow-up"
-                size={20}
+                size={22}
                 color={message.trim() ? "#fff" : colors.subtext}
               />
             </TouchableOpacity>
@@ -208,21 +212,27 @@ const styles = StyleSheet.create({
   inputWrapper: {
     position: 'relative',
     zIndex: 10,
+    marginTop: 8,
   },
   blurContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: -300, // Extend much further downward to ensure coverage
-    height: 350, // Significantly increase height to ensure full coverage
+    bottom: -300,
+    height: 350,
     zIndex: 1,
+  },
+  suggestionsWrapper: {
+    position: 'relative',
+    zIndex: 25,
+    marginTop: 8,
   },
   container: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 4,
     backgroundColor: 'transparent',
-    zIndex: 2, // Keep this above the blur
+    zIndex: 2,
   },
   containerKeyboardOpen: {
     marginBottom: -20,
@@ -230,30 +240,30 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 8,
+    gap: 10,
   },
   input: {
     flex: 1,
-    fontSize: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    paddingRight: 40,
-    borderRadius: 20,
-    maxHeight: 96,
-    minHeight: 36,
+    fontSize: 17,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    paddingRight: 42,
+    borderRadius: 22,
+    maxHeight: 100,
+    minHeight: 42,
     textAlignVertical: 'center',
   },
   sendButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: "center",
     alignItems: "center",
   },
   bulbButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: "center",
     alignItems: "center",
   },

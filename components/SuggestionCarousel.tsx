@@ -75,6 +75,9 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 12,
+    zIndex: 20,
+    elevation: 20,
+    position: 'relative',
   },
   sectionHeader: {
     fontSize: 13,
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
-    elevation: 1,
+    elevation: 2,
   },
   suggestionText: {
     fontSize: 16,

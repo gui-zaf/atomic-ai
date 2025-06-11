@@ -272,6 +272,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: 'relative',
     zIndex: 10,
+    marginTop: 'auto',
+    paddingTop: 16,
   },
 });
 
