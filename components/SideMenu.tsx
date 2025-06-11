@@ -65,7 +65,7 @@ const SideMenu = ({
       onStartShouldSetPanResponder: () => isVisible,
       onMoveShouldSetPanResponder: (_, gestureState) => {
         // Only respond when menu is visible and horizontal movement is dominant
-        return isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+        return isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5;
       },
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dx < 0) {
@@ -83,7 +83,7 @@ const SideMenu = ({
         }
       },
       onPanResponderTerminationRequest: () => true,
-      onShouldBlockNativeResponder: () => false,
+      onShouldBlockNativeResponder: () => false, // Don't block other scroll views
     })
   ).current;
 

@@ -54,6 +54,9 @@ export const ChatMessages = ({
       decelerationRate="normal"
       nestedScrollEnabled={true}
       overScrollMode="always"
+      // Ensure this ScrollView has gesture priority
+      removeClippedSubviews={false}
+      pinchGestureEnabled={false}
     >
       {messages.map((message) => (
         <ChatBubble
@@ -72,7 +75,8 @@ export const ChatMessages = ({
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    zIndex: 1, // Ensure scroll view is above other elements
+    zIndex: 5, // Higher z-index for gesture priority
+    elevation: 5, // Android elevation for gesture priority
     backgroundColor: 'transparent',
   },
   content: {

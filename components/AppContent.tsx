@@ -248,14 +248,8 @@ const AppContent = () => {
         >
           <View style={styles.container}>
             <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-              {/* Main content area where menu swipe gestures work */}
+              {/* Main content area - removed PanResponder to prevent scroll conflicts */}
               <View style={styles.mainContentArea}>
-                {/* Edge swipe area for menu - positioned absolutely */}
-                <View 
-                  style={styles.edgeSwipeArea}
-                  {...mainContentPanResponder.panHandlers}
-                />
-                
                 <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
                 {/* Mostra WelcomeCreator apenas se showWelcome=true e não houver input em foco */}
                 {showWelcome && !isInputFocused && !menuVisible ? (
@@ -268,6 +262,12 @@ const AppContent = () => {
                   />
                 )}
               </View>
+              
+              {/* Dedicated edge swipe area for menu - isolated from chat content */}
+              <View 
+                style={styles.edgeSwipeArea}
+                {...mainContentPanResponder.panHandlers}
+              />
             </SafeAreaView>
 
             {/* Input container with extended blur effect */}
@@ -316,7 +316,8 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 20, // Width of the edge area that responds to swipes
-    zIndex: 10,
+    zIndex: 50, // Very high z-index but positioned to not overlap chat content
+    pointerEvents: 'box-none', // Allow touches to pass through when not capturing
   },
   backgroundContainer: {
     position: 'absolute',
