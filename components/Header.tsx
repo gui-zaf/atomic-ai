@@ -6,9 +6,10 @@ import { useTheme } from "../context/ThemeContext";
 
 interface HeaderProps {
   onMenuPress: () => void;
+  onTokenPress?: () => void;
 }
 
-export const Header = ({ onMenuPress }: HeaderProps) => {
+export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
   const { colors } = useTheme();
 
   return (
@@ -24,7 +25,7 @@ export const Header = ({ onMenuPress }: HeaderProps) => {
 
       <Text style={[styles.title, { color: colors.text }]}>Atomic Chat</Text>
 
-      <TokenPill />
+      <TokenPill onPress={onTokenPress} />
     </View>
   );
 };

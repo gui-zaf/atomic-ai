@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
   PanResponder,
+  Animated,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,12 +16,14 @@ import ChatInput from "./ChatInput";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
+import TokenStoreScreen from "../screens/TokenStoreScreen";
 
 const AppContent = () => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
+  const [tokenStoreVisible, setTokenStoreVisible] = useState(false);
 
   // Gesture handling for swipe to open menu - ONLY for the main content area
   const mainContentPanResponder = useRef(
@@ -114,57 +117,80 @@ const AppContent = () => {
     setMenuVisible(false);
   };
 
+  const openTokenStore = () => {
+    setTokenStoreVisible(true);
+    setMenuVisible(false); // Close menu if open
+  };
+
+  const closeTokenStore = () => {
+    setTokenStoreVisible(false);
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
 
-      {/* This wrapper ensures tapping anywhere dismisses keyboard */}
-      <TouchableWithoutFeedback
-        onPress={() => Keyboard.dismiss()}
-        accessible={false}
+      {/* Main App Content */}
+      <View 
+        style={[
+          styles.container, 
+          { display: tokenStoreVisible ? 'none' : 'flex' }
+        ]}
       >
-        <View style={styles.container}>
-          <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-            {/* Main content area where menu swipe gestures work */}
-            <View style={styles.mainContentArea}>
-              {/* Edge swipe area for menu - positioned absolutely */}
-              <View 
-                style={styles.edgeSwipeArea}
-                {...mainContentPanResponder.panHandlers}
-              />
-              <Header onMenuPress={toggleMenu} />
-              {messages.length === 0 ? (
-                <WelcomeCreator />
-              ) : (
-                <ChatMessages
-                  messages={messages}
-                  likedMessages={likedMessages}
-                  onToggleLike={handleToggleLike}
+        {/* This wrapper ensures tapping anywhere dismisses keyboard */}
+        <TouchableWithoutFeedback
+          onPress={() => Keyboard.dismiss()}
+          accessible={false}
+        >
+          <View style={styles.container}>
+            <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+              {/* Main content area where menu swipe gestures work */}
+              <View style={styles.mainContentArea}>
+                {/* Edge swipe area for menu - positioned absolutely */}
+                <View 
+                  style={styles.edgeSwipeArea}
+                  {...mainContentPanResponder.panHandlers}
                 />
-              )}
-            </View>
-          </SafeAreaView>
+                <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
+                {messages.length === 0 ? (
+                  <WelcomeCreator />
+                ) : (
+                  <ChatMessages
+                    messages={messages}
+                    likedMessages={likedMessages}
+                    onToggleLike={handleToggleLike}
+                  />
+                )}
+              </View>
+            </SafeAreaView>
 
-          <SafeAreaView edges={["bottom"]}>
-            {/* 
-              Input area that handles its own gestures.
-              pointerEvents="box-none" means this View doesn't receive touch events,
-              but its children do. This prevents the parent's pan responder from
-              interfering with the carousel's scroll.
-            */}
-            <View pointerEvents="box-none">
-              <ChatInput onSend={handleSendMessage} />
-            </View>
-          </SafeAreaView>
-        </View>
-      </TouchableWithoutFeedback>
+            <SafeAreaView edges={["bottom"]}>
+              {/* 
+                Input area that handles its own gestures.
+                pointerEvents="box-none" means this View doesn't receive touch events,
+                but its children do. This prevents the parent's pan responder from
+                interfering with the carousel's scroll.
+              */}
+              <View pointerEvents="box-none">
+                <ChatInput onSend={handleSendMessage} />
+              </View>
+            </SafeAreaView>
+          </View>
+        </TouchableWithoutFeedback>
 
-      <SideMenu
-        isVisible={menuVisible}
-        onClose={handleCloseMenu}
-        darkMode={isDarkMode}
-        onToggleDarkMode={toggleTheme}
-      />
+        <SideMenu
+          isVisible={menuVisible}
+          onClose={handleCloseMenu}
+          darkMode={isDarkMode}
+          onToggleDarkMode={toggleTheme}
+          onBuyTokens={openTokenStore}
+        />
+      </View>
+
+      {/* Token Store Screen */}
+      {tokenStoreVisible && (
+        <TokenStoreScreen onClose={closeTokenStore} />
+      )}
     </View>
   );
 };

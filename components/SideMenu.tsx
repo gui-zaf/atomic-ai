@@ -20,6 +20,7 @@ interface SideMenuProps {
   userName?: string;
   darkMode?: boolean;
   onToggleDarkMode?: (value: boolean) => void;
+  onBuyTokens?: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -31,6 +32,7 @@ const SideMenu = ({
   userName = "Guilherme Ferraz",
   darkMode = false,
   onToggleDarkMode = () => {},
+  onBuyTokens,
 }: SideMenuProps) => {
   const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
@@ -207,7 +209,7 @@ const SideMenu = ({
               Store
             </Text>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={onBuyTokens}>
               <Ionicons name="flash-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 Buy Tokens

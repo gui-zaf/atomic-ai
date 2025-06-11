@@ -1,10 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTokens } from "../context/TokenContext";
 import { useTheme } from "../context/ThemeContext";
 
-const TokenPill = () => {
+interface TokenPillProps {
+  onPress?: () => void;
+}
+
+const TokenPill = ({ onPress }: TokenPillProps) => {
   const { tokens } = useTokens();
   const { colors } = useTheme();
   const isZero = tokens === 0;
@@ -17,28 +21,34 @@ const TokenPill = () => {
       : "rgba(255, 59, 48, 0.1)";
 
   return (
-    <View
-      style={[
-        styles.tokenPill,
-        { backgroundColor: colors.surface },
-        isZero && { backgroundColor: errorBgColor },
-      ]}
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={!onPress}
+      activeOpacity={onPress ? 0.7 : 1}
     >
-      <Ionicons
-        name="flash"
-        size={16}
-        color={isZero ? errorColor : colors.primary}
-      />
-      <Text
+      <View
         style={[
-          styles.tokenCount,
-          { color: colors.primary },
-          isZero && { color: errorColor },
+          styles.tokenPill,
+          { backgroundColor: colors.surface },
+          isZero && { backgroundColor: errorBgColor },
         ]}
       >
-        {tokens}
-      </Text>
-    </View>
+        <Ionicons
+          name="flash"
+          size={16}
+          color={isZero ? errorColor : colors.primary}
+        />
+        <Text
+          style={[
+            styles.tokenCount,
+            { color: colors.primary },
+            isZero && { color: errorColor },
+          ]}
+        >
+          {tokens}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
