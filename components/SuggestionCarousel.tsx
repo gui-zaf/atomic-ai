@@ -40,7 +40,6 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
-        // Enhanced props to prevent conflicts with other gesture handlers
         directionalLockEnabled={true}
         alwaysBounceHorizontal={false}
         scrollEventThrottle={16}
@@ -48,7 +47,6 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
         decelerationRate="fast"
         overScrollMode="never"
         scrollToOverflowEnabled={false}
-        // Better gesture isolation
         disableIntervalMomentum={true}
         pagingEnabled={false}
         snapToAlignment="start"

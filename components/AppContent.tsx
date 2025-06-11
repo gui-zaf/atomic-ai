@@ -7,8 +7,6 @@ import {
   PanResponder,
   Animated,
   Image,
-  ImageBackground,
-  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +18,7 @@ import SideMenu from "./SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
 import TokenStoreScreen from "../screens/TokenStoreScreen";
+import { useKeyboardAnimation } from "./hooks/useKeyboardAnimation";
 
 const AppContent = () => {
   const { isDarkMode, toggleTheme, colors } = useTheme();
@@ -32,72 +31,30 @@ const AppContent = () => {
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   
-  // Animation values for keyboard behavior
-  const keyboardAnimation = useRef(new Animated.Value(0)).current;
+  const keyboardAnimation = useKeyboardAnimation(
+    () => setKeyboardVisible(true),
+    () => setKeyboardVisible(false)
+  );
   
-  // Resetar o estado de carregamento da imagem quando o tema mudar
   useEffect(() => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
 
-  // Handle keyboard animation
-  useEffect(() => {
-    const keyboardWillShowListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (event) => {
-        setKeyboardVisible(true);
-        Animated.timing(keyboardAnimation, {
-          toValue: 1,
-          duration: Platform.OS === "ios" ? event.duration || 250 : 250,
-          useNativeDriver: false, // We need to animate layout properties
-        }).start();
-      }
-    );
-
-    const keyboardWillHideListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      (event) => {
-        setKeyboardVisible(false);
-        Animated.timing(keyboardAnimation, {
-          toValue: 0,
-          duration: Platform.OS === "ios" ? event.duration || 250 : 300, // Slightly longer for smoother feel
-          useNativeDriver: false,
-        }).start();
-      }
-    );
-
-    return () => {
-      keyboardWillShowListener.remove();
-      keyboardWillHideListener.remove();
-    };
-  }, [keyboardAnimation]);
-
-  // Gesture handling for swipe to open menu - ONLY for the main content area
   const mainContentPanResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt) => {
-        // Only activate for touches at the left edge of the screen
-        return !menuVisible && evt.nativeEvent.pageX < 20;
-      },
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Only respond to significant horizontal movements from the left edge
-        // AND ensure we don't interfere with vertical scrolling
-        return (
-          !menuVisible &&
-          gestureState.dx > 20 &&
-          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 &&
-          gestureState.dx > 0
-        );
-      },
+      onStartShouldSetPanResponder: (evt) => 
+        !menuVisible && evt.nativeEvent.pageX < 20,
+      onMoveShouldSetPanResponder: (_, gestureState) => 
+        !menuVisible &&
+        gestureState.dx > 20 &&
+        Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 &&
+        gestureState.dx > 0,
       onPanResponderMove: (_, gestureState) => {
-        // As soon as we detect significant rightward movement, open the menu
         if (!menuVisible && gestureState.dx > 50) {
           setMenuVisible(true);
         }
       },
-      onPanResponderRelease: () => {
-        // No additional handling needed
-      },
+      onPanResponderRelease: () => {},
       onPanResponderTerminationRequest: () => true,
       onShouldBlockNativeResponder: () => false,
     })
@@ -106,80 +63,55 @@ const AppContent = () => {
   const handleToggleLike = (messageId: string) => {
     setLikedMessages((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(messageId)) {
-        newSet.delete(messageId);
-      } else {
-        newSet.add(messageId);
-      }
+      newSet.has(messageId) ? newSet.delete(messageId) : newSet.add(messageId);
       return newSet;
     });
   };
 
   const handleSendMessage = (message: string) => {
-    // Add user message
+    const timestamp = Date.now();
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: timestamp.toString(),
       text: message,
       isUser: true,
     };
 
-    let aiMessage: Message;
-
-    // Check if this is an image generation command
-    if (message.toLowerCase().startsWith("/image")) {
-      // Get the prompt from the message
-      const prompt = message.substring(6).trim();
-
-      // Random sample image for demo purposes
-      const randomImage =
-        sampleImages[Math.floor(Math.random() * sampleImages.length)];
-
-      aiMessage = {
-        id: (Date.now() + 1).toString(),
-        text: prompt
-          ? `Here's your "${prompt}" image! ✨`
-          : "Here's your generated image! ✨",
-        isUser: false,
-        image: randomImage,
-      };
-    } else {
-      // For all other messages, including suggestion messages, just send a regular text response
-      aiMessage = {
-        id: (Date.now() + 1).toString(),
-        text: "This is a simulated AI response. You can replace this with actual AI responses.",
-        isUser: false,
-      };
-    }
+    const isImageCommand = message.toLowerCase().startsWith("/image");
+    const aiMessage: Message = {
+      id: (timestamp + 1).toString(),
+      text: isImageCommand
+        ? `Here's your "${message.substring(6).trim()}" image! ✨`
+        : "This is a simulated AI response. You can replace this with actual AI responses.",
+      isUser: false,
+      ...(isImageCommand && {
+        image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
+      }),
+    };
 
     setMessages((prev) => [...prev, userMessage, aiMessage]);
-    setShowWelcome(false); // Esconder o WelcomeCreator quando houver mensagens
+    setShowWelcome(false);
   };
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
-    // Close keyboard when opening menu
     Keyboard.dismiss();
     setIsInputFocused(false);
   };
 
-  const handleCloseMenu = () => {
-    setMenuVisible(false);
-  };
+  const handleCloseMenu = () => setMenuVisible(false);
 
   const openTokenStore = () => {
     setTokenStoreVisible(true);
-    setMenuVisible(false); // Close menu if open
+    setMenuVisible(false);
   };
 
-  const closeTokenStore = () => {
-    setTokenStoreVisible(false);
-  };
+  const closeTokenStore = () => setTokenStoreVisible(false);
 
   const resetChat = () => {
     setMessages([]);
     setLikedMessages(new Set());
-    setMenuVisible(false); // Close menu after resetting
-    setShowWelcome(true); // Mostrar o WelcomeCreator quando o chat for resetado
+    setMenuVisible(false);
+    setShowWelcome(true);
   };
 
   return (
@@ -214,36 +146,32 @@ const AppContent = () => {
               transform: [{
                 scale: keyboardAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [1, 1.02], // Subtle scale when keyboard shows
+                  outputRange: [1, 1.02],
                 })
               }],
               opacity: keyboardAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: [1, 0.95], // Slightly fade when keyboard shows
+                outputRange: [1, 0.95],
               })
             }
           ]}
         >
-          <View style={[
-            styles.solidBackground, 
-            { backgroundColor: colors.background }
-          ]} />
+          <View style={[styles.solidBackground, { backgroundColor: colors.background }]} />
           <Image
             source={isDarkMode 
               ? require('../assets/dark-background.png') 
               : require('../assets/white-background.png')}
             style={[
               styles.backgroundImage,
-              isBackgroundLoaded ? {} : { opacity: 0 }
+              { opacity: isBackgroundLoaded ? 1 : 0 }
             ]}
             onLoad={() => setIsBackgroundLoaded(true)}
-            onError={() => console.log('Erro ao carregar a imagem de fundo')}
+            onError={() => {/* Background image load error */}}
           />
         </Animated.View>
 
-        {/* This wrapper ensures tapping anywhere dismisses keyboard */}
         <TouchableWithoutFeedback
-          onPress={() => Keyboard.dismiss()}
+          onPress={Keyboard.dismiss}
           accessible={false}
         >
           <View style={styles.container}>
@@ -251,7 +179,6 @@ const AppContent = () => {
               {/* Main content area - removed PanResponder to prevent scroll conflicts */}
               <View style={styles.mainContentArea}>
                 <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
-                {/* Mostra WelcomeCreator apenas se showWelcome=true e não houver input em foco */}
                 {showWelcome && !isInputFocused && !menuVisible ? (
                   <WelcomeCreator />
                 ) : (
@@ -263,14 +190,12 @@ const AppContent = () => {
                 )}
               </View>
               
-              {/* Dedicated edge swipe area for menu - isolated from chat content */}
               <View 
                 style={styles.edgeSwipeArea}
                 {...mainContentPanResponder.panHandlers}
               />
             </SafeAreaView>
 
-            {/* Input container with extended blur effect */}
             <View style={styles.inputContainer}>
               <SafeAreaView edges={["bottom"]}>
                 <View pointerEvents="box-none">
@@ -294,7 +219,6 @@ const AppContent = () => {
         />
       </View>
 
-      {/* Token Store Screen */}
       {tokenStoreVisible && (
         <TokenStoreScreen onClose={closeTokenStore} />
       )}
@@ -315,9 +239,9 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    width: 20, // Width of the edge area that responds to swipes
-    zIndex: 50, // Very high z-index but positioned to not overlap chat content
-    pointerEvents: 'box-none', // Allow touches to pass through when not capturing
+    width: 20,
+    zIndex: 50,
+    pointerEvents: 'box-none',
   },
   backgroundContainer: {
     position: 'absolute',

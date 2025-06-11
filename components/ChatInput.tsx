@@ -43,7 +43,6 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => {
         setKeyboardVisible(true);
-        // Animate suggestions out and container adjustment
         Animated.parallel([
           Animated.timing(suggestionsOpacity, {
             toValue: 0,
@@ -55,9 +54,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
             duration: 200,
             useNativeDriver: true,
           }),
-        ]).start(() => {
-          setShowSuggestions(false);
-        });
+        ]).start(() => setShowSuggestions(false));
         onFocusChange(true);
       }
     );
@@ -66,13 +63,12 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setKeyboardVisible(false);
-        // Animate suggestions back in and container back to position
         setShowSuggestions(true);
         Animated.parallel([
           Animated.timing(suggestionsOpacity, {
             toValue: 1,
             duration: 300,
-            delay: 100, // Small delay to feel more natural
+            delay: 100,
             useNativeDriver: true,
           }),
           Animated.timing(containerTranslateY, {
@@ -92,32 +88,29 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
   }, [onFocusChange, suggestionsOpacity, containerTranslateY]);
 
   const handleSend = () => {
-    if (message.trim()) {
-      // Check for /tokens command
-      if (message.trim().toLowerCase() === "/tokens") {
-        // Add tokens and show alert
-        handleTokenCommand();
-        setMessage("");
-        return;
-      }
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) return;
 
-      if (decrementToken()) {
-        onSend(message.trim());
-        setMessage("");
-      } else {
-        Alert.alert(
-          "Tokens Esgotados",
-          "Seus tokens gratuitos acabaram. Aguarde a recarga ou adquira mais tokens.",
-          [{ text: "OK" }]
-        );
-      }
+    if (trimmedMessage.toLowerCase() === "/tokens") {
+      handleTokenCommand();
+      setMessage("");
+      return;
+    }
+
+    if (decrementToken()) {
+      onSend(trimmedMessage);
+      setMessage("");
+    } else {
+      Alert.alert(
+        "Tokens Esgotados",
+        "Seus tokens gratuitos acabaram. Aguarde a recarga ou adquira mais tokens.",
+        [{ text: "OK" }]
+      );
     }
   };
 
   const handleTokenCommand = () => {
-    // Reset tokens and cooldown
     resetTokens();
-    // Show alert with information about tokens
     Alert.alert(
       "Tokens Refreshed",
       "You received 10 additional tokens and cooldown has been reset!",
@@ -139,19 +132,13 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
   };
 
   const handleSelectSuggestion = (suggestion: string) => {
-    // Use the full description as a regular message
     setMessage(suggestion);
-    // Focus the input to allow user to edit if needed
-    setTimeout(() => {
-      Keyboard.dismiss();
-    }, 100);
+    setTimeout(() => Keyboard.dismiss(), 100);
   };
 
-  // Handle submit event to send message
   const handleSubmitEditing = (
     e: NativeSyntheticEvent<TextInputSubmitEditingEventData>
   ) => {
-    // Prevent default behavior and send message
     if (Platform.OS === "ios") {
       e.preventDefault?.();
     }
@@ -174,7 +161,6 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
           style={styles.blurContainer}
         />
         
-        {/* Suggestions with animation */}
         {showSuggestions && (
           <Animated.View 
             style={[
@@ -228,12 +214,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
             <TouchableOpacity
               style={[
                 styles.sendButton,
-                message.trim()
-                  ? [styles.sendButtonActive, { backgroundColor: colors.primary }]
-                  : [
-                      styles.sendButtonInactive,
-                      { backgroundColor: colors.surface },
-                    ],
+                { backgroundColor: message.trim() ? colors.primary : colors.surface },
               ]}
               onPress={handleSend}
               disabled={!message.trim()}
@@ -313,8 +294,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  sendButtonActive: {},
-  sendButtonInactive: {},
+
 });
 
 export default ChatInput;

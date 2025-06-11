@@ -51,22 +51,19 @@ const SideMenu = ({
     return () => slideAnim.removeListener(id);
   }, [slideAnim]);
 
-  const getUserInitials = (name: string) => {
-    return name
+  const getUserInitials = (name: string) => 
+    name
       .split(" ")
       .map((part) => part[0])
       .join("")
       .toUpperCase()
       .substring(0, 2);
-  };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => isVisible,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Only respond when menu is visible and horizontal movement is dominant
-        return isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5;
-      },
+      onMoveShouldSetPanResponder: (_, gestureState) => 
+        isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5,
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dx < 0) {
           slideAnim.setValue(gestureState.dx);
@@ -83,7 +80,7 @@ const SideMenu = ({
         }
       },
       onPanResponderTerminationRequest: () => true,
-      onShouldBlockNativeResponder: () => false, // Don't block other scroll views
+      onShouldBlockNativeResponder: () => false,
     })
   ).current;
 
@@ -130,16 +127,12 @@ const SideMenu = ({
     });
   };
 
-  // Completely unmount when not visible and not animating
   if (!isVisible && !isAnimating) {
     return null;
   }
 
-  // Get background color based on dark mode
-  const menuBackgroundColor =
-    darkMode && colors.menuBackground
-      ? colors.menuBackground
-      : colors.background;
+  const menuBackgroundColor = 
+    darkMode && colors.menuBackground ? colors.menuBackground : colors.background;
 
   return (
     <View

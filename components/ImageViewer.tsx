@@ -40,7 +40,7 @@ export const ImageViewer = ({
         message: message || "Check out this amazing image!",
       });
     } catch (error) {
-      console.log("Error sharing:", error);
+      // Silently handle sharing error
     }
   };
 

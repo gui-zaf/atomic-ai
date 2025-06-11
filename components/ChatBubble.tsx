@@ -47,9 +47,7 @@ export const ChatBubble = ({
     ]).start();
   }, []);
 
-  const imageSource = image
-    ? require("../assets/carousel/sample-01.jpeg")
-    : null;
+  const imageSource = image ? require("../assets/carousel/sample-01.jpeg") : null;
 
   const handleShare = async () => {
     try {
@@ -57,7 +55,7 @@ export const ChatBubble = ({
         message: "Check out this amazing image!",
       });
     } catch (error) {
-      console.log("Error sharing:", error);
+      // Silently handle sharing error
     }
   };
 
@@ -102,9 +100,7 @@ export const ChatBubble = ({
                     <Ionicons
                       name={isLiked ? "heart" : "heart-outline"}
                       size={22}
-                      color={
-                        isLiked ? colors.error : isUser ? "#FFF" : colors.text
-                      }
+                      color={isLiked ? colors.error : isUser ? "#FFF" : colors.text}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity

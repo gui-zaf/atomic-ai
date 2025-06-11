@@ -16,7 +16,6 @@ export const ChatMessages = ({
 }: ChatMessagesProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Scroll to bottom when keyboard opens
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
@@ -27,12 +26,9 @@ export const ChatMessages = ({
       }
     );
 
-    return () => {
-      keyboardShowListener.remove();
-    };
+    return () => keyboardShowListener.remove();
   }, []);
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -54,7 +50,6 @@ export const ChatMessages = ({
       decelerationRate="normal"
       nestedScrollEnabled={true}
       overScrollMode="always"
-      // Ensure this ScrollView has gesture priority
       removeClippedSubviews={false}
       pinchGestureEnabled={false}
     >
@@ -75,8 +70,8 @@ export const ChatMessages = ({
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    zIndex: 5, // Higher z-index for gesture priority
-    elevation: 5, // Android elevation for gesture priority
+    zIndex: 5,
+    elevation: 5,
     backgroundColor: 'transparent',
   },
   content: {

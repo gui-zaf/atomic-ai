@@ -13,12 +13,10 @@ const TokenPill = ({ onPress }: TokenPillProps) => {
   const { colors } = useTheme();
   const isZero = tokens === 0;
 
-  // Error colors for light/dark mode
   const errorColor = colors.error;
-  const errorBgColor =
-    colors.text === "#FFFFFF"
-      ? "rgba(255, 69, 58, 0.2)"
-      : "rgba(255, 59, 48, 0.1)";
+  const errorBgColor = colors.text === "#FFFFFF"
+    ? "rgba(255, 69, 58, 0.2)"
+    : "rgba(255, 59, 48, 0.1)";
 
   return (
     <TouchableOpacity

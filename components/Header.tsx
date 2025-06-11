@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import TokenPill from "./TokenPill";
 import { useTheme } from "../context/ThemeContext";
@@ -12,15 +12,12 @@ interface HeaderProps {
 
 export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
   const { colors, isDarkMode } = useTheme();
-  
-  const blurIntensity = 10;
-  const blurType = isDarkMode ? "dark" : "light";
 
   return (
     <View style={styles.headerWrapper}>
       <BlurView 
-        intensity={blurIntensity} 
-        tint={blurType}
+        intensity={10}
+        tint={isDarkMode ? "dark" : "light"}
         style={styles.blurContainer}
       />
       
