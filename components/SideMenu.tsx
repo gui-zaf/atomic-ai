@@ -58,8 +58,11 @@ const SideMenu = ({
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => isVisible,
+      onStartShouldSetPanResponder: () => isVisible,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Only respond when menu is visible and horizontal movement is dominant
+        return isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+      },
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dx < 0) {
           slideAnim.setValue(gestureState.dx);
@@ -75,6 +78,8 @@ const SideMenu = ({
           }).start();
         }
       },
+      onPanResponderTerminationRequest: () => true,
+      onShouldBlockNativeResponder: () => false,
     })
   ).current;
 

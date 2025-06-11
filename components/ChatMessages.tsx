@@ -50,6 +50,10 @@ export const ChatMessages = ({
       alwaysBounceVertical={true}
       bounces={true}
       directionalLockEnabled={true}
+      scrollEventThrottle={16}
+      decelerationRate="normal"
+      nestedScrollEnabled={true}
+      overScrollMode="always"
     >
       {messages.map((message) => (
         <ChatBubble
@@ -68,6 +72,7 @@ export const ChatMessages = ({
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    zIndex: 1, // Ensure scroll view is above other elements
   },
   content: {
     padding: 16,

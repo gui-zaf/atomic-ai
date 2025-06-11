@@ -126,10 +126,12 @@ const AppContent = () => {
         <View style={styles.container}>
           <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
             {/* Main content area where menu swipe gestures work */}
-            <View
-              style={styles.mainContentArea}
-              {...mainContentPanResponder.panHandlers}
-            >
+            <View style={styles.mainContentArea}>
+              {/* Edge swipe area for menu - positioned absolutely */}
+              <View 
+                style={styles.edgeSwipeArea}
+                {...mainContentPanResponder.panHandlers}
+              />
               <Header onMenuPress={toggleMenu} />
               {messages.length === 0 ? (
                 <WelcomeCreator />
@@ -173,6 +175,15 @@ const styles = StyleSheet.create({
   },
   mainContentArea: {
     flex: 1,
+    position: 'relative',
+  },
+  edgeSwipeArea: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 20, // Width of the edge area that responds to swipes
+    zIndex: 10,
   },
 });
 

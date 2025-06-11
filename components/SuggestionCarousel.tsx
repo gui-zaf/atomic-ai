@@ -43,6 +43,11 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
         // These props help prevent conflicts with side menu gestures
         directionalLockEnabled={true}
         alwaysBounceHorizontal={false}
+        scrollEventThrottle={16}
+        nestedScrollEnabled={true}
+        decelerationRate="fast"
+        overScrollMode="never"
+        scrollToOverflowEnabled={false}
       >
         {suggestions.map((suggestion) => (
           <TouchableOpacity
