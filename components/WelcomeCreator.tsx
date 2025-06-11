@@ -29,7 +29,7 @@ export const WelcomeCreator = () => {
     : { color: colors.text };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       <Animated.View
         style={[
           styles.content,

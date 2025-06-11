@@ -17,13 +17,15 @@ import { useTokens } from "../context/TokenContext";
 import { useTheme } from "../context/ThemeContext";
 import RechargeTimer from "./RechargeTimer";
 import SuggestionCarousel from "./SuggestionCarousel";
+import { BlurView } from "expo-blur";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  onFocusChange?: (isFocused: boolean) => void;
 }
 
-const ChatInput = ({ onSend }: ChatInputProps) => {
-  const { colors } = useTheme();
+const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
+  const { colors, isDarkMode } = useTheme();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -38,6 +40,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         setKeyboardVisible(true);
         // Hide suggestions when keyboard opens
         setShowSuggestions(false);
+        onFocusChange(true);
       }
     );
     const keyboardWillHideListener = Keyboard.addListener(
@@ -46,6 +49,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
         setKeyboardVisible(false);
         // Show suggestions when keyboard closes
         setShowSuggestions(true);
+        onFocusChange(false);
       }
     );
 
@@ -53,7 +57,7 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
       keyboardWillShowListener.remove();
       keyboardWillHideListener.remove();
     };
-  }, []);
+  }, [onFocusChange]);
 
   const handleSend = () => {
     if (message.trim()) {
@@ -125,66 +129,75 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
   return (
     <>
       <RechargeTimer />
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: colors.background },
-          isKeyboardVisible && styles.containerKeyboardOpen,
-        ]}
-      >
-        {showSuggestions && (
-          <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
-        )}
-        <View style={styles.inputContainer}>
-          <TouchableOpacity
-            style={[styles.bulbButton, { backgroundColor: colors.surface }]}
-            onPress={handleSuggestion}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <Ionicons name="bulb" size={20} color={colors.primary} />
-            )}
-          </TouchableOpacity>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.text,
-              },
-            ]}
-            placeholder="Message"
-            placeholderTextColor={colors.subtext}
-            value={message}
-            onChangeText={setMessage}
-            multiline={true}
-            returnKeyType="send"
-            blurOnSubmit={false}
-            onSubmitEditing={handleSubmitEditing}
-            scrollEnabled={true}
-            enablesReturnKeyAutomatically={true}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              message.trim()
-                ? [styles.sendButtonActive, { backgroundColor: colors.primary }]
-                : [
-                    styles.sendButtonInactive,
-                    { backgroundColor: colors.surface },
-                  ],
-            ]}
-            onPress={handleSend}
-            disabled={!message.trim()}
-          >
-            <Ionicons
-              name="arrow-up"
-              size={20}
-              color={message.trim() ? "#fff" : colors.subtext}
+      <View style={styles.inputWrapper}>
+        <BlurView 
+          intensity={10} 
+          tint={isDarkMode ? "dark" : "light"}
+          style={styles.blurContainer}
+        />
+        
+        <View
+          style={[
+            styles.container,
+            isKeyboardVisible && styles.containerKeyboardOpen,
+          ]}
+        >
+          {showSuggestions && (
+            <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
+          )}
+          <View style={styles.inputContainer}>
+            <TouchableOpacity
+              style={[styles.bulbButton, { backgroundColor: colors.surface }]}
+              onPress={handleSuggestion}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <Ionicons name="bulb" size={20} color={colors.primary} />
+              )}
+            </TouchableOpacity>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                },
+              ]}
+              placeholder="Message"
+              placeholderTextColor={colors.subtext}
+              value={message}
+              onChangeText={setMessage}
+              multiline={true}
+              returnKeyType="send"
+              blurOnSubmit={false}
+              onSubmitEditing={handleSubmitEditing}
+              scrollEnabled={true}
+              enablesReturnKeyAutomatically={true}
+              onFocus={() => onFocusChange(true)}
+              onBlur={() => onFocusChange(false)}
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.sendButton,
+                message.trim()
+                  ? [styles.sendButtonActive, { backgroundColor: colors.primary }]
+                  : [
+                      styles.sendButtonInactive,
+                      { backgroundColor: colors.surface },
+                    ],
+              ]}
+              onPress={handleSend}
+              disabled={!message.trim()}
+            >
+              <Ionicons
+                name="arrow-up"
+                size={20}
+                color={message.trim() ? "#fff" : colors.subtext}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </>
@@ -192,9 +205,24 @@ const ChatInput = ({ onSend }: ChatInputProps) => {
 };
 
 const styles = StyleSheet.create({
+  inputWrapper: {
+    position: 'relative',
+    zIndex: 10,
+  },
+  blurContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: -300, // Extend much further downward to ensure coverage
+    height: 350, // Significantly increase height to ensure full coverage
+    zIndex: 1,
+  },
   container: {
     paddingHorizontal: 16,
     paddingVertical: 8,
+    backgroundColor: 'transparent',
+    zIndex: 2, // Keep this above the blur
   },
   containerKeyboardOpen: {
     marginBottom: -20,

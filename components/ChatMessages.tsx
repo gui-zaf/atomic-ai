@@ -73,9 +73,10 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     zIndex: 1, // Ensure scroll view is above other elements
+    backgroundColor: 'transparent',
   },
   content: {
-    padding: 16,
+    padding: 8,
     paddingTop: 8,
   },
 });

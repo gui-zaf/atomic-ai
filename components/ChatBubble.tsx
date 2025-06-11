@@ -158,7 +158,7 @@ export const ChatBubble = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 4,
     paddingVertical: 4,
     flexDirection: "row",
   },

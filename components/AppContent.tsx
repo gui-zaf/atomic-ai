@@ -6,6 +6,8 @@ import {
   Keyboard,
   PanResponder,
   Animated,
+  Image,
+  ImageBackground,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,6 +26,14 @@ const AppContent = () => {
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
   const [tokenStoreVisible, setTokenStoreVisible] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
+  
+  // Resetar o estado de carregamento da imagem quando o tema mudar
+  useEffect(() => {
+    setIsBackgroundLoaded(false);
+  }, [isDarkMode]);
 
   // Gesture handling for swipe to open menu - ONLY for the main content area
   const mainContentPanResponder = useRef(
@@ -105,12 +115,14 @@ const AppContent = () => {
     }
 
     setMessages((prev) => [...prev, userMessage, aiMessage]);
+    setShowWelcome(false); // Esconder o WelcomeCreator quando houver mensagens
   };
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
     // Close keyboard when opening menu
     Keyboard.dismiss();
+    setIsInputFocused(false);
   };
 
   const handleCloseMenu = () => {
@@ -126,6 +138,13 @@ const AppContent = () => {
     setTokenStoreVisible(false);
   };
 
+  const resetChat = () => {
+    setMessages([]);
+    setLikedMessages(new Set());
+    setMenuVisible(false); // Close menu after resetting
+    setShowWelcome(true); // Mostrar o WelcomeCreator quando o chat for resetado
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
@@ -137,6 +156,25 @@ const AppContent = () => {
           { display: tokenStoreVisible ? 'none' : 'flex' }
         ]}
       >
+        {/* Background Image - Moved outside SafeAreaView to extend beyond safe area */}
+        <View style={styles.backgroundContainer}>
+          <View style={[
+            styles.solidBackground, 
+            { backgroundColor: colors.background }
+          ]} />
+          <Image
+            source={isDarkMode 
+              ? require('../assets/dark-background.png') 
+              : require('../assets/white-background.png')}
+            style={[
+              styles.backgroundImage,
+              isBackgroundLoaded ? {} : { opacity: 0 }
+            ]}
+            onLoad={() => setIsBackgroundLoaded(true)}
+            onError={() => console.log('Erro ao carregar a imagem de fundo')}
+          />
+        </View>
+
         {/* This wrapper ensures tapping anywhere dismisses keyboard */}
         <TouchableWithoutFeedback
           onPress={() => Keyboard.dismiss()}
@@ -151,8 +189,10 @@ const AppContent = () => {
                   style={styles.edgeSwipeArea}
                   {...mainContentPanResponder.panHandlers}
                 />
+                
                 <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
-                {messages.length === 0 ? (
+                {/* Mostra WelcomeCreator apenas se showWelcome=true e não houver input em foco */}
+                {showWelcome && !isInputFocused && !menuVisible ? (
                   <WelcomeCreator />
                 ) : (
                   <ChatMessages
@@ -164,17 +204,17 @@ const AppContent = () => {
               </View>
             </SafeAreaView>
 
-            <SafeAreaView edges={["bottom"]}>
-              {/* 
-                Input area that handles its own gestures.
-                pointerEvents="box-none" means this View doesn't receive touch events,
-                but its children do. This prevents the parent's pan responder from
-                interfering with the carousel's scroll.
-              */}
-              <View pointerEvents="box-none">
-                <ChatInput onSend={handleSendMessage} />
-              </View>
-            </SafeAreaView>
+            {/* Input container with extended blur effect */}
+            <View style={styles.inputContainer}>
+              <SafeAreaView edges={["bottom"]}>
+                <View pointerEvents="box-none">
+                  <ChatInput 
+                    onSend={handleSendMessage}
+                    onFocusChange={setIsInputFocused}
+                  />
+                </View>
+              </SafeAreaView>
+            </View>
           </View>
         </TouchableWithoutFeedback>
 
@@ -184,6 +224,7 @@ const AppContent = () => {
           darkMode={isDarkMode}
           onToggleDarkMode={toggleTheme}
           onBuyTokens={openTokenStore}
+          onNewChat={resetChat}
         />
       </View>
 
@@ -209,6 +250,27 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 20, // Width of the edge area that responds to swipes
+    zIndex: 10,
+  },
+  backgroundContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    zIndex: 0,
+  },
+  solidBackground: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  inputContainer: {
+    position: 'relative',
     zIndex: 10,
   },
 });

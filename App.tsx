@@ -1,5 +1,5 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TokenProvider } from "./context/TokenContext";
 import { ThemeProvider } from "./context/ThemeContext";
