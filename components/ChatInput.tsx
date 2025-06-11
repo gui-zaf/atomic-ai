@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -10,6 +10,7 @@ import {
   Alert,
   NativeSyntheticEvent,
   TextInputSubmitEditingEventData,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { getAmazeSuggestion } from "../services/amazeService";
@@ -31,24 +32,55 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const { decrementToken, resetTokens } = useTokens();
+  
+  // Animation values
+  const suggestionsOpacity = useRef(new Animated.Value(1)).current;
+  const containerTranslateY = useRef(new Animated.Value(0)).current;
 
-  // Track keyboard visibility
+  // Track keyboard visibility with animations
   useEffect(() => {
     const keyboardWillShowListener = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => {
         setKeyboardVisible(true);
-        // Hide suggestions when keyboard opens
-        setShowSuggestions(false);
+        // Animate suggestions out and container adjustment
+        Animated.parallel([
+          Animated.timing(suggestionsOpacity, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(containerTranslateY, {
+            toValue: -10,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setShowSuggestions(false);
+        });
         onFocusChange(true);
       }
     );
+    
     const keyboardWillHideListener = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         setKeyboardVisible(false);
-        // Show suggestions when keyboard closes
+        // Animate suggestions back in and container back to position
         setShowSuggestions(true);
+        Animated.parallel([
+          Animated.timing(suggestionsOpacity, {
+            toValue: 1,
+            duration: 300,
+            delay: 100, // Small delay to feel more natural
+            useNativeDriver: true,
+          }),
+          Animated.timing(containerTranslateY, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start();
         onFocusChange(false);
       }
     );
@@ -57,7 +89,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
       keyboardWillShowListener.remove();
       keyboardWillHideListener.remove();
     };
-  }, [onFocusChange]);
+  }, [onFocusChange, suggestionsOpacity, containerTranslateY]);
 
   const handleSend = () => {
     if (message.trim()) {
@@ -129,18 +161,29 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
   return (
     <>
       <RechargeTimer />
-      <View style={styles.inputWrapper}>
+      <Animated.View 
+        style={[
+          styles.inputWrapper,
+          { transform: [{ translateY: containerTranslateY }] },
+          isKeyboardVisible && styles.inputWrapperKeyboardOpen,
+        ]}
+      >
         <BlurView 
           intensity={10} 
           tint={isDarkMode ? "dark" : "light"}
           style={styles.blurContainer}
         />
         
-        {/* Suggestions with higher z-index */}
+        {/* Suggestions with animation */}
         {showSuggestions && (
-          <View style={styles.suggestionsWrapper}>
+          <Animated.View 
+            style={[
+              styles.suggestionsWrapper,
+              { opacity: suggestionsOpacity }
+            ]}
+          >
             <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
-          </View>
+          </Animated.View>
         )}
         
         <View
@@ -203,7 +246,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Animated.View>
     </>
   );
 };
@@ -213,6 +256,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     zIndex: 10,
     marginTop: 8,
+  },
+  inputWrapperKeyboardOpen: {
+    marginBottom: -20,
   },
   blurContainer: {
     position: 'absolute',

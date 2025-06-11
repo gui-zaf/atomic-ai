@@ -8,6 +8,7 @@ import {
   Animated,
   Image,
   ImageBackground,
+  Platform,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,11 +30,47 @@ const AppContent = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  
+  // Animation values for keyboard behavior
+  const keyboardAnimation = useRef(new Animated.Value(0)).current;
   
   // Resetar o estado de carregamento da imagem quando o tema mudar
   useEffect(() => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
+
+  // Handle keyboard animation
+  useEffect(() => {
+    const keyboardWillShowListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (event) => {
+        setKeyboardVisible(true);
+        Animated.timing(keyboardAnimation, {
+          toValue: 1,
+          duration: Platform.OS === "ios" ? event.duration || 250 : 250,
+          useNativeDriver: false, // We need to animate layout properties
+        }).start();
+      }
+    );
+
+    const keyboardWillHideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      (event) => {
+        setKeyboardVisible(false);
+        Animated.timing(keyboardAnimation, {
+          toValue: 0,
+          duration: Platform.OS === "ios" ? event.duration || 250 : 300, // Slightly longer for smoother feel
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardWillShowListener.remove();
+      keyboardWillHideListener.remove();
+    };
+  }, [keyboardAnimation]);
 
   // Gesture handling for swipe to open menu - ONLY for the main content area
   const mainContentPanResponder = useRef(
@@ -146,7 +183,20 @@ const AppContent = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <Animated.View 
+      style={[
+        styles.container, 
+        { 
+          backgroundColor: colors.background,
+          transform: [{
+            translateY: keyboardAnimation.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -10], // Subtle upward movement when keyboard shows
+            })
+          }]
+        }
+      ]}
+    >
       <StatusBar style={isDarkMode ? "light" : "dark"} />
 
       {/* Main App Content */}
@@ -156,8 +206,24 @@ const AppContent = () => {
           { display: tokenStoreVisible ? 'none' : 'flex' }
         ]}
       >
-        {/* Background Image - Moved outside SafeAreaView to extend beyond safe area */}
-        <View style={styles.backgroundContainer}>
+        {/* Background Image - Animated */}
+        <Animated.View 
+          style={[
+            styles.backgroundContainer,
+            {
+              transform: [{
+                scale: keyboardAnimation.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [1, 1.02], // Subtle scale when keyboard shows
+                })
+              }],
+              opacity: keyboardAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0.95], // Slightly fade when keyboard shows
+              })
+            }
+          ]}
+        >
           <View style={[
             styles.solidBackground, 
             { backgroundColor: colors.background }
@@ -173,7 +239,7 @@ const AppContent = () => {
             onLoad={() => setIsBackgroundLoaded(true)}
             onError={() => console.log('Erro ao carregar a imagem de fundo')}
           />
-        </View>
+        </Animated.View>
 
         {/* This wrapper ensures tapping anywhere dismisses keyboard */}
         <TouchableWithoutFeedback
@@ -232,7 +298,7 @@ const AppContent = () => {
       {tokenStoreVisible && (
         <TokenStoreScreen onClose={closeTokenStore} />
       )}
-    </View>
+    </Animated.View>
   );
 };
 
