@@ -22,6 +22,7 @@ interface SideMenuProps {
   onToggleDarkMode?: (value: boolean) => void;
   onBuyTokens?: () => void;
   onNewChat?: () => void;
+  onOpenGallery?: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -35,6 +36,7 @@ const SideMenu = ({
   onToggleDarkMode = () => {},
   onBuyTokens,
   onNewChat,
+  onOpenGallery,
 }: SideMenuProps) => {
   const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
@@ -183,7 +185,7 @@ const SideMenu = ({
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={onOpenGallery}>
               <Ionicons name="images-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 Gallery

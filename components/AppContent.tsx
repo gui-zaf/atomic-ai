@@ -18,6 +18,7 @@ import SideMenu from "./SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
 import TokenStoreScreen from "../screens/TokenStoreScreen";
+import GalleryScreen from "../screens/GalleryScreen";
 import { useKeyboardAnimation } from "./hooks/useKeyboardAnimation";
 
 const AppContent = () => {
@@ -26,6 +27,7 @@ const AppContent = () => {
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
   const [tokenStoreVisible, setTokenStoreVisible] = useState(false);
+  const [galleryVisible, setGalleryVisible] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
@@ -107,6 +109,18 @@ const AppContent = () => {
 
   const closeTokenStore = () => setTokenStoreVisible(false);
 
+  const openGallery = () => {
+    setGalleryVisible(true);
+    setMenuVisible(false);
+  };
+
+  const closeGallery = () => setGalleryVisible(false);
+
+  const navigateToChat = () => {
+    setGalleryVisible(false);
+    setShowWelcome(true);
+  };
+
   const resetChat = () => {
     setMessages([]);
     setLikedMessages(new Set());
@@ -135,7 +149,7 @@ const AppContent = () => {
       <View 
         style={[
           styles.container, 
-          { display: tokenStoreVisible ? 'none' : 'flex' }
+          { display: tokenStoreVisible || galleryVisible ? 'none' : 'flex' }
         ]}
       >
         {/* Background Image - Animated */}
@@ -216,11 +230,16 @@ const AppContent = () => {
           onToggleDarkMode={toggleTheme}
           onBuyTokens={openTokenStore}
           onNewChat={resetChat}
+          onOpenGallery={openGallery}
         />
       </View>
 
       {tokenStoreVisible && (
         <TokenStoreScreen onClose={closeTokenStore} />
+      )}
+
+      {galleryVisible && (
+        <GalleryScreen onClose={closeGallery} onNavigateToChat={navigateToChat} />
       )}
     </Animated.View>
   );
