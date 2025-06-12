@@ -41,32 +41,7 @@ type GalleryImage = {
 const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
   const { showImageViewer } = useImageViewer();
-  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([
-    {
-      id: "1",
-      source: require("../assets/carousel/sample-01.jpeg"),
-      isLiked: false,
-      description: "Abstract Art #1",
-    },
-    {
-      id: "2",
-      source: require("../assets/carousel/sample-02.jpeg"),
-      isLiked: true,
-      description: "Abstract Art #2",
-    },
-    {
-      id: "3",
-      source: require("../assets/carousel/sample-03.jpeg"),
-      isLiked: false,
-      description: "Abstract Art #3",
-    },
-    {
-      id: "4",
-      source: require("../assets/carousel/sample-04.jpeg"),
-      isLiked: true,
-      description: "Abstract Art #4",
-    }
-  ]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   
   // Estado para controlar o feedback de exclusão
   const [isDeleting, setIsDeleting] = useState(false);
@@ -136,9 +111,6 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
     setIsDeleting(true);
     deletedItemId.current = id;
     
-    // Mostrar feedback
-    showFeedback('Imagem excluída com sucesso');
-    
     // Remover a imagem da lista com um pequeno atraso para o efeito visual
     setTimeout(() => {
       setGalleryImages(prevImages => 
@@ -193,17 +165,17 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.emptyIcon}
       />
       <Text style={[styles.emptyText, { color: colors.text }]}>
-        Nenhuma imagem na galeria
+        No images in gallery
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        Use o comando "/image" no chat para gerar novas imagens
+        Use the "/image" command in chat to generate new images
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Home')}
       >
         <Ionicons name="add" size={22} color="#FFFFFF" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Criar nova imagem</Text>
+        <Text style={styles.buttonText}>Create new image</Text>
       </TouchableOpacity>
     </View>
   );

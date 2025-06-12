@@ -90,12 +90,12 @@ const GlobalImageViewer = () => {
   const handleDelete = () => {
     if (currentImage?.id && onDeleteImage) {
       Alert.alert(
-        "Excluir imagem",
-        "Tem certeza que deseja excluir esta imagem?",
+        "Delete Image",
+        "Do you want to delete this image?",
         [
-          { text: "Cancelar", style: "cancel" },
+          { text: "No", style: "cancel" },
           { 
-            text: "Excluir", 
+            text: "Yes", 
             style: "destructive",
             onPress: () => {
               // Armazena o ID antes de fechar o modal

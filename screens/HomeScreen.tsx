@@ -18,7 +18,7 @@ import SideMenu from "../components/SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
 import { useKeyboardAnimation } from "../components/hooks/useKeyboardAnimation";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
@@ -26,6 +26,8 @@ type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
 const HomeScreen = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const isFocused = useIsFocused();
+  const prevFocusedRef = useRef(false);
   const { isDarkMode, toggleTheme, colors } = useTheme();
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
@@ -43,6 +45,29 @@ const HomeScreen = () => {
   useEffect(() => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
+
+  // Effect to handle navigation stack reset when Home screen is focused
+  useEffect(() => {
+    if (isFocused && !prevFocusedRef.current) {
+      prevFocusedRef.current = true;
+      
+      // Clear the navigation stack only if we arrived from another screen
+      const state = navigation.getState();
+      if (state.routes.length > 1) {
+        // Set timeout to avoid doing this during render
+        setTimeout(() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: 'Home' }],
+            })
+          );
+        }, 0);
+      }
+    } else if (!isFocused) {
+      prevFocusedRef.current = false;
+    }
+  }, [isFocused, navigation]);
 
   const mainContentPanResponder = useRef(
     PanResponder.create({

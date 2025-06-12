@@ -31,6 +31,7 @@ const AppNavigator = () => {
           ...TransitionPresets.SlideFromRightIOS,
           cardStyle: { backgroundColor: colors.background },
           presentation: 'card',
+          detachPreviousScreen: true,
         }}
       >
         <Stack.Screen name="Home" component={HomeScreen} />
