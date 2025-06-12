@@ -8,15 +8,13 @@ export const LoadingBubble = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface }]}>
-      <View style={styles.animationWrapper}>
-        <DotTypingAnimation
+        <DotTypingAnimation style={styles.dotsAnimation}
           dotColor={colors.text}
-          dotMargin={3}
+          dotMargin={10}
           dotSpeed={0.2}
-          dotRadius={2}
+          dotRadius={3}
         />
       </View>
-    </View>
   );
 };
 
@@ -25,14 +23,15 @@ const styles = StyleSheet.create({
     minWidth: 60,
     minHeight: 40,
     alignSelf: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 16,
     marginBottom: 8,
     marginLeft: 16,
   },
-  animationWrapper: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
+  dotsAnimation: {
+    alignSelf: 'center',
+  marginRight: 24,
+  marginBottom: 12,
   },
 }); 
