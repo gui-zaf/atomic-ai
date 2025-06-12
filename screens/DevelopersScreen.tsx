@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,60 +6,23 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Animated,
   Dimensions,
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
 
-interface DevelopersScreenProps {
-  onClose: () => void;
-}
+type DevelopersScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Developers'>;
 
 const { width } = Dimensions.get("window");
 
-const DevelopersScreen = ({ onClose }: DevelopersScreenProps) => {
-  const { colors, isDarkMode } = useTheme();
-  
-  // Animation for screen transition
-  const slideAnim = useRef(new Animated.Value(Dimensions.get("window").width)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Animate in when component mounts
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const handleClose = () => {
-    // Animate out then close
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: Dimensions.get("window").width,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onClose();
-    });
-  };
+const DevelopersScreen = () => {
+  const navigation = useNavigation<DevelopersScreenNavigationProp>();
+  const { colors } = useTheme();
 
   const openLink = async (url: string) => {
     try {
@@ -112,19 +75,10 @@ const DevelopersScreen = ({ onClose }: DevelopersScreenProps) => {
   );
 
   return (
-    <Animated.View 
-      style={[
-        styles.container, 
-        { 
-          backgroundColor: colors.background,
-          opacity: opacityAnim,
-          transform: [{ translateX: slideAnim }],
-        }
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>Developers</Text>
@@ -153,19 +107,13 @@ const DevelopersScreen = ({ onClose }: DevelopersScreenProps) => {
           )}
         </ScrollView>
       </SafeAreaView>
-    </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 10,
   },
   safeArea: {
     flex: 1,

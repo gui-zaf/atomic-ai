@@ -9,8 +9,9 @@ import {
   Share,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { ImageViewer } from "./ImageViewer";
 import { useTheme } from "../context/ThemeContext";
+import { useImageViewer } from "../context/ImageViewerContext";
+import { addToggleLikeListener } from "./GlobalImageViewer";
 
 interface ChatBubbleProps {
   message: string;
@@ -28,9 +29,14 @@ export const ChatBubble = ({
   onToggleLike,
 }: ChatBubbleProps) => {
   const { colors } = useTheme();
-  const [isImageViewerVisible, setImageViewerVisible] = useState(false);
+  const { showImageViewer } = useImageViewer();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
+  const [localIsLiked, setLocalIsLiked] = useState(isLiked);
+
+  useEffect(() => {
+    setLocalIsLiked(isLiked);
+  }, [isLiked]);
 
   useEffect(() => {
     Animated.parallel([
@@ -47,6 +53,21 @@ export const ChatBubble = ({
     ]).start();
   }, []);
 
+  useEffect(() => {
+    // Adicionar listener para sincronizar o estado de like
+    // quando alterado no visualizador de imagem
+    if (image) {
+      const removeListener = addToggleLikeListener((newIsLiked) => {
+        setLocalIsLiked(newIsLiked);
+        onToggleLike();
+      });
+      
+      return () => {
+        removeListener();
+      };
+    }
+  }, [image, onToggleLike]);
+
   const imageSource = image ? require("../assets/carousel/sample-01.jpeg") : null;
 
   const handleShare = async () => {
@@ -59,96 +80,103 @@ export const ChatBubble = ({
     }
   };
 
+  const handleDownload = () => {
+    // Implementação futura
+  };
+
+  const handleImagePress = () => {
+    if (imageSource) {
+      showImageViewer({
+        source: imageSource,
+        isLiked: localIsLiked,
+        message
+      });
+    }
+  };
+
+  const handleToggleLike = () => {
+    const newLikeState = !localIsLiked;
+    setLocalIsLiked(newLikeState);
+    onToggleLike();
+  };
+
   return (
-    <>
-      <View
+    <View
+      style={[
+        styles.container,
+        isUser ? styles.userContainer : styles.aiContainer,
+      ]}
+    >
+      <Animated.View
         style={[
-          styles.container,
-          isUser ? styles.userContainer : styles.aiContainer,
+          styles.bubble,
+          isUser
+            ? [styles.userBubble, { backgroundColor: colors.primary }]
+            : [styles.aiBubble, { backgroundColor: colors.surface }],
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY }],
+          },
         ]}
       >
-        <Animated.View
-          style={[
-            styles.bubble,
-            isUser
-              ? [styles.userBubble, { backgroundColor: colors.primary }]
-              : [styles.aiBubble, { backgroundColor: colors.surface }],
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY }],
-            },
-          ]}
-        >
-          {image && (
-            <>
-              <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() => setImageViewerVisible(true)}
-              >
-                <Image
-                  source={imageSource}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-              </TouchableOpacity>
-              <View style={styles.actionBar}>
-                <View style={styles.leftActions}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={onToggleLike}
-                  >
-                    <Ionicons
-                      name={isLiked ? "heart" : "heart-outline"}
-                      size={22}
-                      color={isLiked ? colors.error : isUser ? "#FFF" : colors.text}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.lastLeftButton]}
-                    onPress={() => {}}
-                  >
-                    <Ionicons
-                      name="download-outline"
-                      size={22}
-                      color={isUser ? "#FFF" : colors.text}
-                    />
-                  </TouchableOpacity>
-                </View>
+        {image && (
+          <>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={handleImagePress}
+            >
+              <Image
+                source={imageSource}
+                style={styles.image}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+            <View style={styles.actionBar}>
+              <View style={styles.leftActions}>
                 <TouchableOpacity
-                  style={[styles.actionButton, styles.shareButton]}
-                  onPress={handleShare}
+                  style={styles.actionButton}
+                  onPress={handleToggleLike}
                 >
                   <Ionicons
-                    name="share-outline"
+                    name={localIsLiked ? "heart" : "heart-outline"}
+                    size={22}
+                    color="#FF3B30"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.lastLeftButton]}
+                  onPress={handleDownload}
+                >
+                  <Ionicons
+                    name="download-outline"
                     size={22}
                     color={isUser ? "#FFF" : colors.text}
                   />
                 </TouchableOpacity>
               </View>
-            </>
-          )}
-          <Text
-            style={[
-              styles.text,
-              isUser ? styles.userText : { color: colors.text },
-            ]}
-          >
-            {message}
-          </Text>
-        </Animated.View>
-      </View>
-
-      {imageSource && (
-        <ImageViewer
-          isVisible={isImageViewerVisible}
-          onClose={() => setImageViewerVisible(false)}
-          imageSource={imageSource}
-          message={message}
-          isLiked={isLiked}
-          onToggleLike={onToggleLike}
-        />
-      )}
-    </>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.shareButton]}
+                onPress={handleShare}
+              >
+                <Ionicons
+                  name="share-outline"
+                  size={22}
+                  color={isUser ? "#FFF" : colors.text}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+        <Text
+          style={[
+            styles.text,
+            isUser ? styles.userText : { color: colors.text },
+          ]}
+        >
+          {message}
+        </Text>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -185,10 +213,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   image: {
-    width: "100%",
-    height: 200,
+    width: 250,
+    height: 250,
     borderRadius: 12,
     marginBottom: 12,
+    alignSelf: "center",
   },
   actionBar: {
     flexDirection: "row",

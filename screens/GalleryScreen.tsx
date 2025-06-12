@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -8,372 +8,235 @@ import {
   FlatList,
   Alert,
   Dimensions,
-  Share,
-  ActionSheetIOS,
+  ToastAndroid,
   Platform,
-  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
-import { ImageViewer } from "../components/ImageViewer";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigator";
+import { useImageViewer } from "../context/ImageViewerContext";
+import { addToggleLikeListener } from "../components/GlobalImageViewer";
 
-interface GalleryScreenProps {
-  onClose: () => void;
-  onNavigateToChat: () => void;
-}
+type GalleryScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Gallery"
+>;
 
-interface GalleryImage {
+type Props = {
+  navigation: GalleryScreenNavigationProp;
+};
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const IMAGE_SIZE = SCREEN_WIDTH / 2 - 12;
+
+type GalleryImage = {
   id: string;
   source: any;
   isLiked: boolean;
-  animatedValue?: Animated.Value;
-}
+  description: string;
+};
 
-const { width } = Dimensions.get("window");
-const imageSize = (width - 48) / 2; // 16px padding + 16px gap
-
-const initialImages: GalleryImage[] = [
-  { id: "1", source: require("../assets/carousel/sample-01.jpeg"), isLiked: false, animatedValue: new Animated.Value(1) },
-  { id: "2", source: require("../assets/carousel/sample-02.jpeg"), isLiked: false, animatedValue: new Animated.Value(1) },
-  { id: "3", source: require("../assets/carousel/sample-03.jpeg"), isLiked: false, animatedValue: new Animated.Value(1) },
-  { id: "4", source: require("../assets/carousel/sample-04.jpeg"), isLiked: false, animatedValue: new Animated.Value(1) },
-];
-
-const GalleryScreen = ({ onClose, onNavigateToChat }: GalleryScreenProps) => {
+const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
-  const [images, setImages] = useState<GalleryImage[]>(initialImages);
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isImageViewerVisible, setImageViewerVisible] = useState(false);
+  const { showImageViewer } = useImageViewer();
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([
+    {
+      id: "1",
+      source: require("../assets/carousel/sample-01.jpeg"),
+      isLiked: false,
+      description: "Abstract Art #1",
+    },
+    {
+      id: "2",
+      source: require("../assets/carousel/sample-02.jpeg"),
+      isLiked: true,
+      description: "Abstract Art #2",
+    },
+    {
+      id: "3",
+      source: require("../assets/carousel/sample-03.jpeg"),
+      isLiked: false,
+      description: "Abstract Art #3",
+    },
+    {
+      id: "4",
+      source: require("../assets/carousel/sample-04.jpeg"),
+      isLiked: true,
+      description: "Abstract Art #4",
+    }
+  ]);
   
-  // Animation for screen transition
-  const slideAnim = useRef(new Animated.Value(Dimensions.get("window").width)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  // Estado para controlar o feedback de exclusão
+  const [isDeleting, setIsDeleting] = useState(false);
+  const deletedItemId = useRef<string | null>(null);
 
-  React.useEffect(() => {
-    // Animate in when component mounts
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const handleClose = () => {
-    // Animate out then close
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: Dimensions.get("window").width,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onClose();
-    });
-  };
-
-  const handleToggleLike = (imageId: string) => {
-    setImages(prev => 
-      prev.map(img => 
-        img.id === imageId ? { ...img, isLiked: !img.isLiked } : img
+  // Função para atualizar o estado de like de uma imagem
+  const handleToggleLike = useCallback((imageId: string, newLikeState: boolean) => {
+    setGalleryImages(prevImages => 
+      prevImages.map(img => 
+        img.id === imageId ? { ...img, isLiked: newLikeState } : img
       )
     );
-  };
+  }, []);
 
-
-
-  const handleImagePress = (image: GalleryImage) => {
-    const index = images.findIndex(img => img.id === image.id);
-    setSelectedImage(image);
-    setSelectedIndex(index);
-    setImageViewerVisible(true);
-  };
-
-  const handleDeleteImage = (imageId: string) => {
-    Alert.alert(
-      "Delete Image",
-      "Are you sure you want to delete this image?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            const imageToDelete = images.find(img => img.id === imageId);
-            if (imageToDelete?.animatedValue) {
-              // Animate out the image being deleted
-              Animated.timing(imageToDelete.animatedValue, {
-                toValue: 0,
-                duration: 250,
-                useNativeDriver: false,
-              }).start(() => {
-                // Remove from array after animation
-                setImages(prev => prev.filter(img => img.id !== imageId));
-                setImageViewerVisible(false);
-                setSelectedImage(null);
-              });
-            } else {
-              // Fallback if no animation value
-              setImages(prev => prev.filter(img => img.id !== imageId));
-              setImageViewerVisible(false);
-              setSelectedImage(null);
-            }
-          }
-        }
-      ]
-    );
-  };
-
-  const handleIndexChange = (newIndex: number) => {
-    if (images[newIndex]) {
-      setSelectedIndex(newIndex);
-      setSelectedImage(images[newIndex]);
-    }
-  };
-
-  // Sync selectedImage with images array when it changes
+  // Registra um listener global para likes quando o componente é montado
   React.useEffect(() => {
-    if (selectedImage && images[selectedIndex]) {
-      setSelectedImage(images[selectedIndex]);
-    }
-  }, [images, selectedIndex]);
+    const removeListener = addToggleLikeListener((newIsLiked) => {
+      // Atualizar o estado da imagem atual
+      if (currentViewingImageId.current) {
+        handleToggleLike(currentViewingImageId.current, newIsLiked);
+      }
+    });
+    
+    return () => {
+      removeListener();
+    };
+  }, [handleToggleLike]);
 
-  const handleCurrentImageToggleLike = () => {
-    if (selectedImage) {
-      handleToggleLike(selectedImage.id);
-      // Update the selectedImage state to reflect the change immediately
-      setSelectedImage(prev => prev ? { ...prev, isLiked: !prev.isLiked } : null);
-    }
-  };
+  // Referência para armazenar o ID da imagem que está sendo visualizada atualmente
+  const currentViewingImageId = React.useRef<string | null>(null);
 
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: "Check out this amazing image from Atomic AI!",
-      });
-    } catch (error) {
-      // Silently handle sharing error
-    }
-  };
-
-  const handleDownload = () => {
-    Alert.alert(
-      "Download",
-      "Image downloaded to your device!",
-      [{ text: "OK" }]
+  const handleImagePress = (item: GalleryImage) => {
+    // Armazena o ID da imagem sendo visualizada
+    currentViewingImageId.current = item.id;
+    
+    showImageViewer(
+      {
+        id: item.id,
+        source: item.source,
+        isLiked: item.isLiked,
+        message: item.description,
+      },
+      {
+        isGalleryMode: true,
+        onDeleteImage: handleDeleteImage,
+      }
     );
   };
 
-  const showContextMenu = (image: GalleryImage) => {
-    const options = [
-      image.isLiked ? "Unlike" : "Like",
-      "Download", 
-      "Share", 
-      "Delete",
-      "Cancel"
-    ];
-    
-    const destructiveButtonIndex = 3; // Delete
-    const cancelButtonIndex = 4;
-
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options,
-          destructiveButtonIndex,
-          cancelButtonIndex,
-        },
-        (buttonIndex) => {
-          handleContextMenuAction(image, buttonIndex);
-        }
-      );
+  // Função auxiliar para mostrar feedback
+  const showFeedback = (message: string) => {
+    if (Platform.OS === 'android') {
+      ToastAndroid.show(message, ToastAndroid.SHORT);
     } else {
-      // For Android, show alert with options
-      Alert.alert(
-        "Image Actions",
-        "Choose an action:",
-        [
-          {
-            text: image.isLiked ? "Unlike" : "Like",
-            onPress: () => handleContextMenuAction(image, 0)
-          },
-          {
-            text: "Download",
-            onPress: () => handleContextMenuAction(image, 1)
-          },
-          {
-            text: "Share",
-            onPress: () => handleContextMenuAction(image, 2)
-          },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: () => handleContextMenuAction(image, 3)
-          },
-          {
-            text: "Cancel",
-            style: "cancel"
-          }
-        ]
+      // No iOS, podemos usar um Alert simples ou implementar um toast customizado
+      Alert.alert('', message, [{ text: 'OK' }], { cancelable: true });
+    }
+  };
+
+  const handleDeleteImage = (id: string) => {
+    // Limpar a referência ao ID da imagem atual se for a mesma que está sendo excluída
+    if (currentViewingImageId.current === id) {
+      currentViewingImageId.current = null;
+    }
+    
+    // Marcar como excluindo e armazenar o ID da imagem
+    setIsDeleting(true);
+    deletedItemId.current = id;
+    
+    // Mostrar feedback
+    showFeedback('Imagem excluída com sucesso');
+    
+    // Remover a imagem da lista com um pequeno atraso para o efeito visual
+    setTimeout(() => {
+      setGalleryImages(prevImages => 
+        prevImages.filter(image => image.id !== id)
       );
-    }
+      setIsDeleting(false);
+      deletedItemId.current = null;
+    }, 300);
   };
 
-  const handleContextMenuAction = (image: GalleryImage, buttonIndex: number) => {
-    switch (buttonIndex) {
-      case 0: // Like/Unlike
-        handleToggleLike(image.id);
-        break;
-      case 1: // Download
-        handleDownload();
-        break;
-      case 2: // Share
-        handleShare();
-        break;
-      case 3: // Delete
-        handleDeleteImage(image.id);
-        break;
-    }
-  };
-
-  const renderImageItem = ({ item }: { item: GalleryImage }) => {
-    const animatedValue = item.animatedValue || new Animated.Value(1);
+  const renderItem = ({ item }: { item: GalleryImage }) => {
+    // Aplicar efeito visual se o item estiver sendo excluído
+    const isBeingDeleted = isDeleting && deletedItemId.current === item.id;
     
     return (
-      <Animated.View
+      <TouchableOpacity
         style={[
-          styles.animatedContainer,
-          {
-            opacity: animatedValue,
-            transform: [{
-              scale: animatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.3, 1],
-              })
-            }],
-          }
+          styles.imageContainer,
+          isBeingDeleted && styles.deletingImage
         ]}
+        onPress={() => handleImagePress(item)}
+        activeOpacity={0.8}
+        disabled={isBeingDeleted}
       >
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => handleImagePress(item)}
-          onLongPress={() => showContextMenu(item)}
-          style={styles.imageContainer}
-          delayLongPress={500}
-        >
-          <Image
-            source={item.source}
-            style={[
-              styles.image,
-              { width: imageSize, height: imageSize }
-            ]}
-            resizeMode="cover"
-          />
-          
-          {/* Heart indicator for liked images */}
-          {item.isLiked && (
-            <View style={styles.likeIndicator}>
-              <Ionicons
-                name="heart"
-                size={16}
-                color={colors.error}
-              />
-            </View>
-          )}
-        </TouchableOpacity>
-      </Animated.View>
+        <Image 
+          source={item.source} 
+          style={[
+            styles.image,
+            isBeingDeleted && { opacity: 0.5 }
+          ]} 
+        />
+        {item.isLiked && (
+          <View style={styles.likeIconContainer}>
+            <Ionicons name="heart" size={22} color="#FF3B30" />
+          </View>
+        )}
+        {isBeingDeleted && (
+          <View style={styles.deletingOverlay}>
+            <Ionicons name="trash" size={32} color="#FF3B30" />
+          </View>
+        )}
+      </TouchableOpacity>
     );
   };
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="images-outline" size={80} color={colors.subtext} />
-      <Text style={[styles.emptyTitle, { color: colors.text }]}>
-        No images created yet
+      <Ionicons
+        name="images-outline"
+        size={80}
+        color={colors.primary}
+        style={styles.emptyIcon}
+      />
+      <Text style={[styles.emptyText, { color: colors.text }]}>
+        Nenhuma imagem na galeria
       </Text>
-      <Text style={[styles.emptySubtitle, { color: colors.subtext }]}>
-        Start creating amazing images with AI
+      <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
+        Use o comando "/image" no chat para gerar novas imagens
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
-        onPress={onNavigateToChat}
+        onPress={() => navigation.navigate('Home')}
       >
-        <Ionicons name="sparkles" size={20} color="#fff" />
-        <Text style={styles.createButtonText}>Create Image</Text>
+        <Ionicons name="add" size={22} color="#FFFFFF" style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Criar nova imagem</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <Animated.View 
-      style={[
-        styles.container, 
-        { 
-          backgroundColor: colors.background,
-          opacity: opacityAnim,
-          transform: [{ translateX: slideAnim }]
-        }
-      ]}
-    >
-      <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-        {/* Header */}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.iconButton} onPress={handleClose}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()} 
+            style={styles.closeButton}
+          >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.text }]}>Gallery</Text>
-          <View style={styles.iconButton} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Galeria</Text>
+          <View style={styles.headerRight} />
         </View>
 
-        {/* Content */}
-        {images.length === 0 ? (
+        {galleryImages.length === 0 ? (
           renderEmptyState()
         ) : (
           <FlatList
-            data={images}
-            renderItem={renderImageItem}
+            data={galleryImages}
+            renderItem={renderItem}
             keyExtractor={(item) => item.id}
             numColumns={2}
-            contentContainerStyle={styles.gridContainer}
-            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
+            extraData={[galleryImages, isDeleting, deletedItemId.current]} // Força rerender quando esses estados mudam
           />
         )}
       </SafeAreaView>
-
-      {/* Image Viewer */}
-      {selectedImage && (
-        <ImageViewer
-          isVisible={isImageViewerVisible}
-          onClose={() => {
-            setImageViewerVisible(false);
-            setSelectedImage(null);
-          }}
-          imageSource={selectedImage.source}
-          message="AI Generated Image"
-          isLiked={selectedImage.isLiked}
-          onToggleLike={handleCurrentImageToggleLike}
-          onDelete={() => handleDeleteImage(selectedImage.id)}
-          showDeleteButton={true}
-          images={images.map(img => img.source)}
-          currentIndex={selectedIndex}
-          onIndexChange={handleIndexChange}
-        />
-      )}
-    </Animated.View>
+    </View>
   );
 };
 
@@ -381,84 +244,100 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  safeArea: {
+    flex: 1,
+  },
   header: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    height: 60,
   },
-  iconButton: {
-    width: 32,
-    height: 32,
+  closeButton: {
+    width: 40,
+    height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
+  headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
+    fontWeight: "600",
   },
-  gridContainer: {
-    padding: 16,
+  headerRight: {
+    width: 40,
   },
-  row: {
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  animatedContainer: {
-    marginBottom: 4,
+  list: {
+    padding: 4,
   },
   imageContainer: {
-    backgroundColor: "transparent",
+    margin: 4,
+    borderRadius: 12,
+    overflow: "hidden",
     position: "relative",
   },
   image: {
-    borderRadius: 12,
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
   },
-  likeIndicator: {
+  likeIconContainer: {
     position: "absolute",
     top: 8,
     right: 8,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: 12,
-    padding: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deletingImage: {
+    transform: [{ scale: 0.95 }],
+  },
+  deletingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 32,
+    padding: 32,
   },
-  emptyTitle: {
-    fontSize: 20,
+  emptyIcon: {
+    marginBottom: 24,
+  },
+  emptyText: {
+    fontSize: 24,
     fontWeight: "bold",
-    marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  emptySubtitle: {
+  emptySubtext: {
     fontSize: 16,
     textAlign: "center",
-    marginBottom: 32,
+    marginBottom: 36,
+    lineHeight: 22,
   },
   createButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 24,
-    gap: 8,
+    paddingHorizontal: 20,
+    borderRadius: 10,
   },
-  createButtonText: {
-    color: "#fff",
-    fontSize: 16,
+  buttonIcon: {
+    marginRight: 8,
+  },
+  buttonText: {
+    color: "white",
     fontWeight: "600",
+    fontSize: 16,
   },
 });
 

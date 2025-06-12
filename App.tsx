@@ -2,22 +2,32 @@ import React from "react";
 import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TokenProvider } from "./context/TokenContext";
-import { ThemeProvider, useTheme } from "./context/ThemeContext";
-import AppContent from "./components/AppContent";
+import { ThemeProvider } from "./context/ThemeContext";
+import { ImageViewerProvider } from "./context/ImageViewerContext";
+import AppNavigator from "./navigation/AppNavigator";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import GlobalImageViewer from "./components/GlobalImageViewer";
 
-const AppWrapper = () => {
-  const { colors } = useTheme();
-  
+const App = () => {
   return (
-    <SafeAreaProvider style={{ backgroundColor: colors.background }}>
-      <KeyboardAvoidingView
-        style={[styles.container, { backgroundColor: colors.background }]}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
-        <AppContent />
-      </KeyboardAvoidingView>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <TokenProvider>
+          <ImageViewerProvider>
+            <SafeAreaProvider>
+              <KeyboardAvoidingView
+                style={styles.container}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+              >
+                <AppNavigator />
+                <GlobalImageViewer />
+              </KeyboardAvoidingView>
+            </SafeAreaProvider>
+          </ImageViewerProvider>
+        </TokenProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 };
 
@@ -27,12 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function App() {
-  return (
-    <ThemeProvider>
-      <TokenProvider>
-        <AppWrapper />
-      </TokenProvider>
-    </ThemeProvider>
-  );
-}
+export default App;
