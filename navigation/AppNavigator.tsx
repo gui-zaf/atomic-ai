@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import TokenStoreScreen from '../screens/TokenStoreScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import DevelopersScreen from '../screens/DevelopersScreen';
+import HistoryScreen from '../screens/HistoryScreen';
 import { useTheme } from '../context/ThemeContext';
 
 // Define the stack navigator param list
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   TokenStore: undefined;
   Gallery: undefined;
   Developers: undefined;
+  History: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -38,6 +40,7 @@ const AppNavigator = () => {
         <Stack.Screen name="TokenStore" component={TokenStoreScreen} />
         <Stack.Screen name="Gallery" component={GalleryScreen} />
         <Stack.Screen name="Developers" component={DevelopersScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

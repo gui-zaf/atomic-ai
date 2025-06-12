@@ -24,6 +24,7 @@ interface SideMenuProps {
   onNewChat?: () => void;
   onOpenGallery?: () => void;
   onOpenDevelopers?: () => void;
+  onOpenHistory?: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -39,6 +40,7 @@ const SideMenu = ({
   onNewChat,
   onOpenGallery,
   onOpenDevelopers,
+  onOpenHistory,
 }: SideMenuProps) => {
   const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
@@ -194,7 +196,7 @@ const SideMenu = ({
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={onOpenHistory}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 History

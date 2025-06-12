@@ -145,6 +145,11 @@ const HomeScreen = () => {
     navigation.navigate('Developers');
   };
 
+  const openHistory = () => {
+    handleCloseMenu();
+    navigation.navigate('History');
+  };
+
   const resetChat = () => {
     setMessages([]);
     setLikedMessages(new Set());
@@ -251,6 +256,7 @@ const HomeScreen = () => {
           onNewChat={resetChat}
           onOpenGallery={openGallery}
           onOpenDevelopers={openDevelopers}
+          onOpenHistory={openHistory}
         />
       </View>
     </Animated.View>
