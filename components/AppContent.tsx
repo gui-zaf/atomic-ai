@@ -19,6 +19,7 @@ import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
 import TokenStoreScreen from "../screens/TokenStoreScreen";
 import GalleryScreen from "../screens/GalleryScreen";
+import DevelopersScreen from "../screens/DevelopersScreen";
 import { useKeyboardAnimation } from "./hooks/useKeyboardAnimation";
 
 const AppContent = () => {
@@ -28,6 +29,7 @@ const AppContent = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [tokenStoreVisible, setTokenStoreVisible] = useState(false);
   const [galleryVisible, setGalleryVisible] = useState(false);
+  const [developersVisible, setDevelopersVisible] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
@@ -115,6 +117,13 @@ const AppContent = () => {
   };
 
   const closeGallery = () => setGalleryVisible(false);
+  
+  const openDevelopers = () => {
+    setDevelopersVisible(true);
+    setMenuVisible(false);
+  };
+
+  const closeDevelopers = () => setDevelopersVisible(false);
 
   const navigateToChat = () => {
     setGalleryVisible(false);
@@ -149,7 +158,7 @@ const AppContent = () => {
       <View 
         style={[
           styles.container, 
-          { display: tokenStoreVisible || galleryVisible ? 'none' : 'flex' }
+          { display: tokenStoreVisible || galleryVisible || developersVisible ? 'none' : 'flex' }
         ]}
       >
         {/* Background Image - Animated */}
@@ -231,6 +240,7 @@ const AppContent = () => {
           onBuyTokens={openTokenStore}
           onNewChat={resetChat}
           onOpenGallery={openGallery}
+          onOpenDevelopers={openDevelopers}
         />
       </View>
 
@@ -240,6 +250,10 @@ const AppContent = () => {
 
       {galleryVisible && (
         <GalleryScreen onClose={closeGallery} onNavigateToChat={navigateToChat} />
+      )}
+      
+      {developersVisible && (
+        <DevelopersScreen onClose={closeDevelopers} />
       )}
     </Animated.View>
   );

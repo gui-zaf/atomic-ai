@@ -23,6 +23,7 @@ interface SideMenuProps {
   onBuyTokens?: () => void;
   onNewChat?: () => void;
   onOpenGallery?: () => void;
+  onOpenDevelopers?: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -37,6 +38,7 @@ const SideMenu = ({
   onBuyTokens,
   onNewChat,
   onOpenGallery,
+  onOpenDevelopers,
 }: SideMenuProps) => {
   const { colors } = useTheme();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
@@ -254,7 +256,7 @@ const SideMenu = ({
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={onOpenDevelopers}>
               <Ionicons name="code-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 Developers
