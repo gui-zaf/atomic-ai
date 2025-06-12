@@ -6,11 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
-  SafeAreaView,
   Alert,
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTokens } from "../context/TokenContext";
@@ -235,7 +235,7 @@ const TokenStoreScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.header}>
           <TouchableOpacity 
             onPress={() => navigation.goBack()} 
@@ -279,7 +279,7 @@ const TokenStoreScreen = () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <SafeAreaView edges={["top", "bottom"]} style={[styles.modalOverlay, { backgroundColor: "rgba(0, 0, 0, 0.5)" }]}>
           <View
             style={[styles.modalContent, { backgroundColor: colors.surface }]}
           >
@@ -325,7 +325,7 @@ const TokenStoreScreen = () => {
               </>
             )}
           </View>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );
@@ -473,7 +473,6 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
