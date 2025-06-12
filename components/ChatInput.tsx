@@ -235,8 +235,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
 const styles = StyleSheet.create({
   inputWrapper: {
     position: 'relative',
-    zIndex: 10,
-    marginTop: 8,
+    marginTop: 0,
   },
   inputWrapperKeyboardOpen: {
     marginBottom: -20,
@@ -253,7 +252,7 @@ const styles = StyleSheet.create({
   suggestionsWrapper: {
     position: 'relative',
     zIndex: 25,
-    marginTop: 8,
+    marginTop: 0,
   },
   container: {
     paddingHorizontal: 16,

@@ -8,8 +8,6 @@ import {
   FlatList,
   Alert,
   Dimensions,
-  ToastAndroid,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -91,16 +89,6 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         onDeleteImage: handleDeleteImage,
       }
     );
-  };
-
-  // Função auxiliar para mostrar feedback
-  const showFeedback = (message: string) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.show(message, ToastAndroid.SHORT);
-    } else {
-      // No iOS, podemos usar um Alert simples ou implementar um toast customizado
-      Alert.alert('', message, [{ text: 'OK' }], { cancelable: true });
-    }
   };
 
   const handleDeleteImage = (id: string) => {

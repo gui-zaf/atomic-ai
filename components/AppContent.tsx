@@ -11,15 +11,11 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "./Header";
-import { WelcomeCreator } from "./WelcomeCreator";
 import { ChatMessages } from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { Message, sampleImages } from "../types";
-import TokenStoreScreen from "../screens/TokenStoreScreen";
-import GalleryScreen from "../screens/GalleryScreen";
-import DevelopersScreen from "../screens/DevelopersScreen";
 import { useKeyboardAnimation } from "./hooks/useKeyboardAnimation";
 
 const AppContent = () => {
@@ -27,28 +23,24 @@ const AppContent = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
-  const [tokenStoreVisible, setTokenStoreVisible] = useState(false);
-  const [galleryVisible, setGalleryVisible] = useState(false);
-  const [developersVisible, setDevelopersVisible] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  
+
   const keyboardAnimation = useKeyboardAnimation(
     () => setKeyboardVisible(true),
     () => setKeyboardVisible(false)
   );
-  
+
   useEffect(() => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
 
   const mainContentPanResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (evt) => 
+      onStartShouldSetPanResponder: (evt) =>
         !menuVisible && evt.nativeEvent.pageX < 20,
-      onMoveShouldSetPanResponder: (_, gestureState) => 
+      onMoveShouldSetPanResponder: (_, gestureState) =>
         !menuVisible &&
         gestureState.dx > 20 &&
         Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 &&
@@ -93,7 +85,6 @@ const AppContent = () => {
     };
 
     setMessages((prev) => [...prev, userMessage, aiMessage]);
-    setShowWelcome(false);
   };
 
   const toggleMenu = () => {
@@ -105,115 +96,103 @@ const AppContent = () => {
   const handleCloseMenu = () => setMenuVisible(false);
 
   const openTokenStore = () => {
-    setTokenStoreVisible(true);
     setMenuVisible(false);
   };
-
-  const closeTokenStore = () => setTokenStoreVisible(false);
 
   const openGallery = () => {
-    setGalleryVisible(true);
     setMenuVisible(false);
   };
 
-  const closeGallery = () => setGalleryVisible(false);
-  
   const openDevelopers = () => {
-    setDevelopersVisible(true);
     setMenuVisible(false);
-  };
-
-  const closeDevelopers = () => setDevelopersVisible(false);
-
-  const navigateToChat = () => {
-    setGalleryVisible(false);
-    setShowWelcome(true);
   };
 
   const resetChat = () => {
     setMessages([]);
     setLikedMessages(new Set());
     setMenuVisible(false);
-    setShowWelcome(true);
   };
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.container, 
-        { 
+        styles.container,
+        {
           backgroundColor: colors.background,
-          transform: [{
-            translateY: keyboardAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, -10], // Subtle upward movement when keyboard shows
-            })
-          }]
-        }
+          transform: [
+            {
+              translateY: keyboardAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -10], // Subtle upward movement when keyboard shows
+              }),
+            },
+          ],
+        },
       ]}
     >
       <StatusBar style={isDarkMode ? "light" : "dark"} />
 
       {/* Main App Content */}
-      <View 
+      <View
         style={[
-          styles.container, 
-          { display: tokenStoreVisible || galleryVisible || developersVisible ? 'none' : 'flex' }
+          styles.container,
         ]}
       >
         {/* Background Image - Animated */}
-        <Animated.View 
+        <Animated.View
           style={[
             styles.backgroundContainer,
             {
-              transform: [{
-                scale: keyboardAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [1, 1.02],
-                })
-              }],
+              transform: [
+                {
+                  scale: keyboardAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [1, 1.02],
+                  }),
+                },
+              ],
               opacity: keyboardAnimation.interpolate({
                 inputRange: [0, 1],
                 outputRange: [1, 0.95],
-              })
-            }
+              }),
+            },
           ]}
         >
-          <View style={[styles.solidBackground, { backgroundColor: colors.background }]} />
+          <View
+            style={[
+              styles.solidBackground,
+              { backgroundColor: colors.background },
+            ]}
+          />
           <Image
-            source={isDarkMode 
-              ? require('../assets/dark-background.png') 
-              : require('../assets/white-background.png')}
+            source={
+              isDarkMode
+                ? require("../assets/dark-background.png")
+                : require("../assets/white-background.png")
+            }
             style={[
               styles.backgroundImage,
-              { opacity: isBackgroundLoaded ? 1 : 0 }
+              { opacity: isBackgroundLoaded ? 1 : 0 },
             ]}
             onLoad={() => setIsBackgroundLoaded(true)}
-            onError={() => {/* Background image load error */}}
+            onError={() => {
+              /* Background image load error */
+            }}
           />
         </Animated.View>
 
-        <TouchableWithoutFeedback
-          onPress={Keyboard.dismiss}
-          accessible={false}
-        >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.container}>
             <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
               {/* Main content area - removed PanResponder to prevent scroll conflicts */}
               <View style={styles.mainContentArea}>
-                <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
-                {showWelcome && !isInputFocused && !menuVisible ? (
-                  <WelcomeCreator />
-                ) : (
-                  <ChatMessages
-                    messages={messages}
-                    likedMessages={likedMessages}
-                    onToggleLike={handleToggleLike}
-                  />
-                )}
+                <Header
+                  onMenuPress={toggleMenu}
+                  onTokenPress={openTokenStore}
+                />
               </View>
-              
-              <View 
+
+              <View
                 style={styles.edgeSwipeArea}
                 {...mainContentPanResponder.panHandlers}
               />
@@ -222,7 +201,7 @@ const AppContent = () => {
             <View style={styles.inputContainer}>
               <SafeAreaView edges={["bottom"]}>
                 <View pointerEvents="box-none">
-                  <ChatInput 
+                  <ChatInput
                     onSend={handleSendMessage}
                     onFocusChange={setIsInputFocused}
                   />
@@ -243,18 +222,6 @@ const AppContent = () => {
           onOpenDevelopers={openDevelopers}
         />
       </View>
-
-      {tokenStoreVisible && (
-        <TokenStoreScreen onClose={closeTokenStore} />
-      )}
-
-      {galleryVisible && (
-        <GalleryScreen onClose={closeGallery} onNavigateToChat={navigateToChat} />
-      )}
-      
-      {developersVisible && (
-        <DevelopersScreen onClose={closeDevelopers} />
-      )}
     </Animated.View>
   );
 };
@@ -265,39 +232,38 @@ const styles = StyleSheet.create({
   },
   mainContentArea: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   edgeSwipeArea: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
     width: 20,
     zIndex: 50,
-    pointerEvents: 'box-none',
+    pointerEvents: "box-none",
   },
   backgroundContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
     zIndex: 0,
   },
   solidBackground: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
   },
   backgroundImage: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
   inputContainer: {
-    position: 'relative',
+    position: "relative",
     zIndex: 10,
-    marginTop: 'auto',
-    paddingTop: 16,
+    marginTop: "auto",
   },
 });
 
