@@ -21,6 +21,7 @@ import { useKeyboardAnimation } from "../components/hooks/useKeyboardAnimation";
 import { useNavigation, useIsFocused, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import { LoadingBubble } from "../components/LoadingBubble";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -36,6 +37,7 @@ const HomeScreen = () => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const keyboardAnimation = useKeyboardAnimation(
     () => setKeyboardVisible(true),
@@ -48,22 +50,25 @@ const HomeScreen = () => {
 
   // Add initial welcome message and update it when language changes
   useEffect(() => {
-    if (messages.length === 1) {
+    if (messages.length === 0) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+        setMessages([{
+          id: Date.now().toString(),
+          text: t('welcomeMessage'),
+          isUser: false,
+        }]);
+      }, 1500);
+    } else if (messages.length === 1 && !messages[0].isUser) {
       // If there's only the welcome message, update it
       setMessages([{
         id: Date.now().toString(),
         text: t('welcomeMessage'),
         isUser: false,
       }]);
-    } else if (messages.length === 0) {
-      // If there are no messages, add the welcome message
-      setMessages([{
-        id: Date.now().toString(),
-        text: t('welcomeMessage'),
-        isUser: false,
-      }]);
     }
-  }, [language, t]); // Add language as a dependency
+  }, [language, t]);
 
   // Effect to handle navigation stack reset when Home screen is focused
   useEffect(() => {
@@ -124,19 +129,27 @@ const HomeScreen = () => {
       isUser: true,
     };
 
-    const isImageCommand = message.toLowerCase().startsWith("/image");
-    const aiMessage: Message = {
-      id: (timestamp + 1).toString(),
-      text: isImageCommand
-        ? `Here's your "${message.substring(6).trim()}" image! ✨`
-        : "This is a simulated AI response. You can replace this with actual AI responses.",
-      isUser: false,
-      ...(isImageCommand && {
-        image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
-      }),
-    };
-
-    setMessages((prev) => [...prev, userMessage, aiMessage]);
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Show loading for AI response
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const isImageCommand = message.toLowerCase().startsWith("/image");
+      const aiMessage: Message = {
+        id: (timestamp + 1).toString(),
+        text: isImageCommand
+          ? `Here's your "${message.substring(6).trim()}" image! ✨`
+          : "This is a simulated AI response. You can replace this with actual AI responses.",
+        isUser: false,
+        ...(isImageCommand && {
+          image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
+        }),
+      };
+      
+      setIsLoading(false);
+      setMessages(prev => [...prev, aiMessage]);
+    }, 1500);
   };
 
   const toggleMenu = () => {
@@ -169,14 +182,19 @@ const HomeScreen = () => {
   };
 
   const resetChat = () => {
-    const welcomeMessage = {
-      id: Date.now().toString(),
-      text: t('welcomeMessage'),
-      isUser: false,
-    };
-    setMessages([welcomeMessage]);
+    setIsLoading(true);
+    setMessages([]);
     setLikedMessages(new Set());
     setMenuVisible(false);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setMessages([{
+        id: Date.now().toString(),
+        text: t('welcomeMessage'),
+        isUser: false,
+      }]);
+    }, 1500);
   };
 
   return (
@@ -188,7 +206,7 @@ const HomeScreen = () => {
           transform: [{
             translateY: keyboardAnimation.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, -10], // Subtle upward movement when keyboard shows
+              outputRange: [0, -10],
             })
           }]
         }
@@ -244,6 +262,7 @@ const HomeScreen = () => {
                   likedMessages={likedMessages}
                   onToggleLike={handleToggleLike}
                 />
+                {isLoading && <LoadingBubble />}
               </View>
               
               <View 
