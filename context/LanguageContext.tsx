@@ -43,8 +43,8 @@ const translations = {
     yes: 'Yes',
     no: 'No',
 
-    // Welcome Screen
-    whatWillYouCreate: 'What will you create?',
+    // Welcome Message
+    welcomeMessage: 'Hello, what would you like to create today?',
 
     // Suggestions
     suggestions: 'Suggestions',
@@ -134,8 +134,8 @@ const translations = {
     yes: 'Sim',
     no: 'Não',
 
-    // Welcome Screen
-    whatWillYouCreate: 'O que você vai criar?',
+    // Welcome Message
+    welcomeMessage: 'Olá, o que você deseja criar hoje?',
 
     // Suggestions
     suggestions: 'Sugestões',

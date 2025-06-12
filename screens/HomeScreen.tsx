@@ -11,11 +11,11 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "../components/Header";
-import { WelcomeCreator } from "../components/WelcomeCreator";
 import { ChatMessages } from "../components/ChatMessages";
 import ChatInput from "../components/ChatInput";
 import SideMenu from "../components/SideMenu";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { Message, sampleImages } from "../types";
 import { useKeyboardAnimation } from "../components/hooks/useKeyboardAnimation";
 import { useNavigation, useIsFocused, CommonActions } from "@react-navigation/native";
@@ -29,10 +29,10 @@ const HomeScreen = () => {
   const isFocused = useIsFocused();
   const prevFocusedRef = useRef(false);
   const { isDarkMode, toggleTheme, colors } = useTheme();
+  const { t, language } = useLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [likedMessages, setLikedMessages] = useState<Set<string>>(new Set());
   const [menuVisible, setMenuVisible] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -45,6 +45,25 @@ const HomeScreen = () => {
   useEffect(() => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
+
+  // Add initial welcome message and update it when language changes
+  useEffect(() => {
+    if (messages.length === 1) {
+      // If there's only the welcome message, update it
+      setMessages([{
+        id: Date.now().toString(),
+        text: t('welcomeMessage'),
+        isUser: false,
+      }]);
+    } else if (messages.length === 0) {
+      // If there are no messages, add the welcome message
+      setMessages([{
+        id: Date.now().toString(),
+        text: t('welcomeMessage'),
+        isUser: false,
+      }]);
+    }
+  }, [language, t]); // Add language as a dependency
 
   // Effect to handle navigation stack reset when Home screen is focused
   useEffect(() => {
@@ -118,7 +137,6 @@ const HomeScreen = () => {
     };
 
     setMessages((prev) => [...prev, userMessage, aiMessage]);
-    setShowWelcome(false);
   };
 
   const toggleMenu = () => {
@@ -151,10 +169,14 @@ const HomeScreen = () => {
   };
 
   const resetChat = () => {
-    setMessages([]);
+    const welcomeMessage = {
+      id: Date.now().toString(),
+      text: t('welcomeMessage'),
+      isUser: false,
+    };
+    setMessages([welcomeMessage]);
     setLikedMessages(new Set());
     setMenuVisible(false);
-    setShowWelcome(true);
   };
 
   return (
@@ -217,15 +239,11 @@ const HomeScreen = () => {
               {/* Main content area */}
               <View style={styles.mainContentArea}>
                 <Header onMenuPress={toggleMenu} onTokenPress={openTokenStore} />
-                {showWelcome && !isInputFocused && !menuVisible ? (
-                  <WelcomeCreator />
-                ) : (
-                  <ChatMessages
-                    messages={messages}
-                    likedMessages={likedMessages}
-                    onToggleLike={handleToggleLike}
-                  />
-                )}
+                <ChatMessages
+                  messages={messages}
+                  likedMessages={likedMessages}
+                  onToggleLike={handleToggleLike}
+                />
               </View>
               
               <View 
