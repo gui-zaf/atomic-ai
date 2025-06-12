@@ -9,31 +9,33 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SuggestionCarouselProps {
   onSelectSuggestion: (suggestion: string) => void;
 }
 
-const suggestions = [
-  { id: '1', text: 'Cat in space', icon: 'planet', description: 'A cosmic feline floating among stars and galaxies, with a playful expression.' },
-  { id: '2', text: 'Sunset beach', icon: 'sunny', description: 'A serene beach at sunset with golden sands and colorful sky reflecting on gentle waves.' },
-  { id: '3', text: 'Fantasy castle', icon: 'home', description: 'A magnificent castle with tall towers and magical elements, surrounded by a mystical landscape.' },
-  { id: '4', text: 'Cyberpunk city', icon: 'flash', description: 'A futuristic neon-lit cityscape with towering skyscrapers and flying vehicles in a rainy night.' },
-  { id: '5', text: 'Cute animals', icon: 'paw', description: 'Adorable animals in a cheerful meadow, playing together under a bright sunny sky.' },
-  { id: '6', text: 'Colorful landscape', icon: 'color-palette', description: 'A vibrant landscape with rolling hills, flowing rivers, and a rainbow in the clear blue sky.' },
-  { id: '7', text: 'Sci-fi portrait', icon: 'person', description: 'A detailed portrait with futuristic elements, cybernetic enhancements, and glowing details.' },
-  { id: '8', text: 'Abstract art', icon: 'color-wand', description: 'A mesmerizing abstract composition with swirling shapes, bold colors, and dynamic patterns.' }
-];
-
 const { width } = Dimensions.get('window');
 
 const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => {
   const { colors } = useTheme();
+  const { t } = useLanguage();
+  
+  const suggestions = [
+    { id: '1', translationKey: 'catInSpace', descriptionKey: 'catInSpaceDesc', icon: 'planet' },
+    { id: '2', translationKey: 'sunsetBeach', descriptionKey: 'sunsetBeachDesc', icon: 'sunny' },
+    { id: '3', translationKey: 'fantasycastle', descriptionKey: 'fantasycastleDesc', icon: 'home' },
+    { id: '4', translationKey: 'cyberpunkCity', descriptionKey: 'cyberpunkCityDesc', icon: 'flash' },
+    { id: '5', translationKey: 'cuteAnimals', descriptionKey: 'cuteAnimalsDesc', icon: 'paw' },
+    { id: '6', translationKey: 'colorfulLandscape', descriptionKey: 'colorfulLandscapeDesc', icon: 'color-palette' },
+    { id: '7', translationKey: 'sciFiPortrait', descriptionKey: 'sciFiPortraitDesc', icon: 'person' },
+    { id: '8', translationKey: 'abstractArt', descriptionKey: 'abstractArtDesc', icon: 'color-wand' }
+  ];
   
   return (
     <View style={styles.container}>
       <Text style={[styles.sectionHeader, { color: colors.subtext }]}>
-        Suggestions
+        {t('suggestions')}
       </Text>
       
       <ScrollView
@@ -59,14 +61,14 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
               styles.suggestionBox,
               { backgroundColor: colors.surface }
             ]}
-            onPress={() => onSelectSuggestion(suggestion.description)}
+            onPress={() => onSelectSuggestion(t(suggestion.descriptionKey))}
           >
             <Ionicons name={suggestion.icon as any} size={20} color={colors.primary} />
             <Text
               style={[styles.suggestionText, { color: colors.text }]}
               numberOfLines={1}
             >
-              {suggestion.text}
+              {t(suggestion.translationKey)}
             </Text>
           </TouchableOpacity>
         ))}

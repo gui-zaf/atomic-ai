@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { useTokens } from "../context/TokenContext";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -26,74 +27,72 @@ interface TokenPlan {
   price: string;
   featured: boolean;
   features: {
-    title: string;
+    titleKey: string;
     included: boolean;
     icon?: string;
   }[];
-  description: string;
+  descriptionKey: string;
   color?: string;
 }
 
 const { width } = Dimensions.get("window");
 
-const plans: TokenPlan[] = [
-  {
-    id: "basic",
-    name: "Neural",
-    tokens: 50,
-    price: "$4.99",
-    featured: false,
-    features: [
-      { title: "50 Tokens", included: true, icon: "flash" },
-      { title: "Standard Generation", included: true, icon: "image" },
-      { title: "Basic Chat", included: true, icon: "chatbubble" },
-      { title: "Priority Support", included: false, icon: "help-circle" },
-      { title: "Advanced Features", included: false, icon: "star" },
-    ],
-    description:
-      "Perfect for casual users looking to explore AI capabilities with basic features.",
-  },
-  {
-    id: "pro",
-    name: "Quantum",
-    tokens: 150,
-    price: "$9.99",
-    featured: false,
-    features: [
-      { title: "150 Tokens", included: true, icon: "flash" },
-      { title: "HD Generation", included: true, icon: "image" },
-      { title: "Advanced Chat", included: true, icon: "chatbubble" },
-      { title: "Priority Support", included: true, icon: "help-circle" },
-      { title: "Advanced Features", included: false, icon: "star" },
-    ],
-    description:
-      "Our most popular plan. Perfect balance of features and value for regular users.",
-    color: "#0071E3",
-  },
-  {
-    id: "unlimited",
-    name: "Singularity",
-    tokens: 500,
-    price: "$19.99",
-    featured: true,
-    features: [
-      { title: "500 Tokens", included: true, icon: "flash" },
-      { title: "4K Generation", included: true, icon: "image" },
-      { title: "Premium Chat", included: true, icon: "chatbubble" },
-      { title: "Priority Support", included: true, icon: "help-circle" },
-      { title: "Advanced Features", included: true, icon: "star" },
-    ],
-    description:
-      "For power users who need it all. Unlimited access to our most advanced AI features.",
-  },
-];
-
 const TokenStoreScreen = () => {
   const navigation = useNavigation<TokenStoreScreenNavigationProp>();
   const { colors, isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const { addTokens } = useTokens();
   const [selectedPlan, setSelectedPlan] = useState<TokenPlan | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  
+  const plans: TokenPlan[] = [
+    {
+      id: "basic",
+      name: "Neural",
+      tokens: 50,
+      price: "$4.99",
+      featured: false,
+      features: [
+        { titleKey: "50 Tokens", included: true, icon: "flash" },
+        { titleKey: "standardGeneration", included: true, icon: "image" },
+        { titleKey: "basicChat", included: true, icon: "chatbubble" },
+        { titleKey: "prioritySupport", included: false, icon: "help-circle" },
+        { titleKey: "advancedFeatures", included: false, icon: "star" },
+      ],
+      descriptionKey: "casualUser",
+    },
+    {
+      id: "pro",
+      name: "Quantum",
+      tokens: 150,
+      price: "$9.99",
+      featured: false,
+      features: [
+        { titleKey: "150 Tokens", included: true, icon: "flash" },
+        { titleKey: "hdGeneration", included: true, icon: "image" },
+        { titleKey: "advancedChat", included: true, icon: "chatbubble" },
+        { titleKey: "prioritySupport", included: true, icon: "help-circle" },
+        { titleKey: "advancedFeatures", included: false, icon: "star" },
+      ],
+      descriptionKey: "regularUser",
+      color: "#0071E3",
+    },
+    {
+      id: "unlimited",
+      name: "Singularity",
+      tokens: 500,
+      price: "$19.99",
+      featured: true,
+      features: [
+        { titleKey: "500 Tokens", included: true, icon: "flash" },
+        { titleKey: "fourKGeneration", included: true, icon: "image" },
+        { titleKey: "premiumChat", included: true, icon: "chatbubble" },
+        { titleKey: "prioritySupport", included: true, icon: "help-circle" },
+        { titleKey: "advancedFeatures", included: true, icon: "star" },
+      ],
+      descriptionKey: "powerUser",
+    },
+  ];
 
   const handlePlanSelect = (plan: TokenPlan) => {
     setSelectedPlan(plan);
@@ -104,8 +103,6 @@ const TokenStoreScreen = () => {
     if (selectedPlan) {
       setModalVisible(false);
 
-      // Show loading or processing indicator here if needed
-
       // Wait a bit before showing success message (simulate purchase)
       setTimeout(() => {
         // Add tokens to user's account
@@ -113,20 +110,20 @@ const TokenStoreScreen = () => {
 
         // Show success message
         Alert.alert(
-          "Purchase Successful!",
-          `You've added ${selectedPlan.tokens} tokens to your account.`,
-          [{ text: "OK", onPress: () => navigation.goBack() }]
+          t('purchaseSuccessful'),
+          t('tokensAdded').replace('{0}', selectedPlan.tokens.toString()),
+          [{ text: t('ok'), onPress: () => navigation.goBack() }]
         );
       }, 1000);
     }
   };
 
   const renderFeatureItem = (feature: {
-    title: string;
+    titleKey: string;
     included: boolean;
     icon?: string;
   }) => (
-    <View key={feature.title} style={styles.featureItem}>
+    <View key={feature.titleKey} style={styles.featureItem}>
       <View style={styles.featureIconContainer}>
         {feature.icon && (
           <Ionicons
@@ -145,7 +142,9 @@ const TokenStoreScreen = () => {
           },
         ]}
       >
-        {feature.title}
+        {feature.titleKey.includes("Tokens") 
+          ? feature.titleKey
+          : t(feature.titleKey)}
       </Text>
       <Ionicons
         name={feature.included ? "checkmark-circle" : "close-circle"}
@@ -176,7 +175,7 @@ const TokenStoreScreen = () => {
       >
         {isFeatured && (
           <View style={[styles.featuredBadge, { backgroundColor: planColor }]}>
-            <Text style={styles.featuredText}>Best Value</Text>
+            <Text style={styles.featuredText}>{t('bestValue')}</Text>
           </View>
         )}
 
@@ -205,7 +204,7 @@ const TokenStoreScreen = () => {
             {plan.tokens}
           </Text>
           <Text style={[styles.tokenLabel, { color: colors.subtext }]}>
-            tokens
+            {t('tokens')}
           </Text>
         </View>
 
@@ -218,7 +217,7 @@ const TokenStoreScreen = () => {
         </View>
 
         <Text style={[styles.planDescription, { color: colors.subtext }]}>
-          {plan.description}
+          {t(plan.descriptionKey)}
         </Text>
 
         <TouchableOpacity
@@ -228,7 +227,7 @@ const TokenStoreScreen = () => {
           ]}
           onPress={() => handlePlanSelect(plan)}
         >
-          <Text style={styles.buyButtonText}>Buy Now</Text>
+          <Text style={styles.buyButtonText}>{t('buyNow')}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -245,7 +244,7 @@ const TokenStoreScreen = () => {
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Token Store
+            {t('tokenStoreTitle')}
           </Text>
           <View style={styles.headerRight} />
         </View>
@@ -260,11 +259,10 @@ const TokenStoreScreen = () => {
               <Ionicons name="flash" size={24} color={colors.primary} />
             </View>
             <Text style={[styles.introTitle, { color: colors.text }]}>
-              Power Up Your AI Experience
+              {t('powerUpAI')}
             </Text>
             <Text style={[styles.introText, { color: colors.subtext }]}>
-              Purchase tokens to generate more images and chat with our AI. The
-              more tokens you have, the more you can create!
+              {t('purchaseTokensDescription')}
             </Text>
           </View>
 
@@ -286,15 +284,16 @@ const TokenStoreScreen = () => {
             style={[styles.modalContent, { backgroundColor: colors.surface }]}
           >
             <Text style={[styles.modalTitle, { color: colors.text }]}>
-              Confirm Purchase
+              {t('confirmPurchase')}
             </Text>
             {selectedPlan && (
               <>
                 <Text
                   style={[styles.modalDescription, { color: colors.subtext }]}
                 >
-                  You are about to purchase {selectedPlan.tokens} tokens for{" "}
-                  {selectedPlan.price}.
+                  {t('aboutToPurchase')
+                    .replace('{0}', selectedPlan.tokens.toString())
+                    .replace('{1}', selectedPlan.price)}
                 </Text>
 
                 <View style={styles.modalButtons}>
@@ -309,7 +308,7 @@ const TokenStoreScreen = () => {
                     <Text
                       style={[styles.cancelButtonText, { color: colors.text }]}
                     >
-                      Cancel
+                      {t('cancel')}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -320,7 +319,7 @@ const TokenStoreScreen = () => {
                     ]}
                     onPress={handlePurchase}
                   >
-                    <Text style={styles.confirmButtonText}>Confirm</Text>
+                    <Text style={styles.confirmButtonText}>{t('confirm')}</Text>
                   </TouchableOpacity>
                 </View>
               </>

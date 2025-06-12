@@ -2,9 +2,11 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 export const WelcomeCreator = () => {
   const { colors, isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const fadeAnim = new Animated.Value(0);
   const translateY = new Animated.Value(20);
 
@@ -40,7 +42,7 @@ export const WelcomeCreator = () => {
         ]}
       >
         <Ionicons name="sparkles" size={42} color={colors.primary} />
-        <Text style={[styles.title, textColor]}>What will you create?</Text>
+        <Text style={[styles.title, textColor]}>{t('whatWillYouCreate')}</Text>
       </Animated.View>
     </View>
   );

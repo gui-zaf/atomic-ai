@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { BlurView } from "expo-blur";
 import { useImageViewer } from "../context/ImageViewerContext";
 
@@ -42,6 +43,7 @@ const GlobalImageViewer = () => {
   } = useImageViewer();
   
   const { colors, isDarkMode } = useTheme();
+  const { t } = useLanguage();
   
   // Estado local de like para evitar problemas de dessincronia
   const [localIsLiked, setLocalIsLiked] = useState(false);
@@ -90,12 +92,12 @@ const GlobalImageViewer = () => {
   const handleDelete = () => {
     if (currentImage?.id && onDeleteImage) {
       Alert.alert(
-        "Delete Image",
-        "Do you want to delete this image?",
+        t('deleteImage'),
+        t('deleteImageConfirmation'),
         [
-          { text: "No", style: "cancel" },
+          { text: t('no'), style: "cancel" },
           { 
-            text: "Yes", 
+            text: t('yes'), 
             style: "destructive",
             onPress: () => {
               // Armazena o ID antes de fechar o modal

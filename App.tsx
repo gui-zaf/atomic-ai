@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { TokenProvider } from "./context/TokenContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import { ImageViewerProvider } from "./context/ImageViewerContext";
 import AppNavigator from "./navigation/AppNavigator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -12,20 +13,22 @@ const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
-        <TokenProvider>
-          <ImageViewerProvider>
-            <SafeAreaProvider>
-              <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-              >
-                <AppNavigator />
-                <GlobalImageViewer />
-              </KeyboardAvoidingView>
-            </SafeAreaProvider>
-          </ImageViewerProvider>
-        </TokenProvider>
+        <LanguageProvider>
+          <TokenProvider>
+            <ImageViewerProvider>
+              <SafeAreaProvider>
+                <KeyboardAvoidingView
+                  style={styles.container}
+                  behavior={Platform.OS === "ios" ? "padding" : "height"}
+                  keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+                >
+                  <AppNavigator />
+                  <GlobalImageViewer />
+                </KeyboardAvoidingView>
+              </SafeAreaProvider>
+            </ImageViewerProvider>
+          </TokenProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

@@ -9,10 +9,12 @@ import {
   Switch,
   TouchableWithoutFeedback,
   PanResponder,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 interface SideMenuProps {
   isVisible: boolean;
@@ -43,6 +45,7 @@ const SideMenu = ({
   onOpenHistory,
 }: SideMenuProps) => {
   const { colors } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const [menuPosition, setMenuPosition] = React.useState(-MENU_WIDTH);
@@ -170,12 +173,29 @@ const SideMenu = ({
             <Text style={[styles.headerText, { color: colors.text }]}>
               Atomic AI
             </Text>
+            <View style={styles.spacer} />
+            <TouchableOpacity 
+              style={styles.flagButton}
+              onPress={toggleLanguage}
+            >
+              {language === 'en' ? (
+                <Image 
+                  source={require('../assets/flags/us-flag.png')} 
+                  style={styles.flagIcon} 
+                />
+              ) : (
+                <Image 
+                  source={require('../assets/flags/br-flag.png')} 
+                  style={styles.flagIcon} 
+                />
+              )}
+            </TouchableOpacity>
           </View>
 
           {/* Quick Actions Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              Quick Actions
+              {t('quickActions')}
             </Text>
 
             <TouchableOpacity style={styles.menuItem} onPress={onNewChat}>
@@ -185,21 +205,21 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                New Chat
+                {t('newChat')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={onOpenGallery}>
               <Ionicons name="images-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                Gallery
+                {t('gallery')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={onOpenHistory}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                History
+                {t('history')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -207,13 +227,13 @@ const SideMenu = ({
           {/* Store Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              Store
+              {t('store')}
             </Text>
 
             <TouchableOpacity style={styles.menuItem} onPress={onBuyTokens}>
               <Ionicons name="flash-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                Buy Tokens
+                {t('buyTokens')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -221,7 +241,7 @@ const SideMenu = ({
           {/* Adjusts Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              Settings
+              {t('settings')}
             </Text>
 
             <View style={styles.menuItem}>
@@ -231,7 +251,7 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {darkMode ? "Light Mode" : "Dark Mode"}
+                {darkMode ? t('lightMode') : t('darkMode')}
               </Text>
               <View style={styles.spacer} />
               <Switch
@@ -254,14 +274,14 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                About
+                {t('about')}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={onOpenDevelopers}>
               <Ionicons name="code-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                Developers
+                {t('developers')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -334,6 +354,20 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: "600",
+  },
+  flagButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  flagIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   section: {
     marginBottom: 32,

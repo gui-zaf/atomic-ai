@@ -12,6 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -23,6 +24,7 @@ const { width } = Dimensions.get("window");
 const DevelopersScreen = () => {
   const navigation = useNavigation<DevelopersScreenNavigationProp>();
   const { colors } = useTheme();
+  const { t } = useLanguage();
 
   const openLink = async (url: string) => {
     try {
@@ -48,7 +50,7 @@ const DevelopersScreen = () => {
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <Image source={imagePath} style={styles.avatar} />
       <Text style={[styles.name, { color: colors.text }]}>{name}</Text>
-      <Text style={[styles.title, { color: colors.subtext }]}>Software Engineer</Text>
+      <Text style={[styles.title, { color: colors.subtext }]}>{t('softwareEngineer')}</Text>
       
       <View style={styles.techContainer}>
         {technologies.map(tech => renderTechPill(tech))}
@@ -60,7 +62,7 @@ const DevelopersScreen = () => {
           onPress={() => openLink(githubUrl)}
         >
           <Ionicons name="logo-github" size={20} color={colors.primary} />
-          <Text style={[styles.socialText, { color: colors.primary }]}>GitHub</Text>
+          <Text style={[styles.socialText, { color: colors.primary }]}>{t('githubLink')}</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
@@ -68,7 +70,7 @@ const DevelopersScreen = () => {
           onPress={() => openLink(linkedinUrl)}
         >
           <Ionicons name="logo-linkedin" size={20} color={colors.primary} />
-          <Text style={[styles.socialText, { color: colors.primary }]}>LinkedIn</Text>
+          <Text style={[styles.socialText, { color: colors.primary }]}>{t('linkedinLink')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -81,7 +83,7 @@ const DevelopersScreen = () => {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Developers</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('developersTitle')}</Text>
           <View style={styles.headerRight} />
         </View>
         

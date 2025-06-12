@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useImageViewer } from "../context/ImageViewerContext";
@@ -40,6 +41,7 @@ type GalleryImage = {
 
 const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const { showImageViewer } = useImageViewer();
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   
@@ -165,17 +167,17 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.emptyIcon}
       />
       <Text style={[styles.emptyText, { color: colors.text }]}>
-        No images in gallery
+        {t('noImagesInGallery')}
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        Use the "/image" command in chat to generate new images
+        {t('useImageCommand')}
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Home')}
       >
         <Ionicons name="add" size={22} color="#FFFFFF" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Create new image</Text>
+        <Text style={styles.buttonText}>{t('createNewImage')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -190,7 +192,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Galeria</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('galleryTitle')}</Text>
           <View style={styles.headerRight} />
         </View>
 

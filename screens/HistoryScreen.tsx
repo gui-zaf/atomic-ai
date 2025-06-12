@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
@@ -26,6 +27,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const HistoryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { t } = useLanguage();
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
@@ -36,17 +38,17 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.emptyIcon}
       />
       <Text style={[styles.emptyText, { color: colors.text }]}>
-        No request history
+        {t('noRequestHistory')}
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        Your conversation history will appear here
+        {t('historyWillAppear')}
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Home')}
       >
         <Ionicons name="chatbubble-outline" size={22} color="#FFFFFF" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Start a conversation</Text>
+        <Text style={styles.buttonText}>{t('startConversation')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -61,7 +63,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>History</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('historyTitle')}</Text>
           <View style={styles.headerRight} />
         </View>
 
