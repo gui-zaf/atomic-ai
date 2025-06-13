@@ -66,10 +66,12 @@ const AppContent = () => {
 
   const handleSendMessage = (message: string) => {
     const timestamp = Date.now();
+    const currentDate = new Date(timestamp);
     const userMessage: Message = {
       id: timestamp.toString(),
       text: message,
       isUser: true,
+      timestamp: currentDate,
     };
 
     const isImageCommand = message.toLowerCase().startsWith("/image");
@@ -79,6 +81,7 @@ const AppContent = () => {
         ? `Here's your "${message.substring(6).trim()}" image! ✨`
         : "This is a simulated AI response. You can replace this with actual AI responses.",
       isUser: false,
+      timestamp: new Date(timestamp + 1500),
       ...(isImageCommand && {
         image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
       }),

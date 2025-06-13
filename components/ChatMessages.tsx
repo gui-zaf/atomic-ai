@@ -1,12 +1,12 @@
 import React, { useRef, useEffect } from "react";
-import { StyleSheet, ScrollView, Keyboard, Platform } from "react-native";
+import { StyleSheet, ScrollView, Keyboard, Platform, PanResponder } from "react-native";
 import { ChatBubble } from "./ChatBubble";
 import { Message } from "../types";
 
 interface ChatMessagesProps {
   messages: Message[];
   likedMessages: Set<string>;
-  onToggleLike: (messageId: string) => void;
+  onToggleLike: (id: string) => void;
 }
 
 export const ChatMessages = ({
@@ -15,6 +15,20 @@ export const ChatMessages = ({
   onToggleLike,
 }: ChatMessagesProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        const { dx, dy } = gestureState;
+        // Se o movimento for principalmente vertical, o ScrollView deve assumir.
+        return Math.abs(dy) > 5 && Math.abs(dy) > Math.abs(dx);
+      },
+      // Permite que outras views se tornem o 'responder'. Importante para botões filhos.
+      onPanResponderTerminationRequest: () => true,
+    })
+  ).current;
 
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener(
@@ -52,6 +66,7 @@ export const ChatMessages = ({
       overScrollMode="always"
       removeClippedSubviews={false}
       pinchGestureEnabled={false}
+      {...panResponder.panHandlers}
     >
       {messages.map((message) => (
         <ChatBubble
@@ -61,6 +76,7 @@ export const ChatMessages = ({
           image={message.image}
           isLiked={likedMessages.has(message.id)}
           onToggleLike={() => onToggleLike(message.id)}
+          timestamp={message.timestamp}
         />
       ))}
     </ScrollView>
@@ -70,12 +86,10 @@ export const ChatMessages = ({
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    zIndex: 5,
-    elevation: 5,
-    backgroundColor: 'transparent',
+    width: "100%",
   },
   content: {
-    padding: 8,
-    paddingTop: 8,
+    paddingHorizontal: 8,
+    paddingBottom: 10,
   },
 });

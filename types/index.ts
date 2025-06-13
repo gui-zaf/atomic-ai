@@ -5,6 +5,7 @@ export interface Message {
   text: string;
   isUser: boolean;
   image?: string;
+  timestamp?: Date;
 }
 
 // Images mapping

@@ -58,6 +58,7 @@ const HomeScreen = () => {
           id: Date.now().toString(),
           text: t('welcomeMessage'),
           isUser: false,
+          timestamp: new Date(),
         }]);
       }, 1500);
     } else if (messages.length === 1 && !messages[0].isUser) {
@@ -66,6 +67,7 @@ const HomeScreen = () => {
         id: Date.now().toString(),
         text: t('welcomeMessage'),
         isUser: false,
+        timestamp: new Date(),
       }]);
     }
   }, [language, t]);
@@ -123,10 +125,12 @@ const HomeScreen = () => {
 
   const handleSendMessage = (message: string) => {
     const timestamp = Date.now();
+    const currentDate = new Date(timestamp);
     const userMessage: Message = {
       id: timestamp.toString(),
       text: message,
       isUser: true,
+      timestamp: currentDate,
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -162,12 +166,14 @@ const HomeScreen = () => {
         imageFile = sampleImages[Math.floor(Math.random() * sampleImages.length)];
       }
       
+      const responseTimestamp = new Date(timestamp + 1500); // Adiciona o delay para o timestamp da resposta
       const aiMessage: Message = {
         id: (timestamp + 1).toString(),
         text: isImageGeneration
           ? `Here's your "${prompt}" image! ✨`
           : "This is a simulated AI response. You can replace this with actual AI responses.",
         isUser: false,
+        timestamp: responseTimestamp,
         ...(isImageGeneration && { image: imageFile }),
       };
       
@@ -222,6 +228,7 @@ const HomeScreen = () => {
         id: Date.now().toString(),
         text: t('welcomeMessage'),
         isUser: false,
+        timestamp: new Date(),
       }]);
     }, 1500);
   };
