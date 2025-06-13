@@ -174,7 +174,10 @@ const HomeScreen = () => {
           : "This is a simulated AI response. You can replace this with actual AI responses.",
         isUser: false,
         timestamp: responseTimestamp,
-        ...(isImageGeneration && { image: imageFile }),
+        ...(isImageGeneration && { 
+          image: imageFile,
+          isGenerating: true,
+        }),
       };
       
       setIsLoading(false);

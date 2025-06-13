@@ -6,6 +6,7 @@ export interface Message {
   isUser: boolean;
   image?: string;
   timestamp?: Date;
+  isGenerating?: boolean;
 }
 
 // Images mapping

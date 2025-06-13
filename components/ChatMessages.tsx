@@ -77,6 +77,7 @@ export const ChatMessages = ({
           isLiked={likedMessages.has(message.id)}
           onToggleLike={() => onToggleLike(message.id)}
           timestamp={message.timestamp}
+          isGenerating={message.isGenerating}
         />
       ))}
     </ScrollView>

@@ -84,6 +84,7 @@ const AppContent = () => {
       timestamp: new Date(timestamp + 1500),
       ...(isImageCommand && {
         image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
+        isGenerating: true,
       }),
     };
 
