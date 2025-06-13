@@ -32,6 +32,38 @@ export const addToggleLikeListener = (callback: (isLiked: boolean) => void) => {
   };
 };
 
+// Helper function to get the correct image source based on the image path
+const getImageSource = (imagePath?: any) => {
+  if (!imagePath) return null;
+  
+  // If it's already a require'd asset, return it directly
+  if (typeof imagePath !== 'string') {
+    return imagePath;
+  }
+  
+  // Check if this is one of our sample images
+  if (imagePath.includes('cat-in-space')) {
+    return require('../assets/samples/cat-in-space.jpeg');
+  } else if (imagePath.includes('sunset-beach')) {
+    return require('../assets/samples/sunset-beach.jpeg');
+  } else if (imagePath.includes('fantasy-castle')) {
+    return require('../assets/samples/fantasy-castle.jpeg');
+  } else if (imagePath.includes('cyberpunk-city')) {
+    return require('../assets/samples/cyberpunk-city.jpeg');
+  } else if (imagePath.includes('cute-animals')) {
+    return require('../assets/samples/cute-animals.jpeg');
+  } else if (imagePath.includes('colorful-landscape')) {
+    return require('../assets/samples/colorful-landscape.jpeg');
+  } else if (imagePath.includes('sci-fi-portrait')) {
+    return require('../assets/samples/sci-fi-portrait.jpeg');
+  } else if (imagePath.includes('abstract-art')) {
+    return require('../assets/samples/abstract-art.jpeg');
+  }
+  
+  // Fallback to default sample image
+  return require('../assets/carousel/sample-01.jpeg');
+};
+
 const GlobalImageViewer = () => {
   const { 
     currentImage, 
@@ -116,6 +148,11 @@ const GlobalImageViewer = () => {
 
   if (!currentImage) return null;
 
+  // Get the proper image source
+  const imageSource = currentImage.source ? 
+    (typeof currentImage.source === 'string' ? 
+      getImageSource(currentImage.source) : currentImage.source) : null;
+
   return (
     <Modal
       visible={isVisible}
@@ -157,7 +194,7 @@ const GlobalImageViewer = () => {
             <View style={styles.imageContainer}>
               <View {...panResponder.panHandlers}>
                 <Image
-                  source={currentImage.source}
+                  source={imageSource}
                   style={styles.image}
                   resizeMode="contain"
                 />

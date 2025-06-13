@@ -16,7 +16,7 @@ import ChatInput from "../components/ChatInput";
 import SideMenu from "../components/SideMenu";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { Message, sampleImages } from "../types";
+import { Message, sampleImages, imageDescriptionMapping } from "../types";
 import { useKeyboardAnimation } from "../components/hooks/useKeyboardAnimation";
 import { useNavigation, useIsFocused, CommonActions } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -135,16 +135,40 @@ const HomeScreen = () => {
     setIsLoading(true);
     
     setTimeout(() => {
+      let imageFile: string | undefined;
+      let isImageGeneration = false;
+      let prompt = message;
+      
+      // Check if the message starts with /image command
       const isImageCommand = message.toLowerCase().startsWith("/image");
+      
+      if (isImageCommand) {
+        prompt = message.substring(6).trim();
+        isImageGeneration = true;
+      }
+      
+      // Check if the message matches any of our predefined suggestion descriptions
+      // even without the /image command
+      const matchingImage = imageDescriptionMapping.find(
+        mapping => mapping.english === message || mapping.portuguese === message
+      );
+      
+      if (matchingImage) {
+        imageFile = `../assets/samples/${matchingImage.filename}.jpeg`;
+        isImageGeneration = true;
+      } else if (isImageGeneration) {
+        // If it was an image command but didn't match any predefined suggestion
+        // use a random sample as fallback
+        imageFile = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+      }
+      
       const aiMessage: Message = {
         id: (timestamp + 1).toString(),
-        text: isImageCommand
-          ? `Here's your "${message.substring(6).trim()}" image! ✨`
+        text: isImageGeneration
+          ? `Here's your "${prompt}" image! ✨`
           : "This is a simulated AI response. You can replace this with actual AI responses.",
         isUser: false,
-        ...(isImageCommand && {
-          image: sampleImages[Math.floor(Math.random() * sampleImages.length)],
-        }),
+        ...(isImageGeneration && { image: imageFile }),
       };
       
       setIsLoading(false);

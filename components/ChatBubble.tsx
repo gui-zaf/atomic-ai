@@ -68,7 +68,34 @@ export const ChatBubble = ({
     }
   }, [image, onToggleLike]);
 
-  const imageSource = image ? require("../assets/carousel/sample-01.jpeg") : null;
+  // Helper function to get the correct image source based on the image path
+  const getImageSource = (imagePath?: string) => {
+    if (!imagePath) return null;
+    
+    // Check if this is one of our sample images
+    if (imagePath.includes('cat-in-space')) {
+      return require('../assets/samples/cat-in-space.jpeg');
+    } else if (imagePath.includes('sunset-beach')) {
+      return require('../assets/samples/sunset-beach.jpeg');
+    } else if (imagePath.includes('fantasy-castle')) {
+      return require('../assets/samples/fantasy-castle.jpeg');
+    } else if (imagePath.includes('cyberpunk-city')) {
+      return require('../assets/samples/cyberpunk-city.jpeg');
+    } else if (imagePath.includes('cute-animals')) {
+      return require('../assets/samples/cute-animals.jpeg');
+    } else if (imagePath.includes('colorful-landscape')) {
+      return require('../assets/samples/colorful-landscape.jpeg');
+    } else if (imagePath.includes('sci-fi-portrait')) {
+      return require('../assets/samples/sci-fi-portrait.jpeg');
+    } else if (imagePath.includes('abstract-art')) {
+      return require('../assets/samples/abstract-art.jpeg');
+    }
+    
+    // Fallback to default sample image
+    return require('../assets/carousel/sample-01.jpeg');
+  };
+
+  const imageSource = getImageSource(image);
 
   const handleShare = async () => {
     try {
@@ -119,7 +146,7 @@ export const ChatBubble = ({
           },
         ]}
       >
-        {image && (
+        {image && imageSource && (
           <>
             <TouchableOpacity
               activeOpacity={0.9}
