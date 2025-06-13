@@ -27,6 +27,7 @@ interface SideMenuProps {
   onOpenGallery?: () => void;
   onOpenDevelopers?: () => void;
   onOpenHistory?: () => void;
+  onOpenAbout?: () => void;
 }
 
 const { width } = Dimensions.get("window");
@@ -43,6 +44,7 @@ const SideMenu = ({
   onOpenGallery,
   onOpenDevelopers,
   onOpenHistory,
+  onOpenAbout,
 }: SideMenuProps) => {
   const { colors } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
@@ -267,7 +269,7 @@ const SideMenu = ({
               />
             </View>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={onOpenAbout}>
               <Ionicons
                 name="information-circle-outline"
                 size={24}

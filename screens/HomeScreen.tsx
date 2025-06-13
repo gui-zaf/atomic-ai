@@ -181,6 +181,11 @@ const HomeScreen = () => {
     navigation.navigate('History');
   };
 
+  const openAbout = () => {
+    handleCloseMenu();
+    navigation.navigate('About');
+  };
+
   const resetChat = () => {
     setIsLoading(true);
     setMessages([]);
@@ -294,6 +299,7 @@ const HomeScreen = () => {
           onOpenGallery={openGallery}
           onOpenDevelopers={openDevelopers}
           onOpenHistory={openHistory}
+          onOpenAbout={openAbout}
         />
       </View>
     </Animated.View>

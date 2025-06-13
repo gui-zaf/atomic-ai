@@ -101,6 +101,29 @@ const translations = {
 
     // General
     back: 'Back',
+
+    // About Screen
+    aboutTitle: 'About',
+    atomicArtAbout: 'About Atomic Art',
+    atomicArtAboutContent: 'Atomic Art is an innovative AI-powered image generation platform that transforms your ideas into impressive visual artworks. Using advanced AI technology (powered by OpenAI), the app allows users to create unique images just by describing what they want to see and choosing from various visual styles.',
+    mainFeatures: 'Main Features',
+    mainFeaturesContent: '• Text-to-image generation: Create visual art from written descriptions.\n• Community gallery: Explore public creations and get inspired.\n• Interactive resources: Like, share, and download generated images.\n• Personal history: Track your creative journey with locally saved history.',
+    techHighlights: 'Technical Highlights',
+    techHighlightsContent: '• Built with React Native and Expo for a native experience.\n• Powered by OpenAI image generation technology.\n• Secure and efficient backend infrastructure.',
+    termsOfUse: 'Terms of Use',
+    termsOfUseContent: '• The app is intended for creative and personal use.\n• Users are responsible for the content they generate.\n• Generated content must respect general usage guidelines.',
+    contentRights: 'Content Rights',
+    contentRightsContent: '• Users retain the rights to download and share the images they create.\n• Publicly shared images can be viewed and reinterpreted by other users.\n• The platform may display public images in the community gallery.',
+    privacyData: 'Privacy & Data',
+    privacyDataContent: '• Image history is stored locally on the device.\n• No login is required in the current version.\n• The app requests storage permission to save images.',
+    limitations: 'Limitations',
+    limitationsContent: '• The service is provided "as is", without warranties.\n• Image generation depends on API availability.\n• Some functions require an internet connection.',
+    responsibleUse: 'Responsible Use',
+    responsibleUseContent: '• Respect reasonable usage limits.\n• Content must not infringe copyright or be offensive, illegal, or harmful.',
+    modifications: 'Modifications',
+    modificationsContent: '• Terms may be updated periodically.\n• Continued use of the app indicates acceptance of the new versions of the terms.',
+    contractor: 'Contracting Parties',
+    contractorContent: 'Contractor: Pixelpenguin Tech\nCorporate Name: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContracted: ZCode\nCPF: 240.436.318-20\n\nProject Nature: Volunteer, unpaid',
   },
   pt: {
     // Menu
@@ -192,6 +215,29 @@ const translations = {
 
     // General
     back: 'Voltar',
+
+    // About Screen
+    aboutTitle: 'Sobre',
+    atomicArtAbout: 'Sobre o Atomic Art',
+    atomicArtAboutContent: 'O Atomic Art é uma plataforma inovadora de geração de imagens com inteligência artificial, que transforma suas ideias em obras de arte visuais impressionantes. Utilizando tecnologia avançada de IA (alimentada pela OpenAI), o aplicativo permite que os usuários criem imagens únicas apenas descrevendo o que desejam ver e escolhendo entre diversos estilos visuais.',
+    mainFeatures: 'Principais Funcionalidades',
+    mainFeaturesContent: '• Geração de imagem por texto: Crie artes visuais a partir de descrições escritas.\n• Galeria da comunidade: Explore criações públicas e inspire-se.\n• Recursos interativos: Curta, compartilhe e baixe imagens geradas.\n• Histórico pessoal: Acompanhe sua jornada criativa com um histórico salvo localmente.',
+    techHighlights: 'Destaques Técnicos',
+    techHighlightsContent: '• Desenvolvido com React Native e Expo para uma experiência nativa.\n• Alimentado por tecnologia de geração de imagens da OpenAI.\n• Infraestrutura de backend segura e eficiente.',
+    termsOfUse: 'Termos de Uso',
+    termsOfUseContent: '• O app é destinado para uso criativo e pessoal.\n• Os usuários são responsáveis pelo conteúdo que geram.\n• O conteúdo gerado deve respeitar as diretrizes gerais de uso.',
+    contentRights: 'Direitos sobre o Conteúdo',
+    contentRightsContent: '• Os usuários mantêm os direitos de download e compartilhamento das imagens que criarem.\n• Imagens compartilhadas publicamente podem ser vistas e reinterpretadas por outros usuários.\n• A plataforma pode exibir imagens públicas na galeria da comunidade.',
+    privacyData: 'Privacidade e Dados',
+    privacyDataContent: '• O histórico de imagens é armazenado localmente no dispositivo.\n• Não é necessário login na versão atual.\n• O aplicativo solicita permissão de armazenamento para salvar imagens.',
+    limitations: 'Limitações',
+    limitationsContent: '• O serviço é oferecido "como está", sem garantias.\n• A geração de imagens depende da disponibilidade da API.\n• Algumas funções exigem conexão com a internet.',
+    responsibleUse: 'Uso Responsável',
+    responsibleUseContent: '• Respeite os limites razoáveis de uso.\n• O conteúdo não deve violar direitos autorais nem ser ofensivo, ilegal ou prejudicial.',
+    modifications: 'Modificações',
+    modificationsContent: '• Os termos podem ser atualizados periodicamente.\n• O uso contínuo do app indica aceitação das novas versões dos termos.',
+    contractor: 'Contratante / Contratada',
+    contractorContent: 'Contratante: Pixelpenguin Tech\nRazão Social: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContratada: ZCode\nCPF: 240.436.318-20\n\nNatureza do Projeto: Voluntário, sem remuneração',
   }
 };
 
