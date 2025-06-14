@@ -107,7 +107,7 @@ export const ChatBubble = ({
       };
     }
   }, [image, onToggleLike]);
-  
+
   // Efeito para animar o hue-rotate
   useEffect(() => {
     if (isGenerating) {
@@ -235,7 +235,7 @@ export const ChatBubble = ({
       });
     }
   };
-  
+
   // Componente de ruído visual
   const NoiseOverlay = () => {
     if (currentEffect !== "noise" && currentEffect !== "pixelated") return null;

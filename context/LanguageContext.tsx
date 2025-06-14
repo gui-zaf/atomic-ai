@@ -101,6 +101,7 @@ const translations = {
 
     // General
     back: 'Back',
+    suggestionError: 'Failed to get suggestion. Please try again.',
 
     // About Screen
     aboutTitle: 'About',
@@ -215,6 +216,7 @@ const translations = {
 
     // General
     back: 'Voltar',
+    suggestionError: 'Falha ao obter sugestão. Por favor, tente novamente.',
 
     // About Screen
     aboutTitle: 'Sobre',

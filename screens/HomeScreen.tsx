@@ -185,6 +185,17 @@ const HomeScreen = () => {
     }, 1500);
   };
 
+  const handleSendAIMessage = (message: string) => {
+    const timestamp = Date.now();
+    const aiMessage: Message = {
+      id: timestamp.toString(),
+      text: message,
+      isUser: false,
+      timestamp: new Date(timestamp),
+    };
+    setMessages(prev => [...prev, aiMessage]);
+  };
+
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
     Keyboard.dismiss();
@@ -315,6 +326,7 @@ const HomeScreen = () => {
                 <View pointerEvents="box-none">
                   <ChatInput 
                     onSend={handleSendMessage}
+                    onSendAIMessage={handleSendAIMessage}
                     onFocusChange={setIsInputFocused}
                   />
                 </View>

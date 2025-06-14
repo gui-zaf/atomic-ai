@@ -16,17 +16,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAmazeSuggestion } from "../services/amazeService";
 import { useTokens } from "../context/TokenContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import RechargeTimer from "./RechargeTimer";
 import SuggestionCarousel from "./SuggestionCarousel";
 import { BlurView } from "expo-blur";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  onSendAIMessage: (message: string) => void;
   onFocusChange?: (isFocused: boolean) => void;
 }
 
-const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
+const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatInputProps) => {
   const { colors, isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -125,7 +128,7 @@ const ChatInput = ({ onSend, onFocusChange = () => {} }: ChatInputProps) => {
       const suggestion = await getAmazeSuggestion();
       setMessage(suggestion);
     } catch (error) {
-      Alert.alert("Error", "Failed to get suggestion. Please try again.");
+      onSendAIMessage(t('suggestionError'));
     } finally {
       setIsLoading(false);
     }
