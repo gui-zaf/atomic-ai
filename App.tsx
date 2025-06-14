@@ -5,6 +5,7 @@ import { TokenProvider } from "./context/TokenContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { ImageViewerProvider } from "./context/ImageViewerContext";
+import { HistoryProvider } from "./context/HistoryContext";
 import AppNavigator from "./navigation/AppNavigator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import GlobalImageViewer from "./components/GlobalImageViewer";
@@ -15,18 +16,20 @@ const App = () => {
       <ThemeProvider>
         <LanguageProvider>
           <TokenProvider>
-            <ImageViewerProvider>
-              <SafeAreaProvider>
-                <KeyboardAvoidingView
-                  style={styles.container}
-                  behavior={Platform.OS === "ios" ? "padding" : "height"}
-                  keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-                >
-                  <AppNavigator />
-                  <GlobalImageViewer />
-                </KeyboardAvoidingView>
-              </SafeAreaProvider>
-            </ImageViewerProvider>
+            <HistoryProvider>
+              <ImageViewerProvider>
+                <SafeAreaProvider>
+                  <KeyboardAvoidingView
+                    style={styles.container}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+                  >
+                    <AppNavigator />
+                    <GlobalImageViewer />
+                  </KeyboardAvoidingView>
+                </SafeAreaProvider>
+              </ImageViewerProvider>
+            </HistoryProvider>
           </TokenProvider>
         </LanguageProvider>
       </ThemeProvider>

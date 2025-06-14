@@ -7,6 +7,9 @@ import {
   PanResponder,
   Animated,
   Image,
+  Text,
+  TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,6 +25,8 @@ import { useNavigation, useIsFocused, CommonActions } from "@react-navigation/na
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { LoadingBubble } from "../components/LoadingBubble";
+import { useTokens } from '../context/TokenContext';
+import { useHistory } from '../context/HistoryContext';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -43,6 +48,9 @@ const HomeScreen = () => {
     () => setKeyboardVisible(true),
     () => setKeyboardVisible(false)
   );
+  
+  const { tokens } = useTokens();
+  const { addHistoryItem } = useHistory();
   
   useEffect(() => {
     setIsBackgroundLoaded(false);
@@ -182,6 +190,29 @@ const HomeScreen = () => {
       
       setIsLoading(false);
       setMessages(prev => [...prev, aiMessage]);
+      
+      // Add to history
+      if (isImageGeneration) {
+        addHistoryItem({
+          id: (timestamp + 2).toString(),
+          timestamp: new Date(),
+          type: 'image',
+          prompt: prompt,
+          tokensUsed: 1,
+          model: 'DALL-E',
+          expanded: false
+        });
+      } else {
+        addHistoryItem({
+          id: (timestamp + 2).toString(),
+          timestamp: new Date(),
+          type: 'simulated',
+          prompt: message,
+          response: aiMessage.text,
+          tokensUsed: 1,
+          expanded: false
+        });
+      }
     }, 1500);
   };
 
@@ -194,6 +225,18 @@ const HomeScreen = () => {
       timestamp: new Date(timestamp),
     };
     setMessages(prev => [...prev, aiMessage]);
+    
+    // Add error to history
+    if (message.toLowerCase().includes("error") || message.toLowerCase().includes("failed")) {
+      addHistoryItem({
+        id: (timestamp + 1).toString(),
+        timestamp: new Date(),
+        type: 'error',
+        error: message,
+        tokensUsed: 0,
+        expanded: false
+      });
+    }
   };
 
   const toggleMenu = () => {
