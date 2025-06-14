@@ -78,7 +78,7 @@ const AppContent = () => {
     const aiMessage: Message = {
       id: (timestamp + 1).toString(),
       text: isImageCommand
-        ? `Here's your "${message.substring(6).trim()}" image! ✨`
+        ? `${message.substring(6).trim()}`
         : "This is a simulated AI response. You can replace this with actual AI responses.",
       isUser: false,
       timestamp: new Date(timestamp + 1500),
@@ -207,6 +207,16 @@ const AppContent = () => {
                 <View pointerEvents="box-none">
                   <ChatInput
                     onSend={handleSendMessage}
+                    onSendAIMessage={(message) => {
+                      const timestamp = Date.now();
+                      const aiMessage: Message = {
+                        id: timestamp.toString(),
+                        text: message,
+                        isUser: false,
+                        timestamp: new Date(timestamp),
+                      };
+                      setMessages((prev) => [...prev, aiMessage]);
+                    }}
                     onFocusChange={setIsInputFocused}
                   />
                 </View>

@@ -170,7 +170,7 @@ const HomeScreen = () => {
       const aiMessage: Message = {
         id: (timestamp + 1).toString(),
         text: isImageGeneration
-          ? `Here's your "${prompt}" image! ✨`
+          ? `${prompt}`
           : "This is a simulated AI response. You can replace this with actual AI responses.",
         isUser: false,
         timestamp: responseTimestamp,
