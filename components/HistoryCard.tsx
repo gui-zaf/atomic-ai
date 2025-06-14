@@ -80,7 +80,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
     switch (item.type) {
       case "simulated":
         return (
-          <>
+          <View style={styles.cardContentContainer}>
             <View style={styles.badgeContainer}>
               <Ionicons name="chatbubble-outline" size={16} color={colors.primary} />
               <Text style={[styles.badgeText, { color: colors.primary }]}>
@@ -93,7 +93,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             >
               {item.response || ""}
             </Text>
-          </>
+          </View>
         );
 
       case "image":
@@ -124,7 +124,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
       case "error":
         return (
-          <>
+          <View style={styles.cardContentContainer}>
             <View style={styles.errorHeader}>
               <Ionicons name="warning-outline" size={20} color={colors.error} />
               <Text style={[styles.badgeText, { color: colors.error, marginLeft: 4 }]}>
@@ -137,7 +137,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             >
               {t("history.failed_to_get_suggestion")}
             </Text>
-          </>
+          </View>
         );
 
       default:
@@ -263,10 +263,14 @@ const styles = StyleSheet.create({
     padding: 16,
     position: "relative",
   },
+  cardContentContainer: {
+    flex: 1,
+    flexDirection: 'column',
+  },
   badgeContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   badgeText: {
     fontSize: 14,
@@ -299,7 +303,7 @@ const styles = StyleSheet.create({
   errorHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 10,
   },
   errorTitle: {
     fontSize: 16,
