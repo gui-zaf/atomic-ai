@@ -40,6 +40,10 @@ const translations = {
     startConversation: "Start a conversation",
     historyInteraction: "interaction",
     historyInteractions: "interactions",
+    deleteHistoryTitle: "Delete History",
+    deleteHistoryConfirmation: "Are you sure you want to delete all history items?",
+    deleteItemTitle: "Delete Item",
+    deleteItemConfirmation: "Are you sure you want to delete this item?",
 
     // History Cards
     historyChat: "Chat",
@@ -195,6 +199,10 @@ const translations = {
     startConversation: "Iniciar uma conversa",
     historyInteraction: "interação",
     historyInteractions: "interações",
+    deleteHistoryTitle: "Excluir Histórico",
+    deleteHistoryConfirmation: "Tem certeza que deseja excluir todo o histórico?",
+    deleteItemTitle: "Excluir Item",
+    deleteItemConfirmation: "Tem certeza que deseja excluir este item?",
 
     // History Cards
     historyChat: "Chat",

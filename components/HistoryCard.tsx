@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -52,6 +52,18 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  
+  // Animation for expanded content
+  const expandAnim = useRef(new Animated.Value(0)).current;
+  
+  // Update animation when expanded state changes
+  useEffect(() => {
+    Animated.timing(expandAnim, {
+      toValue: item.expanded ? 1 : 0,
+      duration: 300,
+      useNativeDriver: false, // We need to animate height which requires non-native driver
+    }).start();
+  }, [item.expanded]);
 
   // Determina a imagem correta com base no prompt
   const imageSource = useMemo(() => {
@@ -165,10 +177,27 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
   // Render expanded details
   const renderExpandedDetails = () => {
-    if (!item.expanded) return null;
+    // Instead of returning null, we'll always render but with height animation
+    const maxHeight = expandAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1000], // 1000 is a safe max height that will be constrained by content
+    });
+    
+    const opacity = expandAnim.interpolate({
+      inputRange: [0, 0.5, 1],
+      outputRange: [0, 0.3, 1],
+    });
 
     return (
-      <Animated.View style={styles.expandedContent}>
+      <Animated.View 
+        style={[
+          styles.expandedContent,
+          { 
+            maxHeight,
+            opacity,
+          }
+        ]}
+      >
         <View
           style={[styles.detailsContainer, { borderTopColor: colors.surface }]}
         >
@@ -256,12 +285,25 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
     >
       <View style={styles.cardHeader}>
         {renderCardContent()}
-        <Ionicons
-          name={item.expanded ? "chevron-up" : "chevron-down"}
-          size={20}
-          color={colors.subtext}
-          style={styles.chevron}
-        />
+        <Animated.View
+          style={[
+            styles.chevronContainer,
+            {
+              transform: [{
+                rotate: expandAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '180deg'],
+                })
+              }]
+            }
+          ]}
+        >
+          <Ionicons
+            name="chevron-down"
+            size={20}
+            color={colors.subtext}
+          />
+        </Animated.View>
       </View>
       {renderExpandedDetails()}
     </TouchableOpacity>
@@ -282,13 +324,14 @@ const styles = StyleSheet.create({
   },
   cardHeader: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     padding: 16,
     position: "relative",
   },
   cardContentContainer: {
     flex: 1,
     flexDirection: "column",
+    paddingRight: 30,
   },
   badgeContainer: {
     flexDirection: "row",
@@ -309,6 +352,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    paddingRight: 30,
   },
   thumbnail: {
     width: 60,
@@ -338,10 +382,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 24,
   },
-  chevron: {
+  chevronContainer: {
     position: "absolute",
     right: 16,
-    top: 16,
+    top: 18,
   },
   expandedContent: {
     overflow: "hidden",

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   FlatList,
   Dimensions,
   Animated,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -31,7 +32,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const HistoryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors, isDarkMode } = useTheme();
   const { t } = useLanguage();
-  const { historyItems, toggleExpandItem, deleteHistoryItem } = useHistory();
+  const { historyItems, toggleExpandItem, deleteHistoryItem, clearHistory } = useHistory();
 
   // Animation for list items
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -43,6 +44,42 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  const handleClearHistory = () => {
+    Alert.alert(
+      t("deleteHistoryTitle") || "Delete History",
+      t("deleteHistoryConfirmation") || "Are you sure you want to delete all history items?",
+      [
+        {
+          text: t("no") || "No",
+          style: "cancel"
+        },
+        {
+          text: t("yes") || "Yes",
+          onPress: () => clearHistory(),
+          style: "destructive"
+        }
+      ]
+    );
+  };
+
+  const handleDeleteHistoryItem = (id: string) => {
+    Alert.alert(
+      t("deleteItemTitle") || "Delete Item",
+      t("deleteItemConfirmation") || "Are you sure you want to delete this item?",
+      [
+        {
+          text: t("no") || "No",
+          style: "cancel"
+        },
+        {
+          text: t("yes") || "Yes",
+          onPress: () => deleteHistoryItem(id),
+          style: "destructive"
+        }
+      ]
+    );
+  };
 
   const renderItem = ({
     item,
@@ -70,7 +107,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
         <HistoryCard
           item={item}
           onToggleExpand={() => toggleExpandItem(item.id)}
-          onDelete={() => deleteHistoryItem(item.id)}
+          onDelete={() => handleDeleteHistoryItem(item.id)}
         />
       </Animated.View>
     );
@@ -121,14 +158,12 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
           {historyItems.length > 0 && (
             <TouchableOpacity
               style={styles.headerRight}
-              onPress={() => {
-                // Implement clear all functionality
-              }}
+              onPress={handleClearHistory}
             >
               <Ionicons
-                name="ellipsis-vertical"
+                name="trash-outline"
                 size={20}
-                color={colors.text}
+                color={colors.error}
               />
             </TouchableOpacity>
           )}

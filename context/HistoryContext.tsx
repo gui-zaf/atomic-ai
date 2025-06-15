@@ -78,7 +78,9 @@ export const HistoryProvider = ({
   const toggleExpandItem = (id: string) => {
     setHistoryItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, expanded: !item.expanded } : item,
+        item.id === id 
+          ? { ...item, expanded: !item.expanded } 
+          : { ...item, expanded: false } // Close all other items
       ),
     );
   };
