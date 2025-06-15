@@ -242,7 +242,7 @@ const HomeScreen = () => {
         id: (timestamp + 1).toString(),
         timestamp: new Date(),
         type: "error",
-        error: message,
+        error: t("historyApiErrorDetail"),
         tokensUsed: 0,
         expanded: false,
       });

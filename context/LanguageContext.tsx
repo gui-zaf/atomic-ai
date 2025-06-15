@@ -9,6 +9,14 @@ export interface LanguageContextType {
   t: (key: string) => string;
 }
 
+// Define a more comprehensive type for translations
+type TranslationObject = Record<string, string | Record<string, string>>;
+
+// Translation for a specific language
+interface LanguageTranslation {
+  [key: string]: string | TranslationObject;
+}
+
 // Translations for the app
 const translations = {
   en: {
@@ -30,6 +38,24 @@ const translations = {
     noRequestHistory: "No request history",
     historyWillAppear: "Your conversation history will appear here",
     startConversation: "Start a conversation",
+    historyInteraction: "interaction",
+    historyInteractions: "interactions",
+
+    // History Cards
+    historyChat: "Chat",
+    historyImage: "Image",
+    historyError: "Error",
+    historyPrompt: "Prompt",
+    historyResponse: "Response",
+    historyDate: "Date",
+    historyTokens: "Tokens",
+    historyModel: "Model",
+    historyDelete: "Delete",
+    historyApiError: "API Connection Error",
+    historyApiErrorDetail: "We couldn't connect to our suggestion service. Please check your connection and try again.",
+    historyFailedSuggestion: "Failed to get suggestion from our service.",
+    historySimulated: "Simulated",
+    historyImageGenerated: "Image Generated",
 
     // Gallery Screen
     galleryTitle: "Gallery",
@@ -167,6 +193,24 @@ const translations = {
     noRequestHistory: "Nenhum histórico de solicitações",
     historyWillAppear: "Seu histórico de conversas aparecerá aqui",
     startConversation: "Iniciar uma conversa",
+    historyInteraction: "interação",
+    historyInteractions: "interações",
+
+    // History Cards
+    historyChat: "Chat",
+    historyImage: "Imagem",
+    historyError: "Erro",
+    historyPrompt: "Prompt",
+    historyResponse: "Resposta",
+    historyDate: "Data",
+    historyTokens: "Tokens",
+    historyModel: "Modelo",
+    historyDelete: "Excluir",
+    historyApiError: "Erro de Conexão com API",
+    historyApiErrorDetail: "Não foi possível conectar ao nosso serviço de sugestões. Por favor, verifique sua conexão e tente novamente.",
+    historyFailedSuggestion: "Falha ao obter sugestão do nosso serviço.",
+    historySimulated: "Simulado",
+    historyImageGenerated: "Imagem Gerada",
 
     // Gallery Screen
     galleryTitle: "Galeria",

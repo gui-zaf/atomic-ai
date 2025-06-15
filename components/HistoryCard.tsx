@@ -95,7 +95,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                 color={colors.primary}
               />
               <Text style={[styles.badgeText, { color: colors.primary }]}>
-                Chat
+                {t("historyChat")}
               </Text>
             </View>
             <Text
@@ -116,8 +116,13 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             <View style={styles.imageTextContainer}>
               <View style={styles.badgeContainer}>
                 <Ionicons name="image-outline" size={16} color="#7E57C2" />
-                <Text style={[styles.badgeText, { color: "#7E57C2" }]}>
-                  Imagem
+                <Text
+                  style={[
+                    styles.badgeText,
+                    { color: "#7E57C2" },
+                  ]}
+                >
+                  {t("historyImage")}
                 </Text>
               </View>
               <Text
@@ -141,14 +146,14 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                   { color: colors.error, marginLeft: 4 },
                 ]}
               >
-                Erro
+                {t("historyError")}
               </Text>
             </View>
             <Text
               style={[styles.errorSubtitle, { color: colors.text }]}
               numberOfLines={item.expanded ? undefined : 2}
             >
-              {t("history.failed_to_get_suggestion")}
+              {t("historyApiErrorDetail")}
             </Text>
           </View>
         );
@@ -170,7 +175,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           {item.prompt && (
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.subtext }]}>
-                Prompt:
+                {t("historyPrompt")}:
               </Text>
               <Text style={[styles.detailValue, { color: colors.text }]}>
                 {item.prompt}
@@ -181,7 +186,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           {item.response && (
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.subtext }]}>
-                Resposta:
+                {t("historyResponse")}:
               </Text>
               <Text style={[styles.detailValue, { color: colors.text }]}>
                 {item.response}
@@ -191,7 +196,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.subtext }]}>
-              Data:
+              {t("historyDate")}:
             </Text>
             <Text style={[styles.detailValue, { color: colors.text }]}>
               {formatDate(item.timestamp)}
@@ -200,7 +205,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.subtext }]}>
-              Tokens:
+              {t("historyTokens")}:
             </Text>
             <Text style={[styles.detailValue, { color: colors.text }]}>
               {item.tokensUsed}
@@ -210,7 +215,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           {item.model && (
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.subtext }]}>
-                Modelo:
+                {t("historyModel")}:
               </Text>
               <Text style={[styles.detailValue, { color: colors.text }]}>
                 {item.model}
@@ -236,7 +241,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
               color="#FFFFFF"
               style={styles.deleteIcon}
             />
-            <Text style={styles.deleteButtonText}>Excluir</Text>
+            <Text style={styles.deleteButtonText}>{t("historyDelete")}</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>

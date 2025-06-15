@@ -116,7 +116,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Histórico
+            {t("historyTitle")}
           </Text>
           {historyItems.length > 0 && (
             <TouchableOpacity
@@ -141,8 +141,7 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
               style={[styles.statsBar, { backgroundColor: colors.surface }]}
             >
               <Text style={[styles.statsText, { color: colors.subtext }]}>
-                {historyItems.length}{" "}
-                {historyItems.length === 1 ? "interação" : "interações"}
+                {historyItems.length} {historyItems.length === 1 ? t("historyInteraction") : t("historyInteractions")}
               </Text>
             </View>
             <FlatList
