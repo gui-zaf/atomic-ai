@@ -13,6 +13,8 @@ export interface HistoryItem {
   tokensUsed: number;
   model?: string;
   expanded?: boolean;
+  isLiked?: boolean;
+  likeCount?: number;
 }
 
 interface HistoryContextType {
@@ -20,6 +22,7 @@ interface HistoryContextType {
   addHistoryItem: (item: HistoryItem) => void;
   deleteHistoryItem: (id: string) => void;
   toggleExpandItem: (id: string) => void;
+  updateLikeStatus: (id: string, isLiked: boolean) => void;
   clearHistory: () => void;
 }
 
@@ -68,7 +71,13 @@ export const HistoryProvider = ({
   }, [historyItems]);
 
   const addHistoryItem = (item: HistoryItem) => {
-    setHistoryItems((prev) => [item, ...prev]); // Add to the beginning
+    // Ensure like properties are initialized
+    const itemWithLike = {
+      ...item,
+      isLiked: item.isLiked || false,
+      likeCount: item.likeCount || 0
+    };
+    setHistoryItems((prev) => [itemWithLike, ...prev]); // Add to the beginning
   };
 
   const deleteHistoryItem = (id: string) => {
@@ -85,6 +94,20 @@ export const HistoryProvider = ({
     );
   };
 
+  const updateLikeStatus = (id: string, isLiked: boolean) => {
+    setHistoryItems((prev) =>
+      prev.map((item) =>
+        item.id === id 
+          ? { 
+              ...item, 
+              isLiked: isLiked,
+              likeCount: isLiked ? 1 : 0 
+            } 
+          : item
+      ),
+    );
+  };
+
   const clearHistory = () => {
     setHistoryItems([]);
   };
@@ -96,6 +119,7 @@ export const HistoryProvider = ({
         addHistoryItem,
         deleteHistoryItem,
         toggleExpandItem,
+        updateLikeStatus,
         clearHistory,
       }}
     >

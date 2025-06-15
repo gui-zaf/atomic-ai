@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -95,7 +95,7 @@ const GlobalImageViewer = () => {
     }),
   ).current;
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     try {
       await Share.share({
         message: "Check out this amazing image!",
@@ -103,13 +103,13 @@ const GlobalImageViewer = () => {
     } catch (error) {
       // Silently handle sharing error
     }
-  };
+  }, []);
 
-  const handleDownload = () => {
+  const handleDownload = useCallback(() => {
     // Implementação futura
-  };
+  }, []);
 
-  const handleToggleLike = () => {
+  const handleToggleLike = useCallback(() => {
     // Atualiza o estado local primeiro
     const newLikeState = !localIsLiked;
     setLocalIsLiked(newLikeState);
@@ -119,28 +119,41 @@ const GlobalImageViewer = () => {
 
     // Notifica todos os listeners sobre a mudança
     toggleLikeListeners.forEach((listener) => listener(newLikeState));
-  };
+  }, [localIsLiked, toggleLike]);
 
-  const handleDelete = () => {
-    if (currentImage?.id && onDeleteImage) {
-      Alert.alert(t("deleteImage"), t("deleteImageConfirmation"), [
-        { text: t("no"), style: "cancel" },
-        {
-          text: t("yes"),
-          style: "destructive",
-          onPress: () => {
-            // Armazena o ID antes de fechar o modal
-            const imageId = currentImage.id!;
-            hideImageViewer();
-            // Pequeno atraso para garantir que o modal seja fechado antes da exclusão
-            setTimeout(() => {
-              onDeleteImage(imageId);
-            }, 300);
-          },
-        },
-      ]);
+  const handleDelete = useCallback(() => {
+    if (!currentImage) return;
+    
+    // Verificar se o ID existe antes de tentar excluir
+    const imageId = currentImage.id;
+    if (!imageId) {
+      console.error("Cannot delete image with undefined ID");
+      Alert.alert(
+        t("error"),
+        t("errorDeletingImage"),
+        [{ text: t("ok"), style: "default" }]
+      );
+      return;
     }
-  };
+    
+    Alert.alert(t("deleteImage"), t("deleteImageConfirmation"), [
+      { text: t("no"), style: "cancel" },
+      {
+        text: t("yes"),
+        style: "destructive",
+        onPress: () => {
+          // Armazena o ID antes de fechar o modal
+          hideImageViewer();
+          // Pequeno atraso para garantir que o modal seja fechado antes da exclusão
+          setTimeout(() => {
+            if (onDeleteImage) {
+              onDeleteImage(imageId);
+            }
+          }, 300);
+        },
+      },
+    ]);
+  }, [currentImage, hideImageViewer, onDeleteImage, t]);
 
   if (!currentImage) return null;
 
@@ -217,11 +230,16 @@ const GlobalImageViewer = () => {
                 style={styles.actionButton}
                 onPress={handleToggleLike}
               >
-                <Ionicons
-                  name={localIsLiked ? "heart" : "heart-outline"}
-                  size={28}
-                  color="#FF3B30"
-                />
+                <View style={styles.likeButtonContent}>
+                  <Ionicons
+                    name={localIsLiked ? "heart" : "heart-outline"}
+                    size={28}
+                    color="#FF3B30"
+                  />
+                  {localIsLiked && currentImage.likeCount && (
+                    <Text style={styles.likeCountText}>{currentImage.likeCount}</Text>
+                  )}
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -313,6 +331,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  likeButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  likeCountText: {
+    color: '#FF3B30',
+    fontWeight: '600',
+    fontSize: 16,
+    marginLeft: 5,
   },
 });
 

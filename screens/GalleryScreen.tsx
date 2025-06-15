@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   FlatList,
   Alert,
   Dimensions,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +18,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useImageViewer } from "../context/ImageViewerContext";
 import { addToggleLikeListener } from "../components/GlobalImageViewer";
+import { useHistory, HistoryItem } from "../context/HistoryContext";
+import { imageDescriptionMapping } from "../types";
 
 type GalleryScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -35,32 +38,108 @@ type GalleryImage = {
   source: any;
   isLiked: boolean;
   description: string;
+  likeCount: number;
+};
+
+// Definir um tipo para as chaves do imageMap
+type ImageKey =
+  | "cat-in-space"
+  | "sunset-beach"
+  | "fantasy-castle"
+  | "cyberpunk-city"
+  | "cute-animals"
+  | "colorful-landscape"
+  | "sci-fi-portrait"
+  | "abstract-art";
+
+// Mapeamento estático para as imagens
+const imageMap: Record<ImageKey, any> = {
+  "cat-in-space": require("../assets/samples/cat-in-space.jpeg"),
+  "sunset-beach": require("../assets/samples/sunset-beach.jpeg"),
+  "fantasy-castle": require("../assets/samples/fantasy-castle.jpeg"),
+  "cyberpunk-city": require("../assets/samples/cyberpunk-city.jpeg"),
+  "cute-animals": require("../assets/samples/cute-animals.jpeg"),
+  "colorful-landscape": require("../assets/samples/colorful-landscape.jpeg"),
+  "sci-fi-portrait": require("../assets/samples/sci-fi-portrait.jpeg"),
+  "abstract-art": require("../assets/samples/abstract-art.jpeg"),
 };
 
 const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
   const { showImageViewer } = useImageViewer();
+  const { historyItems, updateLikeStatus } = useHistory();
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
 
-  // Estado para controlar o feedback de exclusão
-  const [isDeleting, setIsDeleting] = useState(false);
-  const deletedItemId = useRef<string | null>(null);
+  // Animation for list items
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  // Determina a imagem correta com base no prompt
+  const getImageSource = useCallback((prompt: string) => {
+    // Verifica se o prompt corresponde a alguma das descrições predefinidas
+    const matchingImage = imageDescriptionMapping.find(
+      (mapping) =>
+        mapping.english === prompt || mapping.portuguese === prompt,
+    );
+
+    if (matchingImage && matchingImage.filename in imageMap) {
+      // Se encontrar uma correspondência, usa a imagem específica
+      return imageMap[matchingImage.filename as ImageKey];
+    }
+
+    // Fallback para uma imagem padrão
+    return require("../assets/samples/abstract-art.jpeg");
+  }, []);
+
+  // Filtrar apenas imagens do histórico e transformá-las em imagens da galeria
+  useEffect(() => {
+    const imageHistoryItems = historyItems.filter(item => item.type === "image");
+    
+    const galleryImagesFromHistory = imageHistoryItems.map(item => {
+      return {
+        id: item.id,
+        source: getImageSource(item.prompt || ""),
+        isLiked: item.isLiked || false,
+        description: item.prompt || "",
+        likeCount: item.likeCount || 0,
+      };
+    });
+    
+    setGalleryImages(galleryImagesFromHistory);
+  }, [historyItems, getImageSource]);
 
   // Função para atualizar o estado de like de uma imagem
   const handleToggleLike = useCallback(
     (imageId: string, newLikeState: boolean) => {
+      // Atualizar o estado local
       setGalleryImages((prevImages) =>
         prevImages.map((img) =>
-          img.id === imageId ? { ...img, isLiked: newLikeState } : img,
+          img.id === imageId 
+            ? { 
+                ...img, 
+                isLiked: newLikeState,
+                likeCount: newLikeState ? 1 : 0 // Incrementa ou zera o contador de likes
+              } 
+            : img
         ),
       );
+      
+      // Atualizar o estado no contexto do histórico para persistência
+      updateLikeStatus(imageId, newLikeState);
     },
-    [],
+    [updateLikeStatus],
   );
 
   // Registra um listener global para likes quando o componente é montado
-  React.useEffect(() => {
+  useEffect(() => {
     const removeListener = addToggleLikeListener((newIsLiked) => {
       // Atualizar o estado da imagem atual
       if (currentViewingImageId.current) {
@@ -76,7 +155,21 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   // Referência para armazenar o ID da imagem que está sendo visualizada atualmente
   const currentViewingImageId = React.useRef<string | null>(null);
 
+  // Criar callbacks para cada imagem que serão usados no imageViewer
+  const createToggleLikeHandler = useCallback((imageId: string) => {
+    // Retorna uma função que será chamada pelo ImageViewer
+    return (newLikeState: boolean) => {
+      handleToggleLike(imageId, newLikeState);
+    };
+  }, [handleToggleLike]);
+
   const handleImagePress = (item: GalleryImage) => {
+    // Ensure the item has a valid ID before proceeding
+    if (!item.id) {
+      console.error("Cannot view image with invalid ID");
+      return;
+    }
+    
     // Armazena o ID da imagem sendo visualizada
     currentViewingImageId.current = item.id;
 
@@ -86,60 +179,49 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         source: item.source,
         isLiked: item.isLiked,
         message: item.description,
+        likeCount: item.likeCount,
       },
       {
-        isGalleryMode: true,
-        onDeleteImage: handleDeleteImage,
+        isGalleryMode: false, // Não mostra opção de exclusão na galeria
+        onToggleLike: createToggleLikeHandler(item.id),
       },
     );
   };
 
-  const handleDeleteImage = (id: string) => {
-    // Limpar a referência ao ID da imagem atual se for a mesma que está sendo excluída
-    if (currentViewingImageId.current === id) {
-      currentViewingImageId.current = null;
-    }
-
-    // Marcar como excluindo e armazenar o ID da imagem
-    setIsDeleting(true);
-    deletedItemId.current = id;
-
-    // Remover a imagem da lista com um pequeno atraso para o efeito visual
-    setTimeout(() => {
-      setGalleryImages((prevImages) =>
-        prevImages.filter((image) => image.id !== id),
-      );
-      setIsDeleting(false);
-      deletedItemId.current = null;
-    }, 300);
-  };
-
-  const renderItem = ({ item }: { item: GalleryImage }) => {
-    // Aplicar efeito visual se o item estiver sendo excluído
-    const isBeingDeleted = isDeleting && deletedItemId.current === item.id;
+  const renderItem = ({ item, index }: { item: GalleryImage, index: number }) => {
+    const animationDelay = index * 50;
 
     return (
-      <TouchableOpacity
-        style={[styles.imageContainer, isBeingDeleted && styles.deletingImage]}
-        onPress={() => handleImagePress(item)}
-        activeOpacity={0.8}
-        disabled={isBeingDeleted}
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [
+            {
+              translateY: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [20, 0],
+              }),
+            },
+          ],
+        }}
       >
-        <Image
-          source={item.source}
-          style={[styles.image, isBeingDeleted && { opacity: 0.5 }]}
-        />
-        {item.isLiked && (
-          <View style={styles.likeIconContainer}>
-            <Ionicons name="heart" size={22} color="#FF3B30" />
-          </View>
-        )}
-        {isBeingDeleted && (
-          <View style={styles.deletingOverlay}>
-            <Ionicons name="trash" size={32} color="#FF3B30" />
-          </View>
-        )}
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.imageContainer}
+          onPress={() => handleImagePress(item)}
+          activeOpacity={0.8}
+        >
+          <Image
+            source={item.source}
+            style={styles.image}
+          />
+          {item.isLiked && (
+            <View style={styles.likeIconContainer}>
+              <Ionicons name="heart" size={22} color="#FF3B30" />
+              <Text style={styles.likeCountText}>{item.likeCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
 
@@ -155,7 +237,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         {t("noImagesInGallery")}
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        {t("useImageCommand")}
+        {t("createImageInstructions")}
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
@@ -198,7 +280,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
             numColumns={2}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
-            extraData={[galleryImages, isDeleting, deletedItemId.current]} // Força rerender quando esses estados mudam
+            extraData={[galleryImages]} // Força rerender quando o estado muda
           />
         )}
       </SafeAreaView>
@@ -251,24 +333,18 @@ const styles = StyleSheet.create({
     top: 8,
     right: 8,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
-    width: 36,
+    paddingHorizontal: 10,
     height: 36,
     borderRadius: 18,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
-  deletingImage: {
-    transform: [{ scale: 0.95 }],
-  },
-  deletingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    justifyContent: "center",
-    alignItems: "center",
+  likeCountText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 16,
+    marginLeft: 4,
   },
   emptyContainer: {
     flex: 1,
@@ -283,12 +359,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 12,
+    textAlign: "center",
   },
   emptySubtext: {
     fontSize: 16,
     textAlign: "center",
     marginBottom: 36,
     lineHeight: 22,
+    paddingHorizontal: 16,
   },
   createButton: {
     flexDirection: "row",

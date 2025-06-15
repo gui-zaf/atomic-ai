@@ -64,21 +64,43 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleDeleteHistoryItem = (id: string) => {
-    Alert.alert(
-      t("deleteItemTitle") || "Delete Item",
-      t("deleteItemConfirmation") || "Are you sure you want to delete this item?",
-      [
-        {
-          text: t("no") || "No",
-          style: "cancel"
-        },
-        {
-          text: t("yes") || "Yes",
-          onPress: () => deleteHistoryItem(id),
-          style: "destructive"
-        }
-      ]
-    );
+    // Verificar se é uma imagem antes de mostrar o aviso específico para imagens
+    const itemToDelete = historyItems.find(item => item.id === id);
+    
+    if (itemToDelete && itemToDelete.type === "image") {
+      Alert.alert(
+        t("deleteItemTitle") || "Delete Item",
+        `${t("deleteItemConfirmation")}\n\n${t("imageDeletedFromHistory")}`,
+        [
+          {
+            text: t("no") || "No",
+            style: "cancel"
+          },
+          {
+            text: t("yes") || "Yes",
+            onPress: () => deleteHistoryItem(id),
+            style: "destructive"
+          }
+        ]
+      );
+    } else {
+      // Para itens que não são imagens, mostra o alerta padrão
+      Alert.alert(
+        t("deleteItemTitle") || "Delete Item",
+        t("deleteItemConfirmation") || "Are you sure you want to delete this item?",
+        [
+          {
+            text: t("no") || "No",
+            style: "cancel"
+          },
+          {
+            text: t("yes") || "Yes",
+            onPress: () => deleteHistoryItem(id),
+            style: "destructive"
+          }
+        ]
+      );
+    }
   };
 
   const renderItem = ({

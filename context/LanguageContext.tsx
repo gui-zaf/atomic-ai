@@ -63,9 +63,10 @@ const translations = {
 
     // Gallery Screen
     galleryTitle: "Gallery",
-    noImagesInGallery: "No images in gallery",
-    useImageCommand: 'Use the "/image" command in chat to generate new images',
-    createNewImage: "Create new image",
+    noImagesInGallery: "No images in your gallery yet",
+    createImageInstructions: "Create an image in the chat to see it here",
+    createNewImage: "Create Image",
+    imageDeletedFromHistory: "This image will also be removed from the gallery",
 
     // Image Viewer
     deleteImage: "Delete Image",
@@ -177,6 +178,11 @@ const translations = {
     contractor: "Contracting Parties",
     contractorContent:
       "Contractor: Pixelpenguin Tech\nCorporate Name: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContracted: ZCode\nCPF: 240.436.318-20\n\nProject Nature: Volunteer, unpaid",
+
+    // Error messages
+    error: "Error",
+    errorDeletingImage: "There was an error deleting the image. Please try again.",
+    imageNotFound: "Image not found. It may have been already deleted.",
   },
   pt: {
     // Menu
@@ -222,9 +228,10 @@ const translations = {
 
     // Gallery Screen
     galleryTitle: "Galeria",
-    noImagesInGallery: "Nenhuma imagem na galeria",
-    useImageCommand: 'Use o comando "/image" no chat para gerar novas imagens',
-    createNewImage: "Criar nova imagem",
+    noImagesInGallery: "Nenhuma imagem na sua galeria ainda",
+    createImageInstructions: "Crie uma imagem no chat para vê-la aqui",
+    createNewImage: "Criar Imagem",
+    imageDeletedFromHistory: "Esta imagem também será removida da galeria",
 
     // Image Viewer
     deleteImage: "Excluir Imagem",
@@ -336,6 +343,11 @@ const translations = {
     contractor: "Contratante / Contratada",
     contractorContent:
       "Contratante: Pixelpenguin Tech\nRazão Social: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContratada: ZCode\nCPF: 240.436.318-20\n\nNatureza do Projeto: Voluntário, sem remuneração",
+
+    // Error messages
+    error: "Erro",
+    errorDeletingImage: "Ocorreu um erro ao excluir a imagem. Por favor, tente novamente.",
+    imageNotFound: "Imagem não encontrada. Ela pode já ter sido excluída.",
   },
 };
 

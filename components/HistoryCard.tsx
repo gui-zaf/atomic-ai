@@ -13,6 +13,8 @@ import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { HistoryItem } from "../context/HistoryContext";
 import { imageDescriptionMapping } from "../types";
+import { useImageViewer } from "../context/ImageViewerContext";
+import { useHistory } from "../context/HistoryContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -52,6 +54,8 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
+  const { showImageViewer } = useImageViewer();
+  const { updateLikeStatus } = useHistory();
   
   // Animation for expanded content
   const expandAnim = useRef(new Animated.Value(0)).current;
@@ -83,6 +87,34 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
     // Fallback para guilherme.jpeg se nada funcionar
     return require("../assets/guilherme.jpeg");
   }, [item]);
+  
+  // Função para exibir a imagem em tela cheia
+  const handleImagePress = () => {
+    if (item.type === "image" && imageSource) {
+      showImageViewer(
+        {
+          id: item.id,
+          source: imageSource,
+          isLiked: item.isLiked || false,
+          message: item.prompt || "",
+          likeCount: item.likeCount || 0,
+        },
+        {
+          isGalleryMode: true, // Usar o mesmo modo da galeria
+          onDeleteImage: (id) => {
+            // Se o usuário excluir a imagem, chamamos o onDelete
+            if (id === item.id) {
+              onDelete();
+            }
+          },
+          onToggleLike: (newLikeState) => {
+            // Atualizar o estado de like no histórico
+            updateLikeStatus(item.id, newLikeState);
+          },
+        }
+      );
+    }
+  };
 
   // Format the timestamp
   const formatDate = (date: Date) => {
@@ -123,7 +155,12 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         return (
           <View style={styles.imageCardContent}>
             {imageSource && (
-              <Image source={imageSource} style={styles.thumbnail} />
+              <TouchableOpacity 
+                activeOpacity={0.8} 
+                onPress={handleImagePress}
+              >
+                <Image source={imageSource} style={styles.thumbnail} />
+              </TouchableOpacity>
             )}
             <View style={styles.imageTextContainer}>
               <View style={styles.badgeContainer}>
@@ -253,11 +290,21 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           )}
 
           {item.type === "image" && (
-            <Image
-              source={imageSource}
-              style={[styles.fullImage, { backgroundColor: colors.background }]}
-              resizeMode="contain"
-            />
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={handleImagePress}
+            >
+              <Image
+                source={imageSource}
+                style={[styles.fullImage, { backgroundColor: colors.background }]}
+                resizeMode="contain"
+              />
+              {item.isLiked && (
+                <View style={styles.likeIconContainerLarge}>
+                  <Ionicons name="heart" size={22} color="#FF3B30" />
+                </View>
+              )}
+            </TouchableOpacity>
           )}
 
           <TouchableOpacity
@@ -278,35 +325,41 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
   };
 
   return (
-    <TouchableOpacity
+    <View
       style={[styles.card, { backgroundColor: colors.surface }]}
-      onPress={onToggleExpand}
-      activeOpacity={0.7}
     >
-      <View style={styles.cardHeader}>
-        {renderCardContent()}
-        <Animated.View
-          style={[
-            styles.chevronContainer,
-            {
-              transform: [{
-                rotate: expandAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '180deg'],
-                })
-              }]
-            }
-          ]}
-        >
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={colors.subtext}
-          />
-        </Animated.View>
-      </View>
+      <TouchableOpacity
+        onPress={item.expanded ? undefined : onToggleExpand}
+        activeOpacity={0.7}
+        style={styles.cardHeaderTouchable}
+      >
+        <View style={styles.cardHeader}>
+          {renderCardContent()}
+          <TouchableOpacity
+            onPress={onToggleExpand}
+            style={styles.chevronContainer}
+          >
+            <Animated.View
+              style={{
+                transform: [{
+                  rotate: expandAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '180deg'],
+                  })
+                }]
+              }}
+            >
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={colors.subtext}
+              />
+            </Animated.View>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
       {renderExpandedDetails()}
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -430,5 +483,20 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+  },
+  cardHeaderTouchable: {
+    width: '100%',
+  },
+  likeIconContainerLarge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    paddingHorizontal: 10,
+    height: 36,
+    borderRadius: 18,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
