@@ -1,15 +1,18 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack";
 
 // Import screens
-import HomeScreen from '../screens/HomeScreen';
-import TokenStoreScreen from '../screens/TokenStoreScreen';
-import GalleryScreen from '../screens/GalleryScreen';
-import DevelopersScreen from '../screens/DevelopersScreen';
-import HistoryScreen from '../screens/HistoryScreen';
-import AboutScreen from '../screens/AboutScreen';
-import { useTheme } from '../context/ThemeContext';
+import HomeScreen from "../screens/HomeScreen";
+import TokenStoreScreen from "../screens/TokenStoreScreen";
+import GalleryScreen from "../screens/GalleryScreen";
+import DevelopersScreen from "../screens/DevelopersScreen";
+import HistoryScreen from "../screens/HistoryScreen";
+import AboutScreen from "../screens/AboutScreen";
+import { useTheme } from "../context/ThemeContext";
 
 // Define the stack navigator param list
 export type RootStackParamList = {
@@ -34,7 +37,7 @@ const AppNavigator = () => {
           headerShown: false,
           ...TransitionPresets.SlideFromRightIOS,
           cardStyle: { backgroundColor: colors.background },
-          presentation: 'card',
+          presentation: "card",
           detachPreviousScreen: true,
         }}
       >
@@ -49,4 +52,4 @@ const AppNavigator = () => {
   );
 };
 
-export default AppNavigator; 
+export default AppNavigator;

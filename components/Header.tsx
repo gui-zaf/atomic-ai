@@ -15,12 +15,12 @@ export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
 
   return (
     <View style={styles.headerWrapper}>
-      <BlurView 
+      <BlurView
         intensity={10}
         tint={isDarkMode ? "dark" : "light"}
         style={styles.blurContainer}
       />
-      
+
       <View style={styles.container}>
         <TouchableOpacity style={styles.iconButton} onPress={onMenuPress}>
           <Ionicons
@@ -42,10 +42,10 @@ export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
 const styles = StyleSheet.create({
   headerWrapper: {
     zIndex: 10,
-    position: 'relative',
+    position: "relative",
   },
   blurContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: -100,
     left: 0,
     right: 0,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     zIndex: 2,
   },
   title: {

@@ -18,7 +18,10 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
-type TokenStoreScreenNavigationProp = StackNavigationProp<RootStackParamList, 'TokenStore'>;
+type TokenStoreScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "TokenStore"
+>;
 
 interface TokenPlan {
   id: string;
@@ -44,7 +47,7 @@ const TokenStoreScreen = () => {
   const { addTokens } = useTokens();
   const [selectedPlan, setSelectedPlan] = useState<TokenPlan | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   const plans: TokenPlan[] = [
     {
       id: "basic",
@@ -110,9 +113,9 @@ const TokenStoreScreen = () => {
 
         // Show success message
         Alert.alert(
-          t('purchaseSuccessful'),
-          t('tokensAdded').replace('{0}', selectedPlan.tokens.toString()),
-          [{ text: t('ok'), onPress: () => navigation.goBack() }]
+          t("purchaseSuccessful"),
+          t("tokensAdded").replace("{0}", selectedPlan.tokens.toString()),
+          [{ text: t("ok"), onPress: () => navigation.goBack() }],
         );
       }, 1000);
     }
@@ -142,7 +145,7 @@ const TokenStoreScreen = () => {
           },
         ]}
       >
-        {feature.titleKey.includes("Tokens") 
+        {feature.titleKey.includes("Tokens")
           ? feature.titleKey
           : t(feature.titleKey)}
       </Text>
@@ -175,7 +178,7 @@ const TokenStoreScreen = () => {
       >
         {isFeatured && (
           <View style={[styles.featuredBadge, { backgroundColor: planColor }]}>
-            <Text style={styles.featuredText}>{t('bestValue')}</Text>
+            <Text style={styles.featuredText}>{t("bestValue")}</Text>
           </View>
         )}
 
@@ -204,7 +207,7 @@ const TokenStoreScreen = () => {
             {plan.tokens}
           </Text>
           <Text style={[styles.tokenLabel, { color: colors.subtext }]}>
-            {t('tokens')}
+            {t("tokens")}
           </Text>
         </View>
 
@@ -227,7 +230,7 @@ const TokenStoreScreen = () => {
           ]}
           onPress={() => handlePlanSelect(plan)}
         >
-          <Text style={styles.buyButtonText}>{t('buyNow')}</Text>
+          <Text style={styles.buyButtonText}>{t("buyNow")}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -237,14 +240,14 @@ const TokenStoreScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()} 
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
             style={styles.closeButton}
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {t('tokenStoreTitle')}
+            {t("tokenStoreTitle")}
           </Text>
           <View style={styles.headerRight} />
         </View>
@@ -259,10 +262,10 @@ const TokenStoreScreen = () => {
               <Ionicons name="flash" size={24} color={colors.primary} />
             </View>
             <Text style={[styles.introTitle, { color: colors.text }]}>
-              {t('powerUpAI')}
+              {t("powerUpAI")}
             </Text>
             <Text style={[styles.introText, { color: colors.subtext }]}>
-              {t('purchaseTokensDescription')}
+              {t("purchaseTokensDescription")}
             </Text>
           </View>
 
@@ -279,21 +282,27 @@ const TokenStoreScreen = () => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <SafeAreaView edges={["top", "bottom"]} style={[styles.modalOverlay, { backgroundColor: "rgba(0, 0, 0, 0.5)" }]}>
+        <SafeAreaView
+          edges={["top", "bottom"]}
+          style={[
+            styles.modalOverlay,
+            { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+          ]}
+        >
           <View
             style={[styles.modalContent, { backgroundColor: colors.surface }]}
           >
             <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {t('confirmPurchase')}
+              {t("confirmPurchase")}
             </Text>
             {selectedPlan && (
               <>
                 <Text
                   style={[styles.modalDescription, { color: colors.subtext }]}
                 >
-                  {t('aboutToPurchase')
-                    .replace('{0}', selectedPlan.tokens.toString())
-                    .replace('{1}', selectedPlan.price)}
+                  {t("aboutToPurchase")
+                    .replace("{0}", selectedPlan.tokens.toString())
+                    .replace("{1}", selectedPlan.price)}
                 </Text>
 
                 <View style={styles.modalButtons}>
@@ -308,7 +317,7 @@ const TokenStoreScreen = () => {
                     <Text
                       style={[styles.cancelButtonText, { color: colors.text }]}
                     >
-                      {t('cancel')}
+                      {t("cancel")}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
@@ -319,7 +328,7 @@ const TokenStoreScreen = () => {
                     ]}
                     onPress={handlePurchase}
                   >
-                    <Text style={styles.confirmButtonText}>{t('confirm')}</Text>
+                    <Text style={styles.confirmButtonText}>{t("confirm")}</Text>
                   </TouchableOpacity>
                 </View>
               </>

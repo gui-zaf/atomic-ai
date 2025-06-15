@@ -1,5 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import { StyleSheet, ScrollView, Keyboard, Platform, PanResponder } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Keyboard,
+  Platform,
+  PanResponder,
+} from "react-native";
 import { ChatBubble } from "./ChatBubble";
 import { Message } from "../types";
 
@@ -27,7 +33,7 @@ export const ChatMessages = ({
       },
       // Permite que outras views se tornem o 'responder'. Importante para botões filhos.
       onPanResponderTerminationRequest: () => true,
-    })
+    }),
   ).current;
 
   useEffect(() => {
@@ -37,7 +43,7 @@ export const ChatMessages = ({
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
-      }
+      },
     );
 
     return () => keyboardShowListener.remove();

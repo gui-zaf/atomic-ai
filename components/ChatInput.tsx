@@ -27,7 +27,11 @@ interface ChatInputProps {
   onFocusChange?: (isFocused: boolean) => void;
 }
 
-const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatInputProps) => {
+const ChatInput = ({
+  onSend,
+  onSendAIMessage,
+  onFocusChange = () => {},
+}: ChatInputProps) => {
   const { colors, isDarkMode } = useTheme();
   const { t } = useLanguage();
   const [message, setMessage] = useState("");
@@ -35,7 +39,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const { decrementToken, resetTokens } = useTokens();
-  
+
   // Animation values
   const suggestionsOpacity = useRef(new Animated.Value(1)).current;
   const containerTranslateY = useRef(new Animated.Value(0)).current;
@@ -59,9 +63,9 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
           }),
         ]).start(() => setShowSuggestions(false));
         onFocusChange(true);
-      }
+      },
     );
-    
+
     const keyboardWillHideListener = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
@@ -81,7 +85,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
           }),
         ]).start();
         onFocusChange(false);
-      }
+      },
     );
 
     return () => {
@@ -107,7 +111,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
       Alert.alert(
         "Tokens Esgotados",
         "Seus tokens gratuitos acabaram. Aguarde a recarga ou adquira mais tokens.",
-        [{ text: "OK" }]
+        [{ text: "OK" }],
       );
     }
   };
@@ -117,7 +121,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
     Alert.alert(
       "Tokens Refreshed",
       "You received 10 additional tokens and cooldown has been reset!",
-      [{ text: "OK" }]
+      [{ text: "OK" }],
     );
   };
 
@@ -128,7 +132,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
       const suggestion = await getAmazeSuggestion();
       setMessage(suggestion);
     } catch (error) {
-      onSendAIMessage(t('suggestionError'));
+      onSendAIMessage(t("suggestionError"));
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +144,7 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
   };
 
   const handleSubmitEditing = (
-    e: NativeSyntheticEvent<TextInputSubmitEditingEventData>
+    e: NativeSyntheticEvent<TextInputSubmitEditingEventData>,
   ) => {
     if (Platform.OS === "ios") {
       e.preventDefault?.();
@@ -151,30 +155,27 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
   return (
     <>
       <RechargeTimer />
-      <Animated.View 
+      <Animated.View
         style={[
           styles.inputWrapper,
           { transform: [{ translateY: containerTranslateY }] },
           isKeyboardVisible && styles.inputWrapperKeyboardOpen,
         ]}
       >
-        <BlurView 
-          intensity={10} 
+        <BlurView
+          intensity={10}
           tint={isDarkMode ? "dark" : "light"}
           style={styles.blurContainer}
         />
-        
+
         {showSuggestions && (
-          <Animated.View 
-            style={[
-              styles.suggestionsWrapper,
-              { opacity: suggestionsOpacity }
-            ]}
+          <Animated.View
+            style={[styles.suggestionsWrapper, { opacity: suggestionsOpacity }]}
           >
             <SuggestionCarousel onSelectSuggestion={handleSelectSuggestion} />
           </Animated.View>
         )}
-        
+
         <View
           style={[
             styles.container,
@@ -217,7 +218,11 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
             <TouchableOpacity
               style={[
                 styles.sendButton,
-                { backgroundColor: message.trim() ? colors.primary : colors.surface },
+                {
+                  backgroundColor: message.trim()
+                    ? colors.primary
+                    : colors.surface,
+                },
               ]}
               onPress={handleSend}
               disabled={!message.trim()}
@@ -237,14 +242,14 @@ const ChatInput = ({ onSend, onSendAIMessage, onFocusChange = () => {} }: ChatIn
 
 const styles = StyleSheet.create({
   inputWrapper: {
-    position: 'relative',
+    position: "relative",
     marginTop: 0,
   },
   inputWrapperKeyboardOpen: {
     marginBottom: -20,
   },
   blurContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -253,14 +258,14 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   suggestionsWrapper: {
-    position: 'relative',
+    position: "relative",
     zIndex: 25,
     marginTop: 0,
   },
   container: {
     paddingHorizontal: 16,
     paddingVertical: 4,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     zIndex: 2,
   },
   containerKeyboardOpen: {
@@ -280,7 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     maxHeight: 100,
     minHeight: 42,
-    textAlignVertical: 'center',
+    textAlignVertical: "center",
   },
   sendButton: {
     width: 38,
@@ -296,7 +301,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
 });
 
 export default ChatInput;

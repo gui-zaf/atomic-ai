@@ -57,9 +57,9 @@ export const theme = {
   dark: {
     colors: darkColors,
   },
-  current: 'light',
+  current: "light",
 } as const;
 
 export type Theme = typeof theme;
 
-export type ColorScheme = 'light' | 'dark';
+export type ColorScheme = "light" | "dark";

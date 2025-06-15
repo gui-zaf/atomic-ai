@@ -1,7 +1,4 @@
-import {
-  ActionSheetIOS,
-  Platform,
-} from "react-native";
+import { ActionSheetIOS, Platform } from "react-native";
 
 interface ImageActionSheetProps {
   onLike: () => void;

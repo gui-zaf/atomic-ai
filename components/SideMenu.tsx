@@ -62,7 +62,7 @@ const SideMenu = ({
     return () => slideAnim.removeListener(id);
   }, [slideAnim]);
 
-  const getUserInitials = (name: string) => 
+  const getUserInitials = (name: string) =>
     name
       .split(" ")
       .map((part) => part[0])
@@ -73,8 +73,9 @@ const SideMenu = ({
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => isVisible,
-      onMoveShouldSetPanResponder: (_, gestureState) => 
-        isVisible && Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5,
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        isVisible &&
+        Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 1.5,
       onPanResponderMove: (_, gestureState) => {
         if (gestureState.dx < 0) {
           slideAnim.setValue(gestureState.dx);
@@ -92,7 +93,7 @@ const SideMenu = ({
       },
       onPanResponderTerminationRequest: () => true,
       onShouldBlockNativeResponder: () => false,
-    })
+    }),
   ).current;
 
   useEffect(() => {
@@ -142,8 +143,10 @@ const SideMenu = ({
     return null;
   }
 
-  const menuBackgroundColor = 
-    darkMode && colors.menuBackground ? colors.menuBackground : colors.background;
+  const menuBackgroundColor =
+    darkMode && colors.menuBackground
+      ? colors.menuBackground
+      : colors.background;
 
   return (
     <View
@@ -176,19 +179,19 @@ const SideMenu = ({
               Atomic AI
             </Text>
             <View style={styles.spacer} />
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.flagButton}
               onPress={toggleLanguage}
             >
-              {language === 'en' ? (
-                <Image 
-                  source={require('../assets/flags/us-flag.png')} 
-                  style={styles.flagIcon} 
+              {language === "en" ? (
+                <Image
+                  source={require("../assets/flags/us-flag.png")}
+                  style={styles.flagIcon}
                 />
               ) : (
-                <Image 
-                  source={require('../assets/flags/br-flag.png')} 
-                  style={styles.flagIcon} 
+                <Image
+                  source={require("../assets/flags/br-flag.png")}
+                  style={styles.flagIcon}
                 />
               )}
             </TouchableOpacity>
@@ -197,7 +200,7 @@ const SideMenu = ({
           {/* Quick Actions Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              {t('quickActions')}
+              {t("quickActions")}
             </Text>
 
             <TouchableOpacity style={styles.menuItem} onPress={onNewChat}>
@@ -207,21 +210,21 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('newChat')}
+                {t("newChat")}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={onOpenGallery}>
               <Ionicons name="images-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('gallery')}
+                {t("gallery")}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={onOpenHistory}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('history')}
+                {t("history")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -229,13 +232,13 @@ const SideMenu = ({
           {/* Store Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              {t('store')}
+              {t("store")}
             </Text>
 
             <TouchableOpacity style={styles.menuItem} onPress={onBuyTokens}>
               <Ionicons name="flash-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('buyTokens')}
+                {t("buyTokens")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -243,7 +246,7 @@ const SideMenu = ({
           {/* Adjusts Section */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.subtext }]}>
-              {t('settings')}
+              {t("settings")}
             </Text>
 
             <View style={styles.menuItem}>
@@ -253,7 +256,7 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {darkMode ? t('lightMode') : t('darkMode')}
+                {darkMode ? t("lightMode") : t("darkMode")}
               </Text>
               <View style={styles.spacer} />
               <Switch
@@ -276,14 +279,17 @@ const SideMenu = ({
                 color={colors.text}
               />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('about')}
+                {t("about")}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem} onPress={onOpenDevelopers}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={onOpenDevelopers}
+            >
               <Ionicons name="code-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t('developers')}
+                {t("developers")}
               </Text>
             </TouchableOpacity>
           </View>

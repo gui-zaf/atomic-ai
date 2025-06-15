@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -6,38 +6,80 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
-import { useLanguage } from '../context/LanguageContext';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 
 interface SuggestionCarouselProps {
   onSelectSuggestion: (suggestion: string) => void;
 }
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
-const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => {
+const SuggestionCarousel = ({
+  onSelectSuggestion,
+}: SuggestionCarouselProps) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
-  
+
   const suggestions = [
-    { id: '1', translationKey: 'catInSpace', descriptionKey: 'catInSpaceDesc', icon: 'planet' },
-    { id: '2', translationKey: 'sunsetBeach', descriptionKey: 'sunsetBeachDesc', icon: 'sunny' },
-    { id: '3', translationKey: 'fantasycastle', descriptionKey: 'fantasycastleDesc', icon: 'home' },
-    { id: '4', translationKey: 'cyberpunkCity', descriptionKey: 'cyberpunkCityDesc', icon: 'flash' },
-    { id: '5', translationKey: 'cuteAnimals', descriptionKey: 'cuteAnimalsDesc', icon: 'paw' },
-    { id: '6', translationKey: 'colorfulLandscape', descriptionKey: 'colorfulLandscapeDesc', icon: 'color-palette' },
-    { id: '7', translationKey: 'sciFiPortrait', descriptionKey: 'sciFiPortraitDesc', icon: 'person' },
-    { id: '8', translationKey: 'abstractArt', descriptionKey: 'abstractArtDesc', icon: 'color-wand' }
+    {
+      id: "1",
+      translationKey: "catInSpace",
+      descriptionKey: "catInSpaceDesc",
+      icon: "planet",
+    },
+    {
+      id: "2",
+      translationKey: "sunsetBeach",
+      descriptionKey: "sunsetBeachDesc",
+      icon: "sunny",
+    },
+    {
+      id: "3",
+      translationKey: "fantasycastle",
+      descriptionKey: "fantasycastleDesc",
+      icon: "home",
+    },
+    {
+      id: "4",
+      translationKey: "cyberpunkCity",
+      descriptionKey: "cyberpunkCityDesc",
+      icon: "flash",
+    },
+    {
+      id: "5",
+      translationKey: "cuteAnimals",
+      descriptionKey: "cuteAnimalsDesc",
+      icon: "paw",
+    },
+    {
+      id: "6",
+      translationKey: "colorfulLandscape",
+      descriptionKey: "colorfulLandscapeDesc",
+      icon: "color-palette",
+    },
+    {
+      id: "7",
+      translationKey: "sciFiPortrait",
+      descriptionKey: "sciFiPortraitDesc",
+      icon: "person",
+    },
+    {
+      id: "8",
+      translationKey: "abstractArt",
+      descriptionKey: "abstractArtDesc",
+      icon: "color-wand",
+    },
   ];
-  
+
   return (
     <View style={styles.container}>
       <Text style={[styles.sectionHeader, { color: colors.subtext }]}>
-        {t('suggestions')}
+        {t("suggestions")}
       </Text>
-      
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -57,13 +99,14 @@ const SuggestionCarousel = ({ onSelectSuggestion }: SuggestionCarouselProps) => 
         {suggestions.map((suggestion) => (
           <TouchableOpacity
             key={suggestion.id}
-            style={[
-              styles.suggestionBox,
-              { backgroundColor: colors.surface }
-            ]}
+            style={[styles.suggestionBox, { backgroundColor: colors.surface }]}
             onPress={() => onSelectSuggestion(t(suggestion.descriptionKey))}
           >
-            <Ionicons name={suggestion.icon as any} size={20} color={colors.primary} />
+            <Ionicons
+              name={suggestion.icon as any}
+              size={20}
+              color={colors.primary}
+            />
             <Text
               style={[styles.suggestionText, { color: colors.text }]}
               numberOfLines={1}
@@ -82,12 +125,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     zIndex: 20,
     elevation: 20,
-    position: 'relative',
+    position: "relative",
   },
   sectionHeader: {
     fontSize: 13,
-    fontWeight: '500',
-    textTransform: 'uppercase',
+    fontWeight: "500",
+    textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 10,
     paddingHorizontal: 16,
@@ -96,15 +139,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   suggestionBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 12,
     marginHorizontal: 6,
     borderRadius: 18,
     maxWidth: width * 0.5,
     minWidth: width * 0.3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
@@ -112,9 +155,9 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: 8,
   },
 });
 
-export default SuggestionCarousel; 
+export default SuggestionCarousel;

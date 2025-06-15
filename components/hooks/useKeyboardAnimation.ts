@@ -1,9 +1,9 @@
-import { useRef, useEffect } from 'react';
-import { Animated, Keyboard, Platform } from 'react-native';
+import { useRef, useEffect } from "react";
+import { Animated, Keyboard, Platform } from "react-native";
 
 export const useKeyboardAnimation = (
   onKeyboardShow?: () => void,
-  onKeyboardHide?: () => void
+  onKeyboardHide?: () => void,
 ) => {
   const keyboardAnimation = useRef(new Animated.Value(0)).current;
 
@@ -17,7 +17,7 @@ export const useKeyboardAnimation = (
           useNativeDriver: false,
         }).start();
         onKeyboardShow?.();
-      }
+      },
     );
 
     const keyboardWillHideListener = Keyboard.addListener(
@@ -29,7 +29,7 @@ export const useKeyboardAnimation = (
           useNativeDriver: false,
         }).start();
         onKeyboardHide?.();
-      }
+      },
     );
 
     return () => {
@@ -39,4 +39,4 @@ export const useKeyboardAnimation = (
   }, [keyboardAnimation, onKeyboardShow, onKeyboardHide]);
 
   return keyboardAnimation;
-}; 
+};

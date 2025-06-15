@@ -18,11 +18,17 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
 // Enable LayoutAnimation on Android
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-type AboutScreenNavigationProp = StackNavigationProp<RootStackParamList, "About">;
+type AboutScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "About"
+>;
 
 interface Section {
   id: string;
@@ -39,26 +45,76 @@ const AboutScreen = () => {
 
   const sections: Section[] = useMemo(
     () => [
-      { id: "about", titleKey: "atomicArtAbout", contentKey: "atomicArtAboutContent", animation: new Animated.Value(0) },
-      { id: "features", titleKey: "mainFeatures", contentKey: "mainFeaturesContent", animation: new Animated.Value(0) },
-      { id: "tech", titleKey: "techHighlights", contentKey: "techHighlightsContent", animation: new Animated.Value(0) },
-      { id: "terms", titleKey: "termsOfUse", contentKey: "termsOfUseContent", animation: new Animated.Value(0) },
-      { id: "rights", titleKey: "contentRights", contentKey: "contentRightsContent", animation: new Animated.Value(0) },
-      { id: "privacy", titleKey: "privacyData", contentKey: "privacyDataContent", animation: new Animated.Value(0) },
-      { id: "limitations", titleKey: "limitations", contentKey: "limitationsContent", animation: new Animated.Value(0) },
-      { id: "responsible", titleKey: "responsibleUse", contentKey: "responsibleUseContent", animation: new Animated.Value(0) },
-      { id: "mods", titleKey: "modifications", contentKey: "modificationsContent", animation: new Animated.Value(0) },
-      { id: "contractor", titleKey: "contractor", contentKey: "contractorContent", animation: new Animated.Value(0) },
+      {
+        id: "about",
+        titleKey: "atomicArtAbout",
+        contentKey: "atomicArtAboutContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "features",
+        titleKey: "mainFeatures",
+        contentKey: "mainFeaturesContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "tech",
+        titleKey: "techHighlights",
+        contentKey: "techHighlightsContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "terms",
+        titleKey: "termsOfUse",
+        contentKey: "termsOfUseContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "rights",
+        titleKey: "contentRights",
+        contentKey: "contentRightsContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "privacy",
+        titleKey: "privacyData",
+        contentKey: "privacyDataContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "limitations",
+        titleKey: "limitations",
+        contentKey: "limitationsContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "responsible",
+        titleKey: "responsibleUse",
+        contentKey: "responsibleUseContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "mods",
+        titleKey: "modifications",
+        contentKey: "modificationsContent",
+        animation: new Animated.Value(0),
+      },
+      {
+        id: "contractor",
+        titleKey: "contractor",
+        contentKey: "contractorContent",
+        animation: new Animated.Value(0),
+      },
     ],
-    []
+    [],
   );
 
   const handleToggleSection = (id: string) => {
     const isExpanding = expandedSection !== id;
-    
+
     // Close current section if any
     if (expandedSection) {
-      const currentSection = sections.find(s => s.id === expandedSection);
+      const currentSection = sections.find((s) => s.id === expandedSection);
       if (currentSection?.animation) {
         Animated.spring(currentSection.animation, {
           toValue: 0,
@@ -72,7 +128,7 @@ const AboutScreen = () => {
 
     // Open new section
     if (isExpanding) {
-      const newSection = sections.find(s => s.id === id);
+      const newSection = sections.find((s) => s.id === id);
       if (newSection?.animation) {
         Animated.spring(newSection.animation, {
           toValue: 1,
@@ -91,49 +147,61 @@ const AboutScreen = () => {
     const isExpanded = expandedSection === section.id;
     const rotateAnimation = section.animation?.interpolate({
       inputRange: [0, 1],
-      outputRange: ['0deg', '180deg'],
-      extrapolate: 'clamp'
+      outputRange: ["0deg", "180deg"],
+      extrapolate: "clamp",
     });
 
     const maxHeight = 500;
     const heightAnimation = section.animation?.interpolate({
       inputRange: [0, 1],
       outputRange: [0, maxHeight],
-      extrapolate: 'clamp'
+      extrapolate: "clamp",
     });
 
     const opacityAnimation = section.animation?.interpolate({
       inputRange: [0, 0.5, 1],
       outputRange: [0, 0.3, 1],
-      extrapolate: 'clamp'
+      extrapolate: "clamp",
     });
 
     return (
-      <View key={section.id} style={[styles.sectionContainer, { borderColor: colors.subtext + '55' }]}>
+      <View
+        key={section.id}
+        style={[
+          styles.sectionContainer,
+          { borderColor: colors.subtext + "55" },
+        ]}
+      >
         <TouchableOpacity
           style={styles.sectionHeader}
           onPress={() => handleToggleSection(section.id)}
           activeOpacity={0.7}
         >
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>{t(section.titleKey)}</Text>
-          <Animated.View style={{ transform: [{ rotate: rotateAnimation || '0deg' }] as any }}>
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={colors.text}
-            />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            {t(section.titleKey)}
+          </Text>
+          <Animated.View
+            style={{
+              transform: [{ rotate: rotateAnimation || "0deg" }] as any,
+            }}
+          >
+            <Ionicons name="chevron-down" size={20} color={colors.text} />
           </Animated.View>
         </TouchableOpacity>
-        
-        <Animated.View style={[
-          styles.sectionContentWrapper,
-          {
-            maxHeight: heightAnimation,
-            opacity: opacityAnimation
-          }
-        ]}>
+
+        <Animated.View
+          style={[
+            styles.sectionContentWrapper,
+            {
+              maxHeight: heightAnimation,
+              opacity: opacityAnimation,
+            },
+          ]}
+        >
           <View style={styles.sectionContent}>
-            <Text style={{ color: colors.subtext }}>{t(section.contentKey)}</Text>
+            <Text style={{ color: colors.subtext }}>
+              {t(section.contentKey)}
+            </Text>
           </View>
         </Animated.View>
       </View>
@@ -144,10 +212,15 @@ const AboutScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView edges={["top"]} style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.closeButton}
+          >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{t("aboutTitle")}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            {t("aboutTitle")}
+          </Text>
           <View style={styles.headerRight} />
         </View>
 
@@ -215,7 +288,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   sectionContentWrapper: {
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   sectionContent: {
     paddingHorizontal: 16,
@@ -223,4 +296,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AboutScreen; 
+export default AboutScreen;

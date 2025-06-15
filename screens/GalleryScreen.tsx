@@ -42,19 +42,22 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const { t } = useLanguage();
   const { showImageViewer } = useImageViewer();
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
-  
+
   // Estado para controlar o feedback de exclusão
   const [isDeleting, setIsDeleting] = useState(false);
   const deletedItemId = useRef<string | null>(null);
 
   // Função para atualizar o estado de like de uma imagem
-  const handleToggleLike = useCallback((imageId: string, newLikeState: boolean) => {
-    setGalleryImages(prevImages => 
-      prevImages.map(img => 
-        img.id === imageId ? { ...img, isLiked: newLikeState } : img
-      )
-    );
-  }, []);
+  const handleToggleLike = useCallback(
+    (imageId: string, newLikeState: boolean) => {
+      setGalleryImages((prevImages) =>
+        prevImages.map((img) =>
+          img.id === imageId ? { ...img, isLiked: newLikeState } : img,
+        ),
+      );
+    },
+    [],
+  );
 
   // Registra um listener global para likes quando o componente é montado
   React.useEffect(() => {
@@ -64,7 +67,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         handleToggleLike(currentViewingImageId.current, newIsLiked);
       }
     });
-    
+
     return () => {
       removeListener();
     };
@@ -76,7 +79,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const handleImagePress = (item: GalleryImage) => {
     // Armazena o ID da imagem sendo visualizada
     currentViewingImageId.current = item.id;
-    
+
     showImageViewer(
       {
         id: item.id,
@@ -87,7 +90,7 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
       {
         isGalleryMode: true,
         onDeleteImage: handleDeleteImage,
-      }
+      },
     );
   };
 
@@ -96,15 +99,15 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
     if (currentViewingImageId.current === id) {
       currentViewingImageId.current = null;
     }
-    
+
     // Marcar como excluindo e armazenar o ID da imagem
     setIsDeleting(true);
     deletedItemId.current = id;
-    
+
     // Remover a imagem da lista com um pequeno atraso para o efeito visual
     setTimeout(() => {
-      setGalleryImages(prevImages => 
-        prevImages.filter(image => image.id !== id)
+      setGalleryImages((prevImages) =>
+        prevImages.filter((image) => image.id !== id),
       );
       setIsDeleting(false);
       deletedItemId.current = null;
@@ -114,23 +117,17 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
   const renderItem = ({ item }: { item: GalleryImage }) => {
     // Aplicar efeito visual se o item estiver sendo excluído
     const isBeingDeleted = isDeleting && deletedItemId.current === item.id;
-    
+
     return (
       <TouchableOpacity
-        style={[
-          styles.imageContainer,
-          isBeingDeleted && styles.deletingImage
-        ]}
+        style={[styles.imageContainer, isBeingDeleted && styles.deletingImage]}
         onPress={() => handleImagePress(item)}
         activeOpacity={0.8}
         disabled={isBeingDeleted}
       >
-        <Image 
-          source={item.source} 
-          style={[
-            styles.image,
-            isBeingDeleted && { opacity: 0.5 }
-          ]} 
+        <Image
+          source={item.source}
+          style={[styles.image, isBeingDeleted && { opacity: 0.5 }]}
         />
         {item.isLiked && (
           <View style={styles.likeIconContainer}>
@@ -155,17 +152,22 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.emptyIcon}
       />
       <Text style={[styles.emptyText, { color: colors.text }]}>
-        {t('noImagesInGallery')}
+        {t("noImagesInGallery")}
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        {t('useImageCommand')}
+        {t("useImageCommand")}
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate("Home")}
       >
-        <Ionicons name="add" size={22} color="#FFFFFF" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>{t('createNewImage')}</Text>
+        <Ionicons
+          name="add"
+          size={22}
+          color="#FFFFFF"
+          style={styles.buttonIcon}
+        />
+        <Text style={styles.buttonText}>{t("createNewImage")}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -174,13 +176,15 @@ const GalleryScreen: React.FC<Props> = ({ navigation }) => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()} 
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
             style={styles.closeButton}
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('galleryTitle')}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            {t("galleryTitle")}
+          </Text>
           <View style={styles.headerRight} />
         </View>
 
@@ -303,4 +307,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GalleryScreen; 
+export default GalleryScreen;

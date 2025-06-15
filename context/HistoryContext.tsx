@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Message } from '../types';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Message } from "../types";
 
 // Types for history entries
 export interface HistoryItem {
   id: string;
   timestamp: Date;
-  type: 'simulated' | 'image' | 'error';
+  type: "simulated" | "image" | "error";
   prompt?: string;
   response?: string;
   error?: string;
@@ -25,28 +25,32 @@ interface HistoryContextType {
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined);
 
-export const HistoryProvider = ({ children }: { children: React.ReactNode }) => {
+export const HistoryProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
 
   // Load history from storage
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const storedHistory = await AsyncStorage.getItem('history');
+        const storedHistory = await AsyncStorage.getItem("history");
         if (storedHistory) {
           // Parse dates from JSON
           const parsed = JSON.parse(storedHistory);
           const itemsWithDates = parsed.map((item: any) => ({
             ...item,
-            timestamp: new Date(item.timestamp)
+            timestamp: new Date(item.timestamp),
           }));
           setHistoryItems(itemsWithDates);
         }
       } catch (error) {
-        console.error('Failed to load history:', error);
+        console.error("Failed to load history:", error);
       }
     };
-    
+
     loadHistory();
   }, []);
 
@@ -54,28 +58,28 @@ export const HistoryProvider = ({ children }: { children: React.ReactNode }) => 
   useEffect(() => {
     const saveHistory = async () => {
       try {
-        await AsyncStorage.setItem('history', JSON.stringify(historyItems));
+        await AsyncStorage.setItem("history", JSON.stringify(historyItems));
       } catch (error) {
-        console.error('Failed to save history:', error);
+        console.error("Failed to save history:", error);
       }
     };
-    
+
     saveHistory();
   }, [historyItems]);
 
   const addHistoryItem = (item: HistoryItem) => {
-    setHistoryItems(prev => [item, ...prev]); // Add to the beginning
+    setHistoryItems((prev) => [item, ...prev]); // Add to the beginning
   };
 
   const deleteHistoryItem = (id: string) => {
-    setHistoryItems(prev => prev.filter(item => item.id !== id));
+    setHistoryItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const toggleExpandItem = (id: string) => {
-    setHistoryItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, expanded: !item.expanded } : item
-      )
+    setHistoryItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, expanded: !item.expanded } : item,
+      ),
     );
   };
 
@@ -84,13 +88,15 @@ export const HistoryProvider = ({ children }: { children: React.ReactNode }) => 
   };
 
   return (
-    <HistoryContext.Provider value={{ 
-      historyItems, 
-      addHistoryItem,
-      deleteHistoryItem,
-      toggleExpandItem,
-      clearHistory
-    }}>
+    <HistoryContext.Provider
+      value={{
+        historyItems,
+        addHistoryItem,
+        deleteHistoryItem,
+        toggleExpandItem,
+        clearHistory,
+      }}
+    >
       {children}
     </HistoryContext.Provider>
   );
@@ -99,7 +105,7 @@ export const HistoryProvider = ({ children }: { children: React.ReactNode }) => 
 export const useHistory = () => {
   const context = useContext(HistoryContext);
   if (context === undefined) {
-    throw new Error('useHistory must be used within a HistoryProvider');
+    throw new Error("useHistory must be used within a HistoryProvider");
   }
   return context;
-}; 
+};

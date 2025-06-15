@@ -29,7 +29,7 @@ const AppContent = () => {
 
   const keyboardAnimation = useKeyboardAnimation(
     () => setKeyboardVisible(true),
-    () => setKeyboardVisible(false)
+    () => setKeyboardVisible(false),
   );
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const AppContent = () => {
       onPanResponderRelease: () => {},
       onPanResponderTerminationRequest: () => true,
       onShouldBlockNativeResponder: () => false,
-    })
+    }),
   ).current;
 
   const handleToggleLike = (messageId: string) => {
@@ -137,11 +137,7 @@ const AppContent = () => {
       <StatusBar style={isDarkMode ? "light" : "dark"} />
 
       {/* Main App Content */}
-      <View
-        style={[
-          styles.container,
-        ]}
-      >
+      <View style={[styles.container]}>
         {/* Background Image - Animated */}
         <Animated.View
           style={[

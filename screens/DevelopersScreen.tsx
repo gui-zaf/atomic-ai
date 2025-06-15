@@ -17,7 +17,10 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 
-type DevelopersScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Developers'>;
+type DevelopersScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "Developers"
+>;
 
 const { width } = Dimensions.get("window");
 
@@ -35,7 +38,10 @@ const DevelopersScreen = () => {
   };
 
   const renderTechPill = (tech: string) => (
-    <View key={tech} style={[styles.techPill, { backgroundColor: colors.primaryBackground }]}>
+    <View
+      key={tech}
+      style={[styles.techPill, { backgroundColor: colors.primaryBackground }]}
+    >
       <Text style={[styles.techText, { color: colors.primary }]}>{tech}</Text>
     </View>
   );
@@ -45,32 +51,44 @@ const DevelopersScreen = () => {
     imagePath: any,
     githubUrl: string,
     linkedinUrl: string,
-    technologies: string[]
+    technologies: string[],
   ) => (
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <Image source={imagePath} style={styles.avatar} />
       <Text style={[styles.name, { color: colors.text }]}>{name}</Text>
-      <Text style={[styles.title, { color: colors.subtext }]}>{t('softwareEngineer')}</Text>
-      
+      <Text style={[styles.title, { color: colors.subtext }]}>
+        {t("softwareEngineer")}
+      </Text>
+
       <View style={styles.techContainer}>
-        {technologies.map(tech => renderTechPill(tech))}
+        {technologies.map((tech) => renderTechPill(tech))}
       </View>
-      
+
       <View style={styles.socialContainer}>
-        <TouchableOpacity 
-          style={[styles.socialButton, { backgroundColor: colors.primaryBackground }]} 
+        <TouchableOpacity
+          style={[
+            styles.socialButton,
+            { backgroundColor: colors.primaryBackground },
+          ]}
           onPress={() => openLink(githubUrl)}
         >
           <Ionicons name="logo-github" size={20} color={colors.primary} />
-          <Text style={[styles.socialText, { color: colors.primary }]}>{t('githubLink')}</Text>
+          <Text style={[styles.socialText, { color: colors.primary }]}>
+            {t("githubLink")}
+          </Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.socialButton, { backgroundColor: colors.primaryBackground }]} 
+
+        <TouchableOpacity
+          style={[
+            styles.socialButton,
+            { backgroundColor: colors.primaryBackground },
+          ]}
           onPress={() => openLink(linkedinUrl)}
         >
           <Ionicons name="logo-linkedin" size={20} color={colors.primary} />
-          <Text style={[styles.socialText, { color: colors.primary }]}>{t('linkedinLink')}</Text>
+          <Text style={[styles.socialText, { color: colors.primary }]}>
+            {t("linkedinLink")}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -80,14 +98,19 @@ const DevelopersScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.closeButton}
+          >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('developersTitle')}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            {t("developersTitle")}
+          </Text>
           <View style={styles.headerRight} />
         </View>
-        
-        <ScrollView 
+
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -97,15 +120,15 @@ const DevelopersScreen = () => {
             require("../assets/guilherme.jpeg"),
             "https://github.com/gui-zaf",
             "https://www.linkedin.com/in/gui-zaf/",
-            ["Kotlin", "Swift", "TypeScript", "NodeJS"]
+            ["Kotlin", "Swift", "TypeScript", "NodeJS"],
           )}
-          
+
           {renderDeveloperCard(
             "Davi Almeida",
             require("../assets/davi.jpeg"),
             "https://github.com/Eletronbius",
             "https://www.linkedin.com/in/davi-almeida-6b862a243/",
-            ["Java", "JavaScript", "Python", "Go"]
+            ["Java", "JavaScript", "Python", "Go"],
           )}
         </ScrollView>
       </SafeAreaView>
@@ -207,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DevelopersScreen; 
+export default DevelopersScreen;

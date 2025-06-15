@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type ImageData = {
   source: any;
@@ -22,13 +22,17 @@ type ViewerOptions = {
   onDeleteImage?: (id: string) => void;
 };
 
-const ImageViewerContext = createContext<ImageViewerContextType | undefined>(undefined);
+const ImageViewerContext = createContext<ImageViewerContextType | undefined>(
+  undefined,
+);
 
 export const ImageViewerProvider = ({ children }: { children: ReactNode }) => {
   const [currentImage, setCurrentImage] = useState<ImageData | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isGalleryMode, setIsGalleryMode] = useState(false);
-  const [onDeleteImage, setOnDeleteImage] = useState<((id: string) => void) | undefined>(undefined);
+  const [onDeleteImage, setOnDeleteImage] = useState<
+    ((id: string) => void) | undefined
+  >(undefined);
 
   const showImageViewer = (imageData: ImageData, options?: ViewerOptions) => {
     setCurrentImage(imageData);
@@ -52,7 +56,7 @@ export const ImageViewerProvider = ({ children }: { children: ReactNode }) => {
       // Cria uma cópia do objeto para evitar mutações diretas
       setCurrentImage({
         ...currentImage,
-        isLiked: !currentImage.isLiked
+        isLiked: !currentImage.isLiked,
       });
     }
   };
@@ -66,7 +70,7 @@ export const ImageViewerProvider = ({ children }: { children: ReactNode }) => {
         isVisible,
         toggleLike,
         onDeleteImage,
-        isGalleryMode
+        isGalleryMode,
       }}
     >
       {children}
@@ -77,7 +81,9 @@ export const ImageViewerProvider = ({ children }: { children: ReactNode }) => {
 export const useImageViewer = () => {
   const context = useContext(ImageViewerContext);
   if (context === undefined) {
-    throw new Error('useImageViewer must be used within an ImageViewerProvider');
+    throw new Error(
+      "useImageViewer must be used within an ImageViewerProvider",
+    );
   }
   return context;
-}; 
+};

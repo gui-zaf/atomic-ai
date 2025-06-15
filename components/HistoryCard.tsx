@@ -17,20 +17,26 @@ import { imageDescriptionMapping } from "../types";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // Definir um tipo para as chaves do imageMap
-type ImageKey = 'cat-in-space' | 'sunset-beach' | 'fantasy-castle' | 
-  'cyberpunk-city' | 'cute-animals' | 'colorful-landscape' | 
-  'sci-fi-portrait' | 'abstract-art';
+type ImageKey =
+  | "cat-in-space"
+  | "sunset-beach"
+  | "fantasy-castle"
+  | "cyberpunk-city"
+  | "cute-animals"
+  | "colorful-landscape"
+  | "sci-fi-portrait"
+  | "abstract-art";
 
 // Mapeamento estático para as imagens
 const imageMap: Record<ImageKey, any> = {
-  'cat-in-space': require('../assets/samples/cat-in-space.jpeg'),
-  'sunset-beach': require('../assets/samples/sunset-beach.jpeg'),
-  'fantasy-castle': require('../assets/samples/fantasy-castle.jpeg'),
-  'cyberpunk-city': require('../assets/samples/cyberpunk-city.jpeg'),
-  'cute-animals': require('../assets/samples/cute-animals.jpeg'),
-  'colorful-landscape': require('../assets/samples/colorful-landscape.jpeg'),
-  'sci-fi-portrait': require('../assets/samples/sci-fi-portrait.jpeg'),
-  'abstract-art': require('../assets/samples/abstract-art.jpeg'),
+  "cat-in-space": require("../assets/samples/cat-in-space.jpeg"),
+  "sunset-beach": require("../assets/samples/sunset-beach.jpeg"),
+  "fantasy-castle": require("../assets/samples/fantasy-castle.jpeg"),
+  "cyberpunk-city": require("../assets/samples/cyberpunk-city.jpeg"),
+  "cute-animals": require("../assets/samples/cute-animals.jpeg"),
+  "colorful-landscape": require("../assets/samples/colorful-landscape.jpeg"),
+  "sci-fi-portrait": require("../assets/samples/sci-fi-portrait.jpeg"),
+  "abstract-art": require("../assets/samples/abstract-art.jpeg"),
 };
 
 interface HistoryCardProps {
@@ -49,11 +55,12 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
   // Determina a imagem correta com base no prompt
   const imageSource = useMemo(() => {
-    if (item.type !== 'image') return null;
+    if (item.type !== "image") return null;
 
     // Verifica se o prompt corresponde a alguma das descrições predefinidas
     const matchingImage = imageDescriptionMapping.find(
-      mapping => mapping.english === item.prompt || mapping.portuguese === item.prompt
+      (mapping) =>
+        mapping.english === item.prompt || mapping.portuguese === item.prompt,
     );
 
     if (matchingImage && matchingImage.filename in imageMap) {
@@ -62,7 +69,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
     }
 
     // Fallback para guilherme.jpeg se nada funcionar
-    return require('../assets/guilherme.jpeg');
+    return require("../assets/guilherme.jpeg");
   }, [item]);
 
   // Format the timestamp
@@ -82,7 +89,11 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         return (
           <View style={styles.cardContentContainer}>
             <View style={styles.badgeContainer}>
-              <Ionicons name="chatbubble-outline" size={16} color={colors.primary} />
+              <Ionicons
+                name="chatbubble-outline"
+                size={16}
+                color={colors.primary}
+              />
               <Text style={[styles.badgeText, { color: colors.primary }]}>
                 Chat
               </Text>
@@ -100,10 +111,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         return (
           <View style={styles.imageCardContent}>
             {imageSource && (
-              <Image
-                source={imageSource}
-                style={styles.thumbnail}
-              />
+              <Image source={imageSource} style={styles.thumbnail} />
             )}
             <View style={styles.imageTextContainer}>
               <View style={styles.badgeContainer}>
@@ -127,7 +135,12 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           <View style={styles.cardContentContainer}>
             <View style={styles.errorHeader}>
               <Ionicons name="warning-outline" size={20} color={colors.error} />
-              <Text style={[styles.badgeText, { color: colors.error, marginLeft: 4 }]}>
+              <Text
+                style={[
+                  styles.badgeText,
+                  { color: colors.error, marginLeft: 4 },
+                ]}
+              >
                 Erro
               </Text>
             </View>
@@ -151,7 +164,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
     return (
       <Animated.View style={styles.expandedContent}>
-        <View style={[styles.detailsContainer, { borderTopColor: colors.surface }]}>
+        <View
+          style={[styles.detailsContainer, { borderTopColor: colors.surface }]}
+        >
           {item.prompt && (
             <View style={styles.detailRow}>
               <Text style={[styles.detailLabel, { color: colors.subtext }]}>
@@ -215,10 +230,13 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             style={[styles.deleteButton, { backgroundColor: colors.error }]}
             onPress={onDelete}
           >
-            <Ionicons name="trash-outline" size={16} color="#FFFFFF" style={styles.deleteIcon} />
-            <Text style={styles.deleteButtonText}>
-              Excluir
-            </Text>
+            <Ionicons
+              name="trash-outline"
+              size={16}
+              color="#FFFFFF"
+              style={styles.deleteIcon}
+            />
+            <Text style={styles.deleteButtonText}>Excluir</Text>
           </TouchableOpacity>
         </View>
       </Animated.View>
@@ -265,7 +283,7 @@ const styles = StyleSheet.create({
   },
   cardContentContainer: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
   },
   badgeContainer: {
     flexDirection: "row",
@@ -357,11 +375,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   deleteIcon: {
-    marginRight: 6
+    marginRight: 6,
   },
   deleteButtonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
   },
-}); 
+});

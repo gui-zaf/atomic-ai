@@ -32,10 +32,10 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
   const { colors, isDarkMode } = useTheme();
   const { t } = useLanguage();
   const { historyItems, toggleExpandItem, deleteHistoryItem } = useHistory();
-  
+
   // Animation for list items
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  
+
   React.useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -44,9 +44,15 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
     }).start();
   }, []);
 
-  const renderItem = ({ item, index }: { item: HistoryItem, index: number }) => {
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: HistoryItem;
+    index: number;
+  }) => {
     const animationDelay = index * 100;
-    
+
     return (
       <Animated.View
         style={{
@@ -79,17 +85,22 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
         style={styles.emptyIcon}
       />
       <Text style={[styles.emptyText, { color: colors.text }]}>
-        {t('noRequestHistory')}
+        {t("noRequestHistory")}
       </Text>
       <Text style={[styles.emptySubtext, { color: colors.subtext }]}>
-        {t('historyWillAppear')}
+        {t("historyWillAppear")}
       </Text>
       <TouchableOpacity
         style={[styles.createButton, { backgroundColor: colors.primary }]}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate("Home")}
       >
-        <Ionicons name="chatbubble-outline" size={22} color="#FFFFFF" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>{t('startConversation')}</Text>
+        <Ionicons
+          name="chatbubble-outline"
+          size={22}
+          color="#FFFFFF"
+          style={styles.buttonIcon}
+        />
+        <Text style={styles.buttonText}>{t("startConversation")}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -98,21 +109,27 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()} 
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
             style={styles.closeButton}
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Histórico</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Histórico
+          </Text>
           {historyItems.length > 0 && (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.headerRight}
               onPress={() => {
                 // Implement clear all functionality
               }}
             >
-              <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
+              <Ionicons
+                name="ellipsis-vertical"
+                size={20}
+                color={colors.text}
+              />
             </TouchableOpacity>
           )}
           {historyItems.length === 0 && <View style={styles.headerRight} />}
@@ -120,15 +137,18 @@ const HistoryScreen: React.FC<Props> = ({ navigation }) => {
 
         {historyItems.length > 0 ? (
           <>
-            <View style={[styles.statsBar, { backgroundColor: colors.surface }]}>
+            <View
+              style={[styles.statsBar, { backgroundColor: colors.surface }]}
+            >
               <Text style={[styles.statsText, { color: colors.subtext }]}>
-                {historyItems.length} {historyItems.length === 1 ? 'interação' : 'interações'}
+                {historyItems.length}{" "}
+                {historyItems.length === 1 ? "interação" : "interações"}
               </Text>
             </View>
             <FlatList
               data={historyItems}
               renderItem={renderItem}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               contentContainerStyle={styles.listContent}
               showsVerticalScrollIndicator={false}
             />
@@ -222,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HistoryScreen; 
+export default HistoryScreen;
