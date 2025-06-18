@@ -28,6 +28,11 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import { LoadingBubble } from "../components/LoadingBubble";
 import { useTokens } from "../context/TokenContext";
 import { useHistory } from "../context/HistoryContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Chave para armazenar as mensagens no AsyncStorage
+const MESSAGES_STORAGE_KEY = '@atomic_chat_messages';
+const LIKED_MESSAGES_STORAGE_KEY = '@atomic_chat_liked_messages';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -44,6 +49,7 @@ const HomeScreen = () => {
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const keyboardAnimation = useKeyboardAnimation(
     () => setKeyboardVisible(true),
@@ -57,33 +63,105 @@ const HomeScreen = () => {
     setIsBackgroundLoaded(false);
   }, [isDarkMode]);
 
+  // Carregar mensagens do AsyncStorage ao iniciar o aplicativo
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const storedMessages = await AsyncStorage.getItem(MESSAGES_STORAGE_KEY);
+        const storedLikedMessages = await AsyncStorage.getItem(LIKED_MESSAGES_STORAGE_KEY);
+        
+        if (storedMessages) {
+          const parsedMessages = JSON.parse(storedMessages);
+          // Converter strings de data de volta para objetos Date
+          const messagesWithDates = parsedMessages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }));
+          setMessages(messagesWithDates);
+        }
+        
+        if (storedLikedMessages) {
+          const parsedLikedMessages = JSON.parse(storedLikedMessages);
+          setLikedMessages(new Set(parsedLikedMessages));
+        }
+        
+        setIsInitialLoad(false);
+      } catch (error) {
+        console.error('Erro ao carregar mensagens:', error);
+        setIsInitialLoad(false);
+      }
+    };
+
+    loadMessages();
+  }, []);
+
   // Add initial welcome message and update it when language changes
   useEffect(() => {
-    if (messages.length === 0) {
+    if (messages.length === 0 && !isInitialLoad) {
       setIsLoading(true);
       setTimeout(() => {
         setIsLoading(false);
-        setMessages([
-          {
-            id: Date.now().toString(),
-            text: t("welcomeMessage"),
-            isUser: false,
-            timestamp: new Date(),
-          },
-        ]);
-      }, 1500);
-    } else if (messages.length === 1 && !messages[0].isUser) {
-      // If there's only the welcome message, update it
-      setMessages([
-        {
+        const welcomeMessage = {
           id: Date.now().toString(),
           text: t("welcomeMessage"),
           isUser: false,
           timestamp: new Date(),
-        },
-      ]);
+        };
+        setMessages([welcomeMessage]);
+        // Salvar a mensagem de boas-vindas no AsyncStorage
+        saveMessagesToStorage([welcomeMessage]);
+      }, 1500);
+    } else if (messages.length === 1 && !messages[0].isUser) {
+      // If there's only the welcome message, update it when language changes
+      const updatedWelcomeMessage = {
+        id: messages[0].id,
+        text: t("welcomeMessage"),
+        isUser: false,
+        timestamp: messages[0].timestamp,
+      };
+      setMessages([updatedWelcomeMessage]);
+      // Atualizar a mensagem de boas-vindas no AsyncStorage
+      saveMessagesToStorage([updatedWelcomeMessage]);
     }
-  }, [language, t]);
+  }, [language, t, isInitialLoad]);
+
+  // Salvar mensagens no AsyncStorage sempre que houver mudanças
+  useEffect(() => {
+    if (!isInitialLoad) {
+      saveMessagesToStorage(messages);
+    }
+  }, [messages, isInitialLoad]);
+
+  // Salvar mensagens curtidas no AsyncStorage sempre que houver mudanças
+  useEffect(() => {
+    if (!isInitialLoad) {
+      saveLikedMessagesToStorage(likedMessages);
+    }
+  }, [likedMessages, isInitialLoad]);
+
+  // Função para salvar mensagens no AsyncStorage
+  const saveMessagesToStorage = async (messagesToSave: Message[]) => {
+    try {
+      // Precisamos converter as datas para string antes de salvar
+      const messagesToStore = messagesToSave.map(msg => ({
+        ...msg,
+        timestamp: msg.timestamp ? msg.timestamp.toISOString() : new Date().toISOString()
+      }));
+      await AsyncStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messagesToStore));
+    } catch (error) {
+      console.error('Erro ao salvar mensagens:', error);
+    }
+  };
+
+  // Função para salvar mensagens curtidas no AsyncStorage
+  const saveLikedMessagesToStorage = async (likedMessagesToSave: Set<string>) => {
+    try {
+      const likedMessagesArray = Array.from(likedMessagesToSave);
+      await AsyncStorage.setItem(LIKED_MESSAGES_STORAGE_KEY, JSON.stringify(likedMessagesArray));
+    } catch (error) {
+      console.error('Erro ao salvar mensagens curtidas:', error);
+    }
+  };
 
   // Effect to handle navigation stack reset when Home screen is focused
   useEffect(() => {
@@ -289,16 +367,21 @@ const HomeScreen = () => {
     setLikedMessages(new Set());
     setMenuVisible(false);
 
+    // Limpar mensagens do AsyncStorage
+    AsyncStorage.removeItem(MESSAGES_STORAGE_KEY);
+    AsyncStorage.removeItem(LIKED_MESSAGES_STORAGE_KEY);
+
     setTimeout(() => {
       setIsLoading(false);
-      setMessages([
-        {
-          id: Date.now().toString(),
-          text: t("welcomeMessage"),
-          isUser: false,
-          timestamp: new Date(),
-        },
-      ]);
+      const welcomeMessage = {
+        id: Date.now().toString(),
+        text: t("welcomeMessage"),
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages([welcomeMessage]);
+      // Salvar a nova mensagem de boas-vindas no AsyncStorage
+      saveMessagesToStorage([welcomeMessage]);
     }, 1500);
   };
 
