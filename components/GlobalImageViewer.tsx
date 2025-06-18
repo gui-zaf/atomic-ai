@@ -104,11 +104,55 @@ const GlobalImageViewer = () => {
 
   const handleShare = async () => {
     try {
-      await Share.share({
-        message: "Check out this amazing image!",
-      });
+      if (!currentImage || !imageSource) return;
+      
+      // Get image URI from the source
+      let imageUri = '';
+      
+      // Handle different image source types
+      if (typeof imageSource === 'number') {
+        // For local require'd images, we need to create a temp file
+        const assetInfo = Image.resolveAssetSource(imageSource);
+        if (!assetInfo?.uri) {
+          throw new Error('Could not resolve image source');
+        }
+        
+        // Create a temp file path
+        const tempFilePath = `${FileSystem.cacheDirectory}temp_image_${Date.now()}.jpg`;
+        
+        // Download the image to the temp file
+        await FileSystem.downloadAsync(assetInfo.uri, tempFilePath);
+        imageUri = tempFilePath;
+      } else if (typeof imageSource === 'object' && imageSource.uri) {
+        // For remote or local uri images
+        imageUri = imageSource.uri;
+      }
+      
+      if (!imageUri) {
+        throw new Error('Invalid image source');
+      }
+
+      // Share the image with text
+      await Share.share(
+        {
+          message: currentImage.message || "Check out this amazing image!",
+          url: imageUri,
+        },
+        {
+          dialogTitle: 'Share this image',
+        }
+      );
+      
     } catch (error) {
-      // Silently handle sharing error
+      console.error('Error sharing image:', error);
+      // Fallback to text-only sharing if image sharing fails
+      try {
+        await Share.share({
+          message: currentImage?.message || "Check out this amazing image!",
+        });
+      } catch (innerError) {
+        // Silently handle sharing error
+      }
     }
   };
 
