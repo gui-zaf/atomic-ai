@@ -13,12 +13,16 @@ import {
   Modal,
   Share,
   Alert,
+  Platform,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { BlurView } from "expo-blur";
 import { useImageViewer } from "../context/ImageViewerContext";
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -79,6 +83,7 @@ const GlobalImageViewer = () => {
 
   // Estado local de like para evitar problemas de dessincronia
   const [localIsLiked, setLocalIsLiked] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Sincroniza o estado local com o estado global quando a imagem muda
   useEffect(() => {
@@ -105,8 +110,87 @@ const GlobalImageViewer = () => {
     }
   };
 
-  const handleDownload = () => {
-    // Implementação futura
+  const handleDownload = async () => {
+    console.log('Download button clicked - starting image download process');
+    
+    if (!currentImage || !imageSource) return;
+    
+    setIsDownloading(true);
+    
+    try {
+      // Request permission to access the media library
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      
+      if (status !== "granted") {
+        // If permission is denied, show an alert with option to open settings
+        Alert.alert(
+          t("permissionNeeded"),
+          t("permissionMessage"),
+          [
+            { text: t("no"), style: "cancel" },
+            { 
+              text: t("openSettings"), 
+              onPress: () => {
+                // Open app settings
+                if (Platform.OS === 'ios') {
+                  Linking.openURL('app-settings:');
+                } else {
+                  Linking.openSettings();
+                }
+              }
+            }
+          ]
+        );
+        setIsDownloading(false);
+        return;
+      }
+
+      // Get image URI from the source
+      let imageUri = '';
+      
+      // Handle different image source types
+      if (typeof imageSource === 'number') {
+        // For local require'd images, we need to create a temp file
+        const assetInfo = Image.resolveAssetSource(imageSource);
+        if (!assetInfo?.uri) {
+          throw new Error('Could not resolve image source');
+        }
+        
+        // Create a temp file path
+        const tempFilePath = `${FileSystem.cacheDirectory}temp_image_${Date.now()}.jpg`;
+        
+        // Download the image to the temp file
+        await FileSystem.downloadAsync(assetInfo.uri, tempFilePath);
+        imageUri = tempFilePath;
+      } else if (typeof imageSource === 'object' && imageSource.uri) {
+        // For remote or local uri images
+        imageUri = imageSource.uri;
+      }
+      
+      if (!imageUri) {
+        throw new Error('Invalid image source');
+      }
+
+      // Save the image to the media library
+      const asset = await MediaLibrary.createAssetAsync(imageUri);
+      
+      // Create an album if needed and add the asset to it
+      const album = await MediaLibrary.getAlbumAsync('Atomic Chat');
+      if (album) {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+      } else {
+        await MediaLibrary.createAlbumAsync('Atomic Chat', asset, false);
+      }
+      
+      // Show success message
+      Alert.alert(t("downloadSuccess"));
+      
+    } catch (error) {
+      console.error('Error saving image:', error);
+      Alert.alert(t("downloadError"));
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const handleToggleLike = () => {
@@ -234,12 +318,13 @@ const GlobalImageViewer = () => {
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleDownload}
+                disabled={isDownloading}
               >
-                <Ionicons
-                  name="download-outline"
-                  size={28}
-                  color={colors.text}
-                />
+                {isDownloading ? (
+                  <Ionicons name="cloud-download-outline" size={28} color={colors.primary} />
+                ) : (
+                  <Ionicons name="download-outline" size={28} color={colors.text} />
+                )}
               </TouchableOpacity>
             </View>
           </SafeAreaView>

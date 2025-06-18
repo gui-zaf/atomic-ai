@@ -72,6 +72,12 @@ const translations = {
     deleteImageConfirmation: "Do you want to delete this image?",
     yes: "Yes",
     no: "No",
+    downloadImage: "Download Image",
+    downloadSuccess: "Image saved to gallery",
+    downloadError: "Failed to save image",
+    permissionNeeded: "Storage Permission Required",
+    permissionMessage: "We need storage permission to save images to your gallery.",
+    openSettings: "Open Settings",
 
     // Welcome Message
     welcomeMessage: "Hello, what would you like to create today?",
@@ -236,6 +242,12 @@ const translations = {
     deleteImageConfirmation: "Deseja excluir esta imagem?",
     yes: "Sim",
     no: "Não",
+    downloadImage: "Baixar Imagem",
+    downloadSuccess: "Imagem salva na galeria",
+    downloadError: "Falha ao salvar imagem",
+    permissionNeeded: "Permissão de Armazenamento Necessária",
+    permissionMessage: "Precisamos de permissão de armazenamento para salvar imagens na sua galeria.",
+    openSettings: "Abrir Configurações",
 
     // Welcome Message
     welcomeMessage: "Olá, o que você deseja criar hoje?",
