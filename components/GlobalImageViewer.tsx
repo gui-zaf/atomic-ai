@@ -23,6 +23,7 @@ import { BlurView } from "expo-blur";
 import { useImageViewer } from "../context/ImageViewerContext";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -80,6 +81,7 @@ const GlobalImageViewer = () => {
 
   const { colors, isDarkMode } = useTheme();
   const { t } = useLanguage();
+  const insets = useSafeAreaInsets();
 
   // Estado local de like para evitar problemas de dessincronia
   const [localIsLiked, setLocalIsLiked] = useState(false);
@@ -292,35 +294,37 @@ const GlobalImageViewer = () => {
     >
       <TouchableWithoutFeedback onPress={hideImageViewer}>
         <View style={styles.container}>
-          <BlurView
-            intensity={isDarkMode ? 70 : 50}
-            style={StyleSheet.absoluteFill}
-            tint={isDarkMode ? "dark" : "light"}
-          />
+          {Platform.OS === 'ios' ? (
+            <BlurView
+              intensity={isDarkMode ? 70 : 50}
+              style={StyleSheet.absoluteFill}
+              tint={isDarkMode ? "dark" : "light"}
+            />
+          ) : (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
+          )}
 
           <StatusBar translucent backgroundColor="rgba(0,0,0,0.5)" />
 
-          <SafeAreaView style={styles.safeArea}>
-            <View style={styles.header}>
+          <View style={[styles.header, { paddingTop: insets.top }]}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={hideImageViewer}
+            >
+              <Ionicons name="close" size={24} color={colors.text} />
+            </TouchableOpacity>
+
+            <View style={styles.spacer} />
+
+            {isGalleryMode && (
               <TouchableOpacity
-                style={styles.closeButton}
-                onPress={hideImageViewer}
+                style={[styles.closeButton, styles.deleteButton]}
+                onPress={handleDelete}
               >
-                <Ionicons name="close" size={24} color={colors.text} />
+                <Ionicons name="trash-outline" size={24} color="#FF3B30" />
               </TouchableOpacity>
-
-              <View style={styles.spacer} />
-
-              {isGalleryMode && (
-                <TouchableOpacity
-                  style={[styles.closeButton, styles.deleteButton]}
-                  onPress={handleDelete}
-                >
-                  <Ionicons name="trash-outline" size={24} color="#FF3B30" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </SafeAreaView>
+            )}
+          </View>
 
           <TouchableWithoutFeedback>
             <View style={styles.imageContainer}>
@@ -342,7 +346,7 @@ const GlobalImageViewer = () => {
             </View>
           </TouchableWithoutFeedback>
 
-          <SafeAreaView style={styles.bottomContainer}>
+          <View style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}>
             <View style={styles.actionBar}>
               <TouchableOpacity
                 style={styles.actionButton}
@@ -379,7 +383,7 @@ const GlobalImageViewer = () => {
                 )}
               </TouchableOpacity>
             </View>
-          </SafeAreaView>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -389,59 +393,64 @@ const GlobalImageViewer = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
-  },
-  safeArea: {
-    width: "100%",
+    backgroundColor: 'transparent',
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 8,
+    zIndex: 2,
   },
   closeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   deleteButton: {
-    backgroundColor: "rgba(255, 0, 0, 0.1)",
+    backgroundColor: 'rgba(255,59,48,0.2)',
   },
   spacer: {
     flex: 1,
   },
   imageContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: screenWidth,
-    height: screenWidth,
-    maxHeight: screenHeight * 0.6,
+    height: screenHeight * 0.7,
   },
   messageContainer: {
-    marginTop: 16,
-    paddingHorizontal: 24,
-    width: "100%",
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    padding: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 12,
   },
   messageText: {
     fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
+    textAlign: 'center',
   },
   bottomContainer: {
-    width: "100%",
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   actionBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 20,
+    padding: 8,
   },
   actionButton: {
     width: 56,
