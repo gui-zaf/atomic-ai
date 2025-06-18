@@ -103,7 +103,7 @@ const AppContent = () => {
     setMenuVisible(false);
   };
 
-  const openGallery = () => {
+  const openSupport = () => {
     setMenuVisible(false);
   };
 
@@ -228,7 +228,7 @@ const AppContent = () => {
           onToggleDarkMode={toggleTheme}
           onBuyTokens={openTokenStore}
           onNewChat={resetChat}
-          onOpenGallery={openGallery}
+          onOpenGallery={openSupport}
           onOpenDevelopers={openDevelopers}
         />
       </View>

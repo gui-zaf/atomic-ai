@@ -22,8 +22,8 @@ const translations = {
   en: {
     // Menu
     quickActions: "Quick Actions",
-    newChat: "New Chat",
-    gallery: "Gallery",
+    newChat: "Clear Chat",
+    gallery: "Support",
     history: "History",
     store: "Store",
     buyTokens: "Buy Tokens",
@@ -177,12 +177,16 @@ const translations = {
     contractor: "Contracting Parties",
     contractorContent:
       "Contractor: Pixelpenguin Tech\nCorporate Name: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContracted: ZCode\nCPF: 240.436.318-20\n\nProject Nature: Volunteer, unpaid",
+
+    // Support Screen
+    supportTitle: "Support",
+    supportMessage: "Need help? Our support team is here to assist you with any questions or issues you may have.",
   },
   pt: {
     // Menu
     quickActions: "Ações Rápidas",
-    newChat: "Novo Chat",
-    gallery: "Galeria",
+    newChat: "Limpar Chat",
+    gallery: "Suporte",
     history: "Histórico",
     store: "Loja",
     buyTokens: "Comprar Tokens",
@@ -336,6 +340,10 @@ const translations = {
     contractor: "Contratante / Contratada",
     contractorContent:
       "Contratante: Pixelpenguin Tech\nRazão Social: Luiz R. C. Silva Ltda\nCNPJ: 53.178.469/0001-81\n\nContratada: ZCode\nCPF: 240.436.318-20\n\nNatureza do Projeto: Voluntário, sem remuneração",
+
+    // Support Screen
+    supportTitle: "Suporte",
+    supportMessage: "Precisa de ajuda? Nossa equipe de suporte está aqui para ajudá-lo com quaisquer dúvidas ou problemas que você possa ter.",
   },
 };
 

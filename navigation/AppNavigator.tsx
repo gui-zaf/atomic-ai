@@ -8,7 +8,7 @@ import {
 // Import screens
 import HomeScreen from "../screens/HomeScreen";
 import TokenStoreScreen from "../screens/TokenStoreScreen";
-import GalleryScreen from "../screens/GalleryScreen";
+import SupportScreen from "../screens/SupportScreen";
 import DevelopersScreen from "../screens/DevelopersScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import AboutScreen from "../screens/AboutScreen";
@@ -18,7 +18,7 @@ import { useTheme } from "../context/ThemeContext";
 export type RootStackParamList = {
   Home: undefined;
   TokenStore: undefined;
-  Gallery: undefined;
+  Support: undefined;
   Developers: undefined;
   History: undefined;
   About: undefined;
@@ -43,7 +43,7 @@ const AppNavigator = () => {
       >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="TokenStore" component={TokenStoreScreen} />
-        <Stack.Screen name="Gallery" component={GalleryScreen} />
+        <Stack.Screen name="Support" component={SupportScreen} />
         <Stack.Screen name="Developers" component={DevelopersScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />
         <Stack.Screen name="About" component={AboutScreen} />

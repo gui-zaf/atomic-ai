@@ -205,7 +205,7 @@ const SideMenu = ({
 
             <TouchableOpacity style={styles.menuItem} onPress={onNewChat}>
               <Ionicons
-                name="add-circle-outline"
+                name="refresh-outline"
                 size={24}
                 color={colors.text}
               />
@@ -214,17 +214,17 @@ const SideMenu = ({
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem} onPress={onOpenGallery}>
-              <Ionicons name="images-outline" size={24} color={colors.text} />
-              <Text style={[styles.menuItemText, { color: colors.text }]}>
-                {t("gallery")}
-              </Text>
-            </TouchableOpacity>
-
             <TouchableOpacity style={styles.menuItem} onPress={onOpenHistory}>
               <Ionicons name="time-outline" size={24} color={colors.text} />
               <Text style={[styles.menuItemText, { color: colors.text }]}>
                 {t("history")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={onOpenGallery}>
+              <Ionicons name="headset-outline" size={24} color={colors.text} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>
+                {t("gallery")}
               </Text>
             </TouchableOpacity>
           </View>

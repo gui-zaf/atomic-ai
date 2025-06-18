@@ -265,7 +265,7 @@ const HomeScreen = () => {
 
   const openGallery = () => {
     handleCloseMenu();
-    navigation.navigate("Gallery");
+    navigation.navigate("Support");
   };
 
   const openDevelopers = () => {
