@@ -83,12 +83,14 @@ const GlobalImageViewer = () => {
 
   // Estado local de like para evitar problemas de dessincronia
   const [localIsLiked, setLocalIsLiked] = useState(false);
+  const [localLikeCount, setLocalLikeCount] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
 
   // Sincroniza o estado local com o estado global quando a imagem muda
   useEffect(() => {
     if (currentImage) {
       setLocalIsLiked(currentImage.isLiked);
+      setLocalLikeCount(currentImage.likeCount || 0);
     }
   }, [currentImage]);
 
@@ -197,6 +199,7 @@ const GlobalImageViewer = () => {
     // Atualiza o estado local primeiro
     const newLikeState = !localIsLiked;
     setLocalIsLiked(newLikeState);
+    setLocalLikeCount(newLikeState ? 1 : 0);
 
     // Atualiza o estado global
     toggleLike();
@@ -301,11 +304,16 @@ const GlobalImageViewer = () => {
                 style={styles.actionButton}
                 onPress={handleToggleLike}
               >
-                <Ionicons
-                  name={localIsLiked ? "heart" : "heart-outline"}
-                  size={28}
-                  color="#FF3B30"
-                />
+                <View style={styles.likeButtonContainer}>
+                  <Ionicons
+                    name={localIsLiked ? "heart" : "heart-outline"}
+                    size={28}
+                    color="#FF3B30"
+                  />
+                  {localIsLiked && localLikeCount > 0 && (
+                    <Text style={styles.likeCountText}>{localLikeCount}</Text>
+                  )}
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -398,6 +406,17 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     justifyContent: "center",
     alignItems: "center",
+  },
+  likeButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  likeCountText: {
+    color: '#FF3B30',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 4,
   },
 });
 

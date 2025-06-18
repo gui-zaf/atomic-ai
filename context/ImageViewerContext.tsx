@@ -5,6 +5,7 @@ type ImageData = {
   isLiked: boolean;
   message?: string;
   id?: string; // ID da imagem para operações como exclusão
+  likeCount?: number; // Contador de likes
 };
 
 interface ImageViewerContextType {
@@ -53,10 +54,14 @@ export const ImageViewerProvider = ({ children }: { children: ReactNode }) => {
 
   const toggleLike = () => {
     if (currentImage) {
+      const newIsLiked = !currentImage.isLiked;
+      const newLikeCount = newIsLiked ? 1 : 0;
+      
       // Cria uma cópia do objeto para evitar mutações diretas
       setCurrentImage({
         ...currentImage,
-        isLiked: !currentImage.isLiked,
+        isLiked: newIsLiked,
+        likeCount: newLikeCount,
       });
     }
   };
