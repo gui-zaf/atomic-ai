@@ -25,6 +25,11 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
   const { t } = useLanguage();
 
+  const handleSpeakWithExpert = () => {
+    // Implementação futura para contato com especialista
+    console.log("Speak with expert button pressed");
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
@@ -54,6 +59,13 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={[styles.message, { color: colors.subtext }]}>
             {t("supportMessage")}
           </Text>
+          
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={handleSpeakWithExpert}
+          >
+            <Text style={styles.buttonText}>{t("speakWithExpert")}</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </View>
@@ -92,6 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 24,
+    marginBottom: 48,
   },
   supportIcon: {
     marginBottom: 24,
@@ -106,6 +119,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     lineHeight: 24,
+    marginBottom: 32,
+  },
+  button: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    minWidth: 200,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

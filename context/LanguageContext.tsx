@@ -181,6 +181,7 @@ const translations = {
     // Support Screen
     supportTitle: "Support",
     supportMessage: "Need help? Our support team is here to assist you with any questions or issues you may have.",
+    speakWithExpert: "Speak with Expert",
   },
   pt: {
     // Menu
@@ -344,6 +345,7 @@ const translations = {
     // Support Screen
     supportTitle: "Suporte",
     supportMessage: "Precisa de ajuda? Nossa equipe de suporte está aqui para ajudá-lo com quaisquer dúvidas ou problemas que você possa ter.",
+    speakWithExpert: "Falar com Especialista",
   },
 };
 
