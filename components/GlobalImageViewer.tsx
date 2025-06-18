@@ -37,16 +37,13 @@ export const addToggleLikeListener = (callback: (isLiked: boolean) => void) => {
   };
 };
 
-// Helper function to get the correct image source based on the image path
 const getImageSource = (imagePath?: any) => {
   if (!imagePath) return null;
 
-  // If it's already a require'd asset, return it directly
   if (typeof imagePath !== "string") {
     return imagePath;
   }
 
-  // Check if this is one of our sample images
   if (imagePath.includes("cat-in-space")) {
     return require("../assets/samples/cat-in-space.jpeg");
   } else if (imagePath.includes("sunset-beach")) {
@@ -101,37 +98,39 @@ const GlobalImageViewer = () => {
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderTerminationRequest: () => true,
-    }),
+    })
   ).current;
 
   const handleShare = async () => {
     try {
       if (!currentImage || !imageSource) return;
-      
+
       // Get image URI from the source
-      let imageUri = '';
-      
+      let imageUri = "";
+
       // Handle different image source types
-      if (typeof imageSource === 'number') {
+      if (typeof imageSource === "number") {
         // For local require'd images, we need to create a temp file
         const assetInfo = Image.resolveAssetSource(imageSource);
         if (!assetInfo?.uri) {
-          throw new Error('Could not resolve image source');
+          throw new Error("Could not resolve image source");
         }
-        
+
         // Create a temp file path
-        const tempFilePath = `${FileSystem.cacheDirectory}temp_image_${Date.now()}.jpg`;
-        
+        const tempFilePath = `${
+          FileSystem.cacheDirectory
+        }temp_image_${Date.now()}.jpg`;
+
         // Download the image to the temp file
         await FileSystem.downloadAsync(assetInfo.uri, tempFilePath);
         imageUri = tempFilePath;
-      } else if (typeof imageSource === 'object' && imageSource.uri) {
+      } else if (typeof imageSource === "object" && imageSource.uri) {
         // For remote or local uri images
         imageUri = imageSource.uri;
       }
-      
+
       if (!imageUri) {
-        throw new Error('Invalid image source');
+        throw new Error("Invalid image source");
       }
 
       // Share the image with text
@@ -141,12 +140,11 @@ const GlobalImageViewer = () => {
           url: imageUri,
         },
         {
-          dialogTitle: 'Share this image',
+          dialogTitle: "Share this image",
         }
       );
-      
     } catch (error) {
-      console.error('Error sharing image:', error);
+      console.error("Error sharing image:", error);
       // Fallback to text-only sharing if image sharing fails
       try {
         await Share.share({
@@ -159,82 +157,79 @@ const GlobalImageViewer = () => {
   };
 
   const handleDownload = async () => {
-    console.log('Download button clicked - starting image download process');
-    
+    console.log("Download button clicked - starting image download process");
+
     if (!currentImage || !imageSource) return;
-    
+
     setIsDownloading(true);
-    
+
     try {
       // Request permission to access the media library
       const { status } = await MediaLibrary.requestPermissionsAsync();
-      
+
       if (status !== "granted") {
         // If permission is denied, show an alert with option to open settings
-        Alert.alert(
-          t("permissionNeeded"),
-          t("permissionMessage"),
-          [
-            { text: t("no"), style: "cancel" },
-            { 
-              text: t("openSettings"), 
-              onPress: () => {
-                // Open app settings
-                if (Platform.OS === 'ios') {
-                  Linking.openURL('app-settings:');
-                } else {
-                  Linking.openSettings();
-                }
+        Alert.alert(t("permissionNeeded"), t("permissionMessage"), [
+          { text: t("no"), style: "cancel" },
+          {
+            text: t("openSettings"),
+            onPress: () => {
+              // Open app settings
+              if (Platform.OS === "ios") {
+                Linking.openURL("app-settings:");
+              } else {
+                Linking.openSettings();
               }
-            }
-          ]
-        );
+            },
+          },
+        ]);
         setIsDownloading(false);
         return;
       }
 
       // Get image URI from the source
-      let imageUri = '';
-      
+      let imageUri = "";
+
       // Handle different image source types
-      if (typeof imageSource === 'number') {
+      if (typeof imageSource === "number") {
         // For local require'd images, we need to create a temp file
         const assetInfo = Image.resolveAssetSource(imageSource);
         if (!assetInfo?.uri) {
-          throw new Error('Could not resolve image source');
+          throw new Error("Could not resolve image source");
         }
-        
+
         // Create a temp file path
-        const tempFilePath = `${FileSystem.cacheDirectory}temp_image_${Date.now()}.jpg`;
-        
+        const tempFilePath = `${
+          FileSystem.cacheDirectory
+        }temp_image_${Date.now()}.jpg`;
+
         // Download the image to the temp file
         await FileSystem.downloadAsync(assetInfo.uri, tempFilePath);
         imageUri = tempFilePath;
-      } else if (typeof imageSource === 'object' && imageSource.uri) {
+      } else if (typeof imageSource === "object" && imageSource.uri) {
         // For remote or local uri images
         imageUri = imageSource.uri;
       }
-      
+
       if (!imageUri) {
-        throw new Error('Invalid image source');
+        throw new Error("Invalid image source");
       }
 
       // Save the image to the media library
       const asset = await MediaLibrary.createAssetAsync(imageUri);
-      
+
       // Create an album if needed and add the asset to it
-      const album = await MediaLibrary.getAlbumAsync('Atomic Chat');
+      const album = await MediaLibrary.getAlbumAsync("Atomic Chat");
       if (album) {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       } else {
-        await MediaLibrary.createAlbumAsync('Atomic Chat', asset, false);
+        await MediaLibrary.createAlbumAsync("Atomic Chat", asset, false);
       }
-      
+
       // Show success message
       Alert.alert(t("downloadSuccess"));
-      
     } catch (error) {
-      console.error('Error saving image:', error);
+      console.error("Error saving image:", error);
       Alert.alert(t("downloadError"));
     } finally {
       setIsDownloading(false);
@@ -294,14 +289,19 @@ const GlobalImageViewer = () => {
     >
       <TouchableWithoutFeedback onPress={hideImageViewer}>
         <View style={styles.container}>
-          {Platform.OS === 'ios' ? (
+          {Platform.OS === "ios" ? (
             <BlurView
               intensity={isDarkMode ? 70 : 50}
               style={StyleSheet.absoluteFill}
               tint={isDarkMode ? "dark" : "light"}
             />
           ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: "rgba(0,0,0,0.7)" },
+              ]}
+            />
           )}
 
           <StatusBar translucent backgroundColor="rgba(0,0,0,0.5)" />
@@ -346,7 +346,9 @@ const GlobalImageViewer = () => {
             </View>
           </TouchableWithoutFeedback>
 
-          <View style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}>
+          <View
+            style={[styles.bottomContainer, { paddingBottom: insets.bottom }]}
+          >
             <View style={styles.actionBar}>
               <TouchableOpacity
                 style={styles.actionButton}
@@ -377,9 +379,17 @@ const GlobalImageViewer = () => {
                 disabled={isDownloading}
               >
                 {isDownloading ? (
-                  <Ionicons name="cloud-download-outline" size={28} color={colors.primary} />
+                  <Ionicons
+                    name="cloud-download-outline"
+                    size={28}
+                    color={colors.primary}
+                  />
                 ) : (
-                  <Ionicons name="download-outline" size={28} color={colors.text} />
+                  <Ionicons
+                    name="download-outline"
+                    size={28}
+                    color={colors.text}
+                  />
                 )}
               </TouchableOpacity>
             </View>
@@ -393,12 +403,12 @@ const GlobalImageViewer = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 8,
     zIndex: 2,
@@ -407,49 +417,45 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: "center",
+    alignItems: "center",
   },
   deleteButton: {
-    backgroundColor: 'rgba(255,59,48,0.2)',
+    backgroundColor: "rgba(255,59,48,0.2)",
   },
   spacer: {
     flex: 1,
   },
   imageContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     width: screenWidth,
     height: screenHeight * 0.7,
   },
   messageContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
     padding: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 12,
   },
   messageText: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   bottomContainer: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
   actionBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderRadius: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     padding: 8,
   },
   actionButton: {
@@ -461,14 +467,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   likeButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   likeCountText: {
-    color: '#FF3B30',
+    color: "#FF3B30",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 4,
   },
 });
