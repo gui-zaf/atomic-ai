@@ -150,6 +150,7 @@ const translations = {
     // General
     back: "Back",
     suggestionError: "Failed to get suggestion. Please try again.",
+    apiError: "Text model request failed. Please try again later.",
 
     // About Screen
     aboutTitle: "About",
@@ -320,6 +321,7 @@ const translations = {
     // General
     back: "Voltar",
     suggestionError: "Falha ao obter sugestão. Por favor, tente novamente.",
+    apiError: "A requisição para o modelo de texto falhou. Tente novamente mais tarde.",
 
     // About Screen
     aboutTitle: "Sobre",

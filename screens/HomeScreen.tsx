@@ -33,6 +33,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // Chave para armazenar as mensagens no AsyncStorage
 const MESSAGES_STORAGE_KEY = '@atomic_chat_messages';
 const LIKED_MESSAGES_STORAGE_KEY = '@atomic_chat_liked_messages';
+const CONTEXT_ID_STORAGE_KEY = '@atomic_chat_context_id';
+
+// API URL
+const API_URL = 'http://localhost:3000'; // URL local para desenvolvimento
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -214,7 +218,7 @@ const HomeScreen = () => {
     });
   };
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = async (message: string) => {
     const timestamp = Date.now();
     const currentDate = new Date(timestamp);
     const userMessage: Message = {
@@ -229,76 +233,127 @@ const HomeScreen = () => {
     // Show loading for AI response
     setIsLoading(true);
 
-    setTimeout(() => {
-      let imageFile: string | undefined;
-      let isImageGeneration = false;
-      let prompt = message;
+    let imageFile: string | undefined;
+    let isImageGeneration = false;
+    let prompt = message;
+    let aiResponseText = "";
 
-      // Check if the message starts with /image command
-      const isImageCommand = message.toLowerCase().startsWith("/image");
+    // Check if the message starts with /image command
+    const isImageCommand = message.toLowerCase().startsWith("/image");
 
-      if (isImageCommand) {
-        prompt = message.substring(6).trim();
-        isImageGeneration = true;
-      }
+    if (isImageCommand) {
+      prompt = message.substring(6).trim();
+      isImageGeneration = true;
+    }
 
-      // Check if the message matches any of our predefined suggestion descriptions
-      // even without the /image command
-      const matchingImage = imageDescriptionMapping.find(
-        (mapping) =>
-          mapping.english === message || mapping.portuguese === message,
-      );
+    // Check if the message matches any of our predefined suggestion descriptions
+    // even without the /image command
+    const matchingImage = imageDescriptionMapping.find(
+      (mapping) =>
+        mapping.english === message || mapping.portuguese === message,
+    );
 
-      if (matchingImage) {
-        imageFile = `../assets/samples/${matchingImage.filename}.jpeg`;
-        isImageGeneration = true;
-      } else if (isImageGeneration) {
-        // If it was an image command but didn't match any predefined suggestion
-        // use a random sample as fallback
-        imageFile =
-          sampleImages[Math.floor(Math.random() * sampleImages.length)];
-      }
+    if (matchingImage) {
+      imageFile = `../assets/samples/${matchingImage.filename}.jpeg`;
+      isImageGeneration = true;
+    } else if (isImageGeneration) {
+      // If it was an image command but didn't match any predefined suggestion
+      // use a random sample as fallback
+      imageFile =
+        sampleImages[Math.floor(Math.random() * sampleImages.length)];
+    }
 
-      const responseTimestamp = new Date(timestamp + 1500); // Adiciona o delay para o timestamp da resposta
-      const aiMessage: Message = {
-        id: (timestamp + 1).toString(),
-        text: isImageGeneration
-          ? `${prompt}`
-          : "This is a simulated AI response. You can replace this with actual AI responses.",
-        isUser: false,
-        timestamp: responseTimestamp,
-        ...(isImageGeneration && {
-          image: imageFile,
-          isGenerating: true,
-        }),
-      };
+    // Se não for geração de imagem, enviar para a API
+    if (!isImageGeneration) {
+      try {
+        // Obter o contextId do AsyncStorage ou criar um novo
+        let contextId = await AsyncStorage.getItem(CONTEXT_ID_STORAGE_KEY);
+        
+        console.log('Enviando requisição para a API:', `${API_URL}/chat/message`);
+        
+        const response = await fetch(`${API_URL}/chat/message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            message: message,
+            contextId: contextId || undefined,
+            role: "Você é um assistente útil e amigável.",
+            model: "sabia-3"
+          }),
+        });
 
-      setIsLoading(false);
-      setMessages((prev) => [...prev, aiMessage]);
+        if (!response.ok) {
+          throw new Error(`Falha na resposta da API: ${response.status} ${response.statusText}`);
+        }
 
-      // Add to history
-      if (isImageGeneration) {
+        const data = await response.json();
+        
+        // Salvar o contextId para futuras requisições
+        if (data.contextId) {
+          await AsyncStorage.setItem(CONTEXT_ID_STORAGE_KEY, data.contextId);
+        }
+        
+        aiResponseText = data.response;
+      } catch (error) {
+        console.error('Erro ao chamar a API:', error);
+        
+        // Usar a mensagem de erro do LanguageContext
+        aiResponseText = t("apiError");
+        
+        // Adicionar o erro ao histórico
         addHistoryItem({
-          id: (timestamp + 2).toString(),
+          id: (timestamp + 3).toString(),
           timestamp: new Date(),
-          type: "image",
-          prompt: prompt,
-          tokensUsed: 1,
-          model: "DALL-E",
+          type: "error",
+          error: t("apiError"),
+          tokensUsed: 0,
           expanded: false,
         });
-      } else {
-        addHistoryItem({
-          id: (timestamp + 2).toString(),
-          timestamp: new Date(),
-          type: "simulated",
-          prompt: message,
-          response: aiMessage.text,
-          tokensUsed: 1,
-          expanded: false,
-        });
       }
-    }, 1500);
+    }
+
+    const responseTimestamp = new Date(timestamp + 1500);
+    const aiMessage: Message = {
+      id: (timestamp + 1).toString(),
+      text: isImageGeneration
+        ? `${prompt}`
+        : aiResponseText || "This is a simulated AI response. You can replace this with actual AI responses.",
+      isUser: false,
+      timestamp: responseTimestamp,
+      ...(isImageGeneration && {
+        image: imageFile,
+        isGenerating: true,
+      }),
+    };
+
+    setIsLoading(false);
+    setMessages((prev) => [...prev, aiMessage]);
+
+    // Add to history
+    if (isImageGeneration) {
+      addHistoryItem({
+        id: (timestamp + 2).toString(),
+        timestamp: new Date(),
+        type: "image",
+        prompt: prompt,
+        tokensUsed: 1,
+        model: "DALL-E",
+        expanded: false,
+      });
+    } else {
+      addHistoryItem({
+        id: (timestamp + 2).toString(),
+        timestamp: new Date(),
+        type: "simulated",
+        prompt: message,
+        response: aiMessage.text,
+        tokensUsed: 1,
+        expanded: false,
+      });
+    }
   };
 
   const handleSendAIMessage = (message: string) => {
