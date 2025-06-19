@@ -29,14 +29,12 @@ import { LoadingBubble } from "../components/LoadingBubble";
 import { useTokens } from "../context/TokenContext";
 import { useHistory } from "../context/HistoryContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { sendChatMessage } from "../config/api";
 
 // Chave para armazenar as mensagens no AsyncStorage
 const MESSAGES_STORAGE_KEY = '@atomic_chat_messages';
 const LIKED_MESSAGES_STORAGE_KEY = '@atomic_chat_liked_messages';
 const CONTEXT_ID_STORAGE_KEY = '@atomic_chat_context_id';
-
-// API URL
-const API_URL = 'http://localhost:3000'; // URL local para desenvolvimento
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -269,27 +267,7 @@ const HomeScreen = () => {
         // Obter o contextId do AsyncStorage ou criar um novo
         let contextId = await AsyncStorage.getItem(CONTEXT_ID_STORAGE_KEY);
         
-        console.log('Enviando requisição para a API:', `${API_URL}/chat/message`);
-        
-        const response = await fetch(`${API_URL}/chat/message`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            message: message,
-            contextId: contextId || undefined,
-            role: "Você é um assistente útil e amigável.",
-            model: "sabia-3"
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Falha na resposta da API: ${response.status} ${response.statusText}`);
-        }
-
-        const data = await response.json();
+        const data = await sendChatMessage(message, contextId || undefined);
         
         // Salvar o contextId para futuras requisições
         if (data.contextId) {
