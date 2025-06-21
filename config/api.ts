@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://192.168.15.78:3000";
+const API_BASE_URL = "http://192.168.15.68:3000";
 
 export const API_ENDPOINTS = {
   amaze: `${API_BASE_URL}/amaze`,
@@ -10,21 +10,23 @@ export const API_ENDPOINTS = {
  */
 export const sendChatMessage = async (message: string, contextId?: string) => {
   const response = await fetch(API_ENDPOINTS.chat, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify({
       message: message,
       contextId: contextId || undefined,
       role: "Você é um assistente útil e amigável.",
-      model: "sabia-3"
+      model: "sabia-3",
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Falha na resposta da API: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Falha na resposta da API: ${response.status} ${response.statusText}`
+    );
   }
 
   const data = await response.json();
