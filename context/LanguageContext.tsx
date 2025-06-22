@@ -189,6 +189,12 @@ const translations = {
     supportTitle: "Support",
     supportMessage: "Need help? Our support team is here to assist you with any questions or issues you may have.",
     speakWithExpert: "Speak with Expert",
+    inQueueMessage: "You're next in line, please wait...",
+    estimatedTime: "Estimated time:",
+    exitQueue: "Exit Queue",
+    endSupportTitle: "End Support",
+    endSupportMessage: "Are you sure you want to end this support session?",
+    end: "End",
   },
   pt: {
     // Menu
@@ -360,6 +366,12 @@ const translations = {
     supportTitle: "Suporte",
     supportMessage: "Precisa de ajuda? Nossa equipe de suporte está aqui para ajudá-lo com quaisquer dúvidas ou problemas que você possa ter.",
     speakWithExpert: "Falar com Especialista",
+    inQueueMessage: "Você é o próximo da fila, aguarde...",
+    estimatedTime: "Tempo estimado:",
+    exitQueue: "Sair da fila",
+    endSupportTitle: "Encerrar Suporte",
+    endSupportMessage: "Tem certeza que deseja encerrar esta sessão de suporte?",
+    end: "Encerrar",
   },
 };
 

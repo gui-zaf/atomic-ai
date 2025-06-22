@@ -6,6 +6,19 @@ export const API_ENDPOINTS = {
   chat: `${API_BASE_URL}/chat/message`,
 } as const;
 
+// List of possible support agent names
+const supportNames = [
+  "Ana Silva", "Pedro Santos", "Mariana Oliveira", "Carlos Souza", 
+  "Juliana Costa", "Rafael Pereira", "Camila Ferreira", "Felipe Rodrigues", 
+  "Beatriz Almeida", "Gabriel Nascimento", "Larissa Lima", "Lucas Ribeiro"
+];
+
+// Generate a random support agent name
+export const getRandomSupportName = (): string => {
+  const randomIndex = Math.floor(Math.random() * supportNames.length);
+  return supportNames[randomIndex];
+};
+
 export const sendChatMessage = async (message: string, contextId?: string) => {
   const response = await fetch(API_ENDPOINTS.chat, {
     method: "POST",
@@ -29,6 +42,81 @@ export const sendChatMessage = async (message: string, contextId?: string) => {
 
   const data = await response.json();
   return data;
+};
+
+export const sendSupportMessage = async (message: string, contextId?: string) => {
+  try {
+    const supportName = getRandomSupportName();
+    
+    const response = await fetch(API_ENDPOINTS.chat, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        message: message,
+        contextId: contextId || undefined,
+        role: `Você é ${supportName}, um agente de suporte do aplicativo Atomic AI. Seu objetivo é ajudar o usuário com suas dúvidas sobre o aplicativo. Se esta for a primeira mensagem do usuário, apresente-se e peça para o usuário se apresentar também. Responda no mesmo idioma em que o usuário escrever. O Atomic AI é um aplicativo que permite aos usuários gerar imagens a partir de descrições de texto e tem as seguintes funcionalidades principais: 1) Gerar imagens por texto usando comandos no chat, 2) Comprar tokens de requisição clicando no ícone de raio no menu lateral ou na tela inicial no canto superior direito, 3) Visualizar o histórico de imagens geradas. Os tokens são necessários para usar as funcionalidades do aplicativo. Os usuários recebem alguns tokens gratuitos diariamente, mas podem comprar mais na loja. Seja cordial, profissional e forneça informações precisas. Limite suas respostas a no máximo 1 parágrafo curto. Escreva pouco, não seja muito longo.`,
+        model: "sabia-3",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Falha na resposta da API: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const rawData = await response.json();
+    console.log("Raw API response:", rawData);
+    
+    // Handle different response formats
+    let responseText = "";
+    let responseContextId = contextId || `support-${Date.now()}`;
+    
+    if (typeof rawData === 'string') {
+      responseText = rawData;
+    } else if (rawData && typeof rawData === 'object') {
+      // Try to extract the actual response text
+      if (rawData.response) {
+        responseText = rawData.response;
+      } else if (rawData.text) {
+        responseText = rawData.text;
+      } else if (rawData.message) {
+        responseText = rawData.message;
+      } else if (rawData.completion) {
+        responseText = rawData.completion;
+      } else {
+        // If we can't find a standard field, stringify the entire object as a fallback
+        responseText = "Resposta da API: " + JSON.stringify(rawData);
+      }
+      
+      // Try to get the context ID if available
+      if (rawData.contextId) {
+        responseContextId = rawData.contextId;
+      } else if (rawData.context_id) {
+        responseContextId = rawData.context_id;
+      }
+    }
+    
+    // If message is empty, it's the initial message
+    if (!message.trim()) {
+      const initialMessage = `Olá! Meu nome é ${supportName}, sou o atendente de suporte do Atomic AI. Como posso ajudar você hoje? Poderia se apresentar, por favor?`;
+      return {
+        text: initialMessage,
+        contextId: responseContextId
+      };
+    }
+    
+    return {
+      text: responseText || `Desculpe, estou com dificuldades para responder no momento. Por favor, tente novamente.`,
+      contextId: responseContextId
+    };
+  } catch (error) {
+    console.error("Error in sendSupportMessage:", error);
+    throw error;
+  }
 };
 
 export default API_ENDPOINTS;
