@@ -195,6 +195,9 @@ const translations = {
     endSupportTitle: "End Support",
     endSupportMessage: "Are you sure you want to end this support session?",
     end: "End",
+    isTyping: "is typing...",
+    supportIntro: "Hello! My name is {0}, I'm the support agent for Atomic AI. How can I help you today? Could you please introduce yourself?",
+    supportError: "Sorry, I'm having trouble responding at the moment. Please try again.",
   },
   pt: {
     // Menu
@@ -372,6 +375,9 @@ const translations = {
     endSupportTitle: "Encerrar Suporte",
     endSupportMessage: "Tem certeza que deseja encerrar esta sessão de suporte?",
     end: "Encerrar",
+    isTyping: "está digitando...",
+    supportIntro: "Olá! Meu nome é {0}, sou o atendente de suporte do Atomic AI. Como posso ajudar você hoje? Poderia se apresentar, por favor?",
+    supportError: "Desculpe, estou com dificuldades para responder no momento. Por favor, tente novamente.",
   },
 };
 

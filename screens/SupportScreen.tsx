@@ -22,12 +22,14 @@ import { ChatBubble } from "../components/ChatBubble";
 import { Message } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { sendSupportMessage, getRandomSupportName } from "../config/api";
+import EndSupportPill from "../components/EndSupportPill";
 
 // Storage keys
 const SUPPORT_STATE_KEY = "support_screen_state";
 const SUPPORT_MESSAGES_KEY = "support_messages";
 const SUPPORT_TIME_KEY = "support_estimated_time";
 const SUPPORT_CONTEXT_ID_KEY = "support_context_id";
+const SUPPORT_AGENT_NAME_KEY = "support_agent_name";
 
 type SupportScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -42,7 +44,7 @@ type SupportScreenState = "initial" | "queue" | "chat";
 
 const SupportScreen: React.FC<Props> = ({ navigation }) => {
   const { colors } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [screenState, setScreenState] = useState<SupportScreenState>("initial");
   const [estimatedTime, setEstimatedTime] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -51,6 +53,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [contextId, setContextId] = useState<string | undefined>(undefined);
+  const [supportAgentName, setSupportAgentName] = useState<string>("");
   const scrollViewRef = useRef<ScrollView>(null);
 
   // Load saved state on component mount
@@ -61,6 +64,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
         const savedMessages = await AsyncStorage.getItem(SUPPORT_MESSAGES_KEY);
         const savedTime = await AsyncStorage.getItem(SUPPORT_TIME_KEY);
         const savedContextId = await AsyncStorage.getItem(SUPPORT_CONTEXT_ID_KEY);
+        const savedAgentName = await AsyncStorage.getItem(SUPPORT_AGENT_NAME_KEY);
 
         if (savedState) {
           setScreenState(savedState as SupportScreenState);
@@ -83,6 +87,10 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
         
         if (savedContextId) {
           setContextId(savedContextId);
+        }
+        
+        if (savedAgentName) {
+          setSupportAgentName(savedAgentName);
         }
       } catch (error) {
         console.log("Error loading saved support state:", error);
@@ -153,6 +161,21 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     saveContextId();
   }, [contextId]);
 
+  // Save agent name when it changes
+  useEffect(() => {
+    const saveAgentName = async () => {
+      if (supportAgentName) {
+        try {
+          await AsyncStorage.setItem(SUPPORT_AGENT_NAME_KEY, supportAgentName);
+        } catch (error) {
+          console.log("Error saving agent name:", error);
+        }
+      }
+    };
+    
+    saveAgentName();
+  }, [supportAgentName]);
+
   useEffect(() => {
     if (screenState === "queue") {
       // Add 1 minute to current time for estimated wait time only if not already set
@@ -180,10 +203,18 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
   }, [screenState, estimatedTime, messages]);
   
   const sendInitialSupportMessage = () => {
-    const supportName = getRandomSupportName();
+    // Gerar um nome de agente apenas se ainda não tiver um
+    const agentName = supportAgentName || getRandomSupportName();
+    if (!supportAgentName) {
+      setSupportAgentName(agentName);
+    }
+    
+    // Usar a tradução com o nome do agente
+    const introMessage = t("supportIntro").replace("{0}", agentName);
+    
     const initialMessage: Message = {
       id: Date.now().toString(),
-      text: `Olá! Meu nome é ${supportName}, sou o atendente de suporte do Atomic AI. Como posso ajudar você hoje? Poderia se apresentar, por favor?`,
+      text: introMessage,
       isUser: false,
       timestamp: new Date(),
     };
@@ -252,9 +283,13 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     setIsTyping(true);
 
     try {
-      console.log("Sending message to support API:", messageText);
-      const response = await sendSupportMessage(messageText, contextId);
-      console.log("Support API response:", response);
+      // Passar o nome do agente e o idioma atual para manter consistência
+      const response = await sendSupportMessage(
+        messageText, 
+        contextId, 
+        supportAgentName || undefined,
+        language
+      );
       
       // Check the structure of the response to extract the text
       let responseText = "";
@@ -271,7 +306,6 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
       } else if (typeof response === 'string') {
         responseText = response;
       } else {
-        console.log("Unexpected response structure:", response);
         responseText = "Desculpe, não consegui processar sua mensagem corretamente.";
       }
       
@@ -288,12 +322,10 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
       
       setMessages((prev) => [...prev, supportReply]);
     } catch (error) {
-      console.log("Error sending support message:", error);
-      
-      // Fallback message in case of error
+      // Fallback message in case of error - usar tradução
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Desculpe, estou tendo dificuldades para processar sua mensagem. Poderia tentar novamente mais tarde?",
+        text: t("supportError"),
         isUser: false,
         timestamp: new Date(),
       };
@@ -328,12 +360,14 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
               await AsyncStorage.removeItem(SUPPORT_MESSAGES_KEY);
               await AsyncStorage.removeItem(SUPPORT_TIME_KEY);
               await AsyncStorage.removeItem(SUPPORT_CONTEXT_ID_KEY);
+              await AsyncStorage.removeItem(SUPPORT_AGENT_NAME_KEY);
 
               // Reset current state
               setScreenState("initial");
               setMessages([]);
               setEstimatedTime("");
               setContextId(undefined);
+              setSupportAgentName("");
             } catch (error) {
               console.log("Error clearing support state:", error);
             }
@@ -344,16 +378,12 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const renderHeaderRight = () => {
-    if (screenState !== "initial") {
-  return (
-          <TouchableOpacity
-          onPress={handleEndSupport}
-          style={styles.endSupportButton}
-          >
-          <Ionicons name="close-circle" size={26} color={colors.error} />
-          </TouchableOpacity>
+    if (screenState === "chat") {
+      return (
+        <EndSupportPill onPress={handleEndSupport} />
       );
     }
+    // Espaço vazio para manter o layout consistente
     return <View style={styles.headerRight} />;
   };
 
@@ -454,16 +484,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
                     timestamp={msg.timestamp}
                   />
                 ))}
-                {isTyping && (
-                  <View style={styles.typingContainer}>
-                    <View style={[styles.typingBubble, { backgroundColor: colors.surface }]}>
-                      <ActivityIndicator size="small" color={colors.primary} style={styles.typingIndicator} />
-                      <Text style={{ color: colors.subtext }}>
-                        Digitando...
-                      </Text>
-                    </View>
-                  </View>
-                )}
+                {renderTypingIndicator()}
               </ScrollView>
 
               <View
@@ -510,6 +531,22 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  // Renderizar o indicador de digitação
+  const renderTypingIndicator = () => {
+    if (!isTyping) return null;
+    
+    return (
+      <View style={styles.typingContainer}>
+        <View style={[styles.typingBubble, { backgroundColor: colors.surface }]}>
+          <ActivityIndicator size="small" color={colors.primary} style={styles.typingIndicator} />
+          <Text style={{ color: colors.subtext }}>
+            {t("isTyping")}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
@@ -520,9 +557,14 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {t("supportTitle")}
-          </Text>
+          
+          {/* Título centralizado absolutamente */}
+          <View style={styles.headerTitleContainer}>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>
+              {t("supportTitle")}
+            </Text>
+          </View>
+          
           {renderHeaderRight()}
         </View>
 
@@ -545,25 +587,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     height: 60,
+    position: "relative",
   },
   backButton: {
     width: 40,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
+  },
+  headerTitleContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 0,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: "600",
+    textAlign: "center",
   },
   headerRight: {
-    width: 40,
-  },
-  endSupportButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    marginRight: 8,
+    zIndex: 1,
   },
   content: {
     flex: 1,

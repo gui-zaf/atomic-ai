@@ -246,7 +246,8 @@ const HomeScreen = () => {
         // Obter o contextId do AsyncStorage ou criar um novo
         let contextId = await AsyncStorage.getItem(CONTEXT_ID_STORAGE_KEY);
         
-        const data = await sendChatMessage(message, contextId || undefined);
+        // Passar o idioma atual para a API
+        const data = await sendChatMessage(message, contextId || undefined, language);
         
         // Salvar o contextId para futuras requisições
         if (data.contextId) {
