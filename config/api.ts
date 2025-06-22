@@ -8,9 +8,18 @@ export const API_ENDPOINTS = {
 
 // List of possible support agent names
 const supportNames = [
-  "Ana Silva", "Pedro Santos", "Mariana Oliveira", "Carlos Souza", 
-  "Juliana Costa", "Rafael Pereira", "Camila Ferreira", "Felipe Rodrigues", 
-  "Beatriz Almeida", "Gabriel Nascimento", "Larissa Lima", "Lucas Ribeiro"
+  "Ana Silva",
+  "Pedro Santos",
+  "Mariana Oliveira",
+  "Carlos Souza",
+  "Juliana Costa",
+  "Rafael Pereira",
+  "Camila Ferreira",
+  "Felipe Rodrigues",
+  "Beatriz Almeida",
+  "Gabriel Nascimento",
+  "Larissa Lima",
+  "Lucas Ribeiro",
 ];
 
 // Generate a random support agent name
@@ -44,10 +53,13 @@ export const sendChatMessage = async (message: string, contextId?: string) => {
   return data;
 };
 
-export const sendSupportMessage = async (message: string, contextId?: string) => {
+export const sendSupportMessage = async (
+  message: string,
+  contextId?: string
+) => {
   try {
     const supportName = getRandomSupportName();
-    
+
     const response = await fetch(API_ENDPOINTS.chat, {
       method: "POST",
       headers: {
@@ -70,14 +82,14 @@ export const sendSupportMessage = async (message: string, contextId?: string) =>
 
     const rawData = await response.json();
     console.log("Raw API response:", rawData);
-    
+
     // Handle different response formats
     let responseText = "";
     let responseContextId = contextId || `support-${Date.now()}`;
-    
-    if (typeof rawData === 'string') {
+
+    if (typeof rawData === "string") {
       responseText = rawData;
-    } else if (rawData && typeof rawData === 'object') {
+    } else if (rawData && typeof rawData === "object") {
       // Try to extract the actual response text
       if (rawData.response) {
         responseText = rawData.response;
@@ -91,7 +103,7 @@ export const sendSupportMessage = async (message: string, contextId?: string) =>
         // If we can't find a standard field, stringify the entire object as a fallback
         responseText = "Resposta da API: " + JSON.stringify(rawData);
       }
-      
+
       // Try to get the context ID if available
       if (rawData.contextId) {
         responseContextId = rawData.contextId;
@@ -99,19 +111,21 @@ export const sendSupportMessage = async (message: string, contextId?: string) =>
         responseContextId = rawData.context_id;
       }
     }
-    
+
     // If message is empty, it's the initial message
     if (!message.trim()) {
       const initialMessage = `Olá! Meu nome é ${supportName}, sou o atendente de suporte do Atomic AI. Como posso ajudar você hoje? Poderia se apresentar, por favor?`;
       return {
         text: initialMessage,
-        contextId: responseContextId
+        contextId: responseContextId,
       };
     }
-    
+
     return {
-      text: responseText || `Desculpe, estou com dificuldades para responder no momento. Por favor, tente novamente.`,
-      contextId: responseContextId
+      text:
+        responseText ||
+        `Desculpe, estou com dificuldades para responder no momento. Por favor, tente novamente.`,
+      contextId: responseContextId,
     };
   } catch (error) {
     console.error("Error in sendSupportMessage:", error);
