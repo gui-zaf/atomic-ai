@@ -21,7 +21,7 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import { ChatBubble } from "../components/ChatBubble";
 import { Message } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { sendSupportMessage } from "../config/api";
+import { sendSupportMessage, getRandomSupportName } from "../config/api";
 
 // Storage keys
 const SUPPORT_STATE_KEY = "support_screen_state";
@@ -179,58 +179,21 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, [screenState, estimatedTime, messages]);
   
-  const sendInitialSupportMessage = async () => {
-    setIsTyping(true);
-    try {
-      console.log("Sending initial message to support API");
-      const response = await sendSupportMessage("");
-      console.log("Initial support API response:", response);
-      
-      // Check the structure of the response to extract the text
-      let responseText = "";
-      const responseObj = response as any; // Type assertion to handle unknown response structure
-      
-      if (responseObj && typeof responseObj === 'object') {
-        if (responseObj.text) {
-          responseText = responseObj.text;
-        } else if (responseObj.response) {
-          responseText = responseObj.response;
-        } else if (responseObj.message) {
-          responseText = responseObj.message;
-        }
-      } else if (typeof response === 'string') {
-        responseText = response;
-      } else {
-        console.log("Unexpected response structure:", response);
-        responseText = "Olá! Sou o atendente de suporte do Atomic AI. Como posso ajudá-lo hoje?";
-      }
-      
-      if (responseObj && responseObj.contextId) {
-        setContextId(responseObj.contextId);
-      }
-      
-      const initialMessage: Message = {
-        id: Date.now().toString(),
-        text: responseText,
-        isUser: false,
-        timestamp: new Date(),
-      };
-      
-      setMessages([initialMessage]);
-    } catch (error) {
-      console.log("Error sending initial support message:", error);
-      // Fallback message in case of error
-      const fallbackMessage: Message = {
-        id: Date.now().toString(),
-        text: "Olá! Sou o atendente de suporte do Atomic AI. Como posso ajudá-lo hoje?",
-        isUser: false,
-        timestamp: new Date(),
-      };
-      
-      setMessages([fallbackMessage]);
-    } finally {
-      setIsTyping(false);
-    }
+  const sendInitialSupportMessage = () => {
+    const supportName = getRandomSupportName();
+    const initialMessage: Message = {
+      id: Date.now().toString(),
+      text: `Olá! Meu nome é ${supportName}, sou o atendente de suporte do Atomic AI. Como posso ajudar você hoje? Poderia se apresentar, por favor?`,
+      isUser: false,
+      timestamp: new Date(),
+    };
+    
+    // Gerar um ID de contexto único
+    const newContextId = `support-${Date.now()}`;
+    setContextId(newContextId);
+    
+    // Adicionar a mensagem inicial
+    setMessages([initialMessage]);
   };
 
   useEffect(() => {
