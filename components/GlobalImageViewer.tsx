@@ -299,12 +299,12 @@ const GlobalImageViewer = () => {
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: "rgba(0,0,0,0.7)" },
+                { backgroundColor: "rgba(0,0,0,0.9)" },
               ]}
             />
           )}
 
-          <StatusBar translucent backgroundColor="rgba(0,0,0,0.5)" />
+          <StatusBar translucent backgroundColor="rgba(0,0,0,0.9)" />
 
           <View style={[styles.header, { paddingTop: insets.top }]}>
             <TouchableOpacity

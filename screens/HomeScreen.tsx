@@ -4,7 +4,6 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
-  PanResponder,
   Animated,
   Image,
 } from "react-native";
@@ -187,26 +186,6 @@ const HomeScreen = () => {
       prevFocusedRef.current = false;
     }
   }, [isFocused, navigation]);
-
-  const mainContentPanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: (evt) =>
-        !menuVisible && evt.nativeEvent.pageX < 20,
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        !menuVisible &&
-        gestureState.dx > 20 &&
-        Math.abs(gestureState.dx) > Math.abs(gestureState.dy) * 2 &&
-        gestureState.dx > 0,
-      onPanResponderMove: (_, gestureState) => {
-        if (!menuVisible && gestureState.dx > 50) {
-          setMenuVisible(true);
-        }
-      },
-      onPanResponderRelease: () => {},
-      onPanResponderTerminationRequest: () => true,
-      onShouldBlockNativeResponder: () => false,
-    }),
-  ).current;
 
   const handleToggleLike = (messageId: string) => {
     setLikedMessages((prev) => {
@@ -483,11 +462,6 @@ const HomeScreen = () => {
                 />
                 {isLoading && <LoadingBubble />}
               </View>
-
-              <View
-                style={styles.edgeSwipeArea}
-                {...mainContentPanResponder.panHandlers}
-              />
             </SafeAreaView>
 
             <View style={styles.inputContainer}>
@@ -528,15 +502,6 @@ const styles = StyleSheet.create({
   mainContentArea: {
     flex: 1,
     position: "relative",
-  },
-  edgeSwipeArea: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 20,
-    zIndex: 50,
-    pointerEvents: "box-none",
   },
   backgroundContainer: {
     position: "absolute",

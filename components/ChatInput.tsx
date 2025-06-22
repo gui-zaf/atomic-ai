@@ -162,11 +162,23 @@ const ChatInput = ({
           isKeyboardVisible && styles.inputWrapperKeyboardOpen,
         ]}
       >
-        <BlurView
-          intensity={10}
-          tint={isDarkMode ? "dark" : "light"}
-          style={styles.blurContainer}
-        />
+        {Platform.OS === "ios" || Platform.OS === "android" ? (
+          <BlurView
+            intensity={40}
+            tint={isDarkMode ? "dark" : "light"}
+            style={styles.blurContainer}
+          />
+        ) : (
+          <View
+            style={[
+              styles.blurContainer,
+              {
+                backgroundColor: colors.background,
+                opacity: 0.9,
+              },
+            ]}
+          />
+        )}
 
         {showSuggestions && (
           <Animated.View
@@ -242,7 +254,10 @@ const ChatInput = ({
 
 const styles = StyleSheet.create({
   inputWrapper: {
-    position: "relative",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     marginTop: 0,
   },
   inputWrapperKeyboardOpen: {
@@ -260,7 +275,7 @@ const styles = StyleSheet.create({
   suggestionsWrapper: {
     position: "relative",
     zIndex: 25,
-    marginTop: 0,
+    marginBottom: 8,
   },
   container: {
     paddingHorizontal: 16,

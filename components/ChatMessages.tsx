@@ -1,10 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   StyleSheet,
   ScrollView,
   Keyboard,
   Platform,
-  PanResponder,
+  View,
 } from "react-native";
 import { ChatBubble } from "./ChatBubble";
 import { Message } from "../types";
@@ -21,32 +21,30 @@ export const ChatMessages = ({
   onToggleLike,
 }: ChatMessagesProps) => {
   const scrollViewRef = useRef<ScrollView>(null);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onStartShouldSetPanResponderCapture: () => false,
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        const { dx, dy } = gestureState;
-        // Se o movimento for principalmente vertical, o ScrollView deve assumir.
-        return Math.abs(dy) > 5 && Math.abs(dy) > Math.abs(dx);
-      },
-      // Permite que outras views se tornem o 'responder'. Importante para botões filhos.
-      onPanResponderTerminationRequest: () => true,
-    }),
-  ).current;
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener(
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => {
+        setIsKeyboardVisible(true);
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
       },
     );
 
-    return () => keyboardShowListener.remove();
+    const keyboardHideListener = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardShowListener.remove();
+      keyboardHideListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -65,26 +63,37 @@ export const ChatMessages = ({
       scrollEnabled={true}
       alwaysBounceVertical={true}
       bounces={true}
-      directionalLockEnabled={true}
+      directionalLockEnabled={false}
       scrollEventThrottle={16}
       decelerationRate="normal"
       nestedScrollEnabled={true}
       overScrollMode="always"
       removeClippedSubviews={false}
       pinchGestureEnabled={false}
-      {...panResponder.panHandlers}
     >
-      {messages.map((message) => (
-        <ChatBubble
+      {messages.map((message, index) => (
+        <View 
           key={message.id}
-          message={message.text}
-          isUser={message.isUser}
-          image={message.image}
-          isLiked={likedMessages.has(message.id)}
-          onToggleLike={() => onToggleLike(message.id)}
-          timestamp={message.timestamp}
-          isGenerating={message.isGenerating}
-        />
+          style={
+            index === 0 
+              ? styles.firstBubbleContainer 
+              : index === messages.length - 1 
+                ? isKeyboardVisible 
+                  ? styles.lastBubbleContainerKeyboard 
+                  : styles.lastBubbleContainer 
+                : undefined
+          }
+        >
+          <ChatBubble
+            message={message.text}
+            isUser={message.isUser}
+            image={message.image}
+            isLiked={likedMessages.has(message.id)}
+            onToggleLike={() => onToggleLike(message.id)}
+            timestamp={message.timestamp}
+            isGenerating={message.isGenerating}
+          />
+        </View>
       ))}
     </ScrollView>
   );
@@ -98,5 +107,14 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 8,
     paddingBottom: 10,
+  },
+  firstBubbleContainer: {
+    marginTop: 60,
+  },
+  lastBubbleContainer: {
+    marginBottom: 140,
+  },
+  lastBubbleContainerKeyboard: {
+    marginBottom: 20,
   },
 });

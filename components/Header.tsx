@@ -1,9 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import TokenPill from "./TokenPill";
 import { useTheme } from "../context/ThemeContext";
 import { BlurView } from "expo-blur";
+import { colors } from "../theme/theme";
 
 interface HeaderProps {
   onMenuPress: () => void;
@@ -12,14 +19,27 @@ interface HeaderProps {
 
 export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
   const { colors, isDarkMode } = useTheme();
+  const isAndroid = Platform.OS === "android";
 
   return (
     <View style={styles.headerWrapper}>
-      <BlurView
-        intensity={10}
-        tint={isDarkMode ? "dark" : "light"}
-        style={styles.blurContainer}
-      />
+      {isAndroid ? (
+        <View
+          style={[
+            styles.blurContainer,
+            {
+              backgroundColor: colors.background,
+              opacity: 0.9,
+            },
+          ]}
+        />
+      ) : (
+        <BlurView
+          intensity={40}
+          tint={isDarkMode ? "dark" : "light"}
+          style={styles.blurContainer}
+        />
+      )}
 
       <View style={styles.container}>
         <TouchableOpacity style={styles.iconButton} onPress={onMenuPress}>
@@ -42,9 +62,11 @@ export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
 const styles = StyleSheet.create({
   headerWrapper: {
     zIndex: 10,
-    position: "relative",
+    position: "absolute",
+    width: "100%",
   },
   blurContainer: {
+    width: "100%",
     position: "absolute",
     top: -100,
     left: 0,
@@ -64,10 +86,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    opacity: 0.7,
+    opacity: 1,
     fontWeight: "bold",
     flex: 1,
     textAlign: "center",
+    marginLeft: 42,
   },
   iconButton: {
     width: 32,
@@ -76,6 +99,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    opacity: 0.7,
+    opacity: 1,
   },
 });

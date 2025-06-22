@@ -10,6 +10,7 @@ import {
   Dimensions,
   Easing,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
@@ -369,15 +370,30 @@ export const ChatBubble = ({
             {/* Timestamp com BlurView para imagens */}
             {formattedTime && !isGenerating ? (
               <View style={styles.imageTimeContainer}>
-                <BlurView
-                  intensity={70}
-                  tint={isDarkMode ? "dark" : "light"}
-                  style={styles.timeBlurPill}
-                >
-                  <Text style={[styles.timeText, { color: colors.text }]}>
-                    {formattedTime}
-                  </Text>
-                </BlurView>
+                {Platform.OS === "ios" ? (
+                  <BlurView
+                    intensity={70}
+                    tint={isDarkMode ? "dark" : "light"}
+                    style={styles.timeBlurPill}
+                  >
+                    <Text style={[styles.timeText, { color: colors.text }]}>
+                      {formattedTime}
+                    </Text>
+                  </BlurView>
+                ) : (
+                  <View
+                    style={[
+                      styles.timeBlurPill,
+                      {
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.timeText, { color: "#FFFFFF" }]}>
+                      {formattedTime}
+                    </Text>
+                  </View>
+                )}
               </View>
             ) : null}
           </TouchableOpacity>

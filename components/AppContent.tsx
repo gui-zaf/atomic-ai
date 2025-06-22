@@ -11,7 +11,6 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "./Header";
-import { ChatMessages } from "./ChatMessages";
 import ChatInput from "./ChatInput";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../context/ThemeContext";
@@ -181,7 +180,7 @@ const AppContent = () => {
           />
         </Animated.View>
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
           <View style={styles.container}>
             <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
               {/* Main content area - removed PanResponder to prevent scroll conflicts */}
@@ -251,7 +250,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 20,
     zIndex: 50,
-    pointerEvents: "box-none",
   },
   backgroundContainer: {
     position: "absolute",
