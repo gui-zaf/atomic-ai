@@ -345,13 +345,13 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
 
   const renderHeaderRight = () => {
     if (screenState !== "initial") {
-      return (
-        <TouchableOpacity
+  return (
+          <TouchableOpacity
           onPress={handleEndSupport}
           style={styles.endSupportButton}
-        >
+          >
           <Ionicons name="close-circle" size={26} color={colors.error} />
-        </TouchableOpacity>
+          </TouchableOpacity>
       );
     }
     return <View style={styles.headerRight} />;
@@ -361,27 +361,27 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     switch (screenState) {
       case "initial":
         return (
-          <View style={styles.content}>
-            <Ionicons
-              name="headset-outline"
-              size={80}
-              color={colors.primary}
-              style={styles.supportIcon}
-            />
-            <Text style={[styles.title, { color: colors.text }]}>
-              {t("supportTitle")}
-            </Text>
-            <Text style={[styles.message, { color: colors.subtext }]}>
-              {t("supportMessage")}
-            </Text>
-
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.primary }]}
-              onPress={handleSpeakWithExpert}
-            >
-              <Text style={styles.buttonText}>{t("speakWithExpert")}</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.content}>
+          <Ionicons
+            name="headset-outline"
+            size={80}
+            color={colors.primary}
+            style={styles.supportIcon}
+          />
+          <Text style={[styles.title, { color: colors.text }]}>
+            {t("supportTitle")}
+          </Text>
+          <Text style={[styles.message, { color: colors.subtext }]}>
+            {t("supportMessage")}
+          </Text>
+          
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={handleSpeakWithExpert}
+          >
+            <Text style={styles.buttonText}>{t("speakWithExpert")}</Text>
+          </TouchableOpacity>
+        </View>
         );
 
       case "queue":
@@ -720,4 +720,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SupportScreen;
+export default SupportScreen; 
