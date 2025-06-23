@@ -10,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import TokenPill from "./TokenPill";
 import { useTheme } from "../context/ThemeContext";
 import { BlurView } from "expo-blur";
-import { colors } from "../theme/theme";
 
 interface HeaderProps {
   onMenuPress: () => void;
@@ -51,7 +50,9 @@ export const Header = ({ onMenuPress, onTokenPress }: HeaderProps) => {
           />
         </TouchableOpacity>
 
-        <Text style={[styles.title, { color: colors.text }]}>Atomic Chat</Text>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>Atomic Chat</Text>
+        </View>
 
         <TokenPill onPress={onTokenPress} />
       </View>
@@ -83,20 +84,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "transparent",
     zIndex: 2,
+    position: "relative",
+  },
+  titleContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 0,
   },
   title: {
     fontSize: 18,
-    opacity: 1,
     fontWeight: "bold",
-    flex: 1,
     textAlign: "center",
-    marginLeft: 42,
   },
   iconButton: {
     width: 32,
     height: 32,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
   },
   icon: {
     opacity: 1,
