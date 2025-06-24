@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Keyboard,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,6 +26,7 @@ const SuggestionCarousel = ({
   const { colors, isDarkMode } = useTheme();
   const { t } = useLanguage();
   const isAndroid = Platform.OS === "android";
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const suggestions = [
     {
@@ -76,6 +78,32 @@ const SuggestionCarousel = ({
       icon: "color-wand",
     },
   ];
+
+  // Monitor keyboard visibility
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  // Se o teclado estiver visível, não mostrar as sugestões
+  if (keyboardVisible) {
+    return null;
+  }
 
   return (
     <View style={styles.containerWrapper}>

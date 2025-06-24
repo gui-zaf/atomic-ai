@@ -109,19 +109,19 @@ const ChatInput = ({
       setMessage("");
     } else {
       Alert.alert(
-        "Tokens Esgotados",
-        "Seus tokens gratuitos acabaram. Aguarde a recarga ou adquira mais tokens.",
-        [{ text: "OK" }],
+        t("tokensExhausted"),
+        t("tokensExhaustedMessage"),
+        [{ text: t("ok") }],
       );
     }
   };
 
   const handleTokenCommand = () => {
-    resetTokens();
+    resetTokens(3);
     Alert.alert(
-      "Tokens Refreshed",
-      "You received 10 additional tokens and cooldown has been reset!",
-      [{ text: "OK" }],
+      t("tokensRefreshed"),
+      t("tokensRefreshedMessage"),
+      [{ text: t("ok") }],
     );
   };
 
@@ -214,7 +214,7 @@ const ChatInput = ({
                   color: colors.text,
                 },
               ]}
-              placeholder="Message"
+              placeholder={t("inputPlaceholder")}
               placeholderTextColor={colors.subtext}
               value={message}
               onChangeText={setMessage}

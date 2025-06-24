@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Keyboard, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTokens } from "../context/TokenContext";
 import { useTheme } from "../context/ThemeContext";
@@ -13,16 +13,49 @@ const formatTimeRemaining = (milliseconds: number) => {
 };
 
 const RechargeTimer = () => {
-  const { isRecharging, rechargeTimeRemaining } = useTokens();
+  const { isRecharging, rechargeTimeRemaining, tokens } = useTokens();
   const { colors } = useTheme();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  if (!isRecharging) return null;
+  // Cores de erro (vermelho) como no TokenPill
+  const errorColor = colors.error;
+  const errorBgColor =
+    colors.text === "#FFFFFF"
+      ? "rgba(255, 69, 58, 0.2)"
+      : "rgba(255, 59, 48, 0.1)";
+
+  // Monitorar o estado do teclado
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  // Mostrar apenas quando estiver recarregando e sem tokens
+  if (!isRecharging || tokens > 0) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.timerPill, { backgroundColor: colors.surface }]}>
-        <Ionicons name="time-outline" size={16} color={colors.text} />
-        <Text style={[styles.timerText, { color: colors.text }]}>
+    <View style={[
+      styles.container,
+      keyboardVisible ? styles.containerKeyboardVisible : null
+    ]}>
+      <View style={[styles.timerPill, { backgroundColor: errorBgColor }]}>
+        <Ionicons name="time-outline" size={16} color={errorColor} />
+        <Text style={[styles.timerText, { color: errorColor }]}>
           {formatTimeRemaining(rechargeTimeRemaining)}
         </Text>
       </View>
@@ -32,10 +65,15 @@ const RechargeTimer = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    position: "absolute",
+    bottom: 148, // Posicionado acima da view de sugestões quando o teclado está fechado
+    left: 0,
+    right: 0,
     alignItems: "center",
+    zIndex: 100,
+  },
+  containerKeyboardVisible: {
+    bottom: 20, // Posicionado mais acima quando o teclado está aberto
   },
   timerPill: {
     flexDirection: "row",

@@ -6,11 +6,12 @@ interface TokenContextType {
   isRecharging: boolean;
   rechargeTimeRemaining: number;
   decrementToken: () => boolean;
-  resetTokens: () => void;
+  resetTokens: (amount?: number) => void;
   addTokens: (amount: number) => void;
 }
 
 const INITIAL_TOKENS = 10;
+const DEFAULT_RESET_TOKENS = 3; // Mudando o padrão para 3 tokens
 const RECHARGE_TIME = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 const TokenContext = createContext<TokenContextType | undefined>(undefined);
@@ -92,9 +93,9 @@ export const TokenProvider = ({ children }: { children: React.ReactNode }) => {
     return true;
   };
 
-  const resetTokens = () => {
-    // Reset cooldown and give 10 tokens
-    const newTokens = tokens + 10;
+  const resetTokens = (amount: number = DEFAULT_RESET_TOKENS) => {
+    // Reset cooldown and add the specified amount of tokens (padrão: 3)
+    const newTokens = tokens + amount;
     setTokens(newTokens);
 
     // Reset recharge state if needed

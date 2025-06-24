@@ -57,7 +57,7 @@ const HomeScreen = () => {
     () => setKeyboardVisible(false),
   );
 
-  const { tokens } = useTokens();
+  const { decrementToken, tokens } = useTokens();
   const { addHistoryItem } = useHistory();
 
   useEffect(() => {
@@ -271,9 +271,33 @@ const HomeScreen = () => {
         sampleImages[Math.floor(Math.random() * sampleImages.length)];
     }
 
-    // Se não for geração de imagem, enviar para a API
-    if (!isImageGeneration) {
-      try {
+    // Verificar se há tokens suficientes
+    // Imagens custam 1 token, mensagens de texto custam 1
+    const tokenCost = 1;
+    
+    if (tokens < tokenCost) {
+      setIsLoading(false);
+      
+      // Mostrar mensagem de erro
+      const errorMessage: Message = {
+        id: (timestamp + 1).toString(),
+        text: t("notEnoughTokensMessage").replace("{0}", tokenCost.toString()).replace("{1}", tokens.toString()),
+        isUser: false,
+        timestamp: new Date(timestamp + 500),
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
+
+    try {
+      // Decrementar o número correto de tokens
+      for (let i = 0; i < tokenCost; i++) {
+        decrementToken();
+      }
+      
+      // Se não for geração de imagem, enviar para a API
+      if (!isImageGeneration) {
         // Obter o contextId do AsyncStorage ou criar um novo
         let contextId = await AsyncStorage.getItem(CONTEXT_ID_STORAGE_KEY);
         
@@ -286,62 +310,65 @@ const HomeScreen = () => {
         }
         
         aiResponseText = data.response;
-      } catch (error) {
-        console.error('Erro ao chamar a API:', error);
-        
-        // Usar a mensagem de erro do LanguageContext
-        aiResponseText = t("apiError");
-        
-        // Adicionar o erro ao histórico
+      } else {
+        // ... código existente para geração de imagem ...
+      }
+      
+      const responseTimestamp = new Date(timestamp + 1500);
+      const aiMessage: Message = {
+        id: (timestamp + 1).toString(),
+        text: isImageGeneration
+          ? `${prompt}`
+          : aiResponseText || "This is a simulated AI response. You can replace this with actual AI responses.",
+        isUser: false,
+        timestamp: responseTimestamp,
+        ...(isImageGeneration && {
+          image: imageFile,
+          isGenerating: true,
+        }),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+
+      // Add to history
+      if (isImageGeneration) {
         addHistoryItem({
-          id: (timestamp + 3).toString(),
+          id: (timestamp + 2).toString(),
           timestamp: new Date(),
-          type: "error",
-          error: t("apiError"),
-          tokensUsed: 0,
+          type: "image",
+          prompt: prompt,
+          tokensUsed: 1,
+          model: "DALL-E",
+          expanded: false,
+        });
+      } else {
+        addHistoryItem({
+          id: (timestamp + 2).toString(),
+          timestamp: new Date(),
+          type: "simulated",
+          prompt: message,
+          response: aiMessage.text,
+          tokensUsed: 1,
           expanded: false,
         });
       }
-    }
-
-    const responseTimestamp = new Date(timestamp + 1500);
-    const aiMessage: Message = {
-      id: (timestamp + 1).toString(),
-      text: isImageGeneration
-        ? `${prompt}`
-        : aiResponseText || "This is a simulated AI response. You can replace this with actual AI responses.",
-      isUser: false,
-      timestamp: responseTimestamp,
-      ...(isImageGeneration && {
-        image: imageFile,
-        isGenerating: true,
-      }),
-    };
-
-    setIsLoading(false);
-    setMessages((prev) => [...prev, aiMessage]);
-
-    // Add to history
-    if (isImageGeneration) {
+    } catch (error) {
+      console.error('Erro ao chamar a API:', error);
+      
+      // Usar a mensagem de erro do LanguageContext
+      aiResponseText = t("apiError");
+      
+      // Adicionar o erro ao histórico
       addHistoryItem({
-        id: (timestamp + 2).toString(),
+        id: (timestamp + 3).toString(),
         timestamp: new Date(),
-        type: "image",
-        prompt: prompt,
-        tokensUsed: 1,
-        model: "DALL-E",
+        type: "error",
+        error: t("apiError"),
+        tokensUsed: 0,
         expanded: false,
       });
-    } else {
-      addHistoryItem({
-        id: (timestamp + 2).toString(),
-        timestamp: new Date(),
-        type: "simulated",
-        prompt: message,
-        response: aiMessage.text,
-        tokensUsed: 1,
-        expanded: false,
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 

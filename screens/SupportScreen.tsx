@@ -532,7 +532,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
                     styles.input,
                     { color: colors.text, backgroundColor: colors.surface },
                   ]}
-                  placeholder="Digite uma mensagem..."
+                  placeholder={t("inputPlaceholder")}
                   placeholderTextColor={colors.subtext}
                   value={inputMessage}
                   onChangeText={setInputMessage}
