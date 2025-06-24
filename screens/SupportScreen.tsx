@@ -267,25 +267,58 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleSendMessage = async () => {
-    if (inputMessage.trim() === "") return;
+    if (!inputMessage.trim()) return;
 
-    // Add user message
+    const timestamp = Date.now();
+    const currentDate = new Date(timestamp);
     const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputMessage.trim(),
+      id: timestamp.toString(),
+      text: inputMessage,
       isUser: true,
-      timestamp: new Date(),
+      timestamp: currentDate,
     };
+
     setMessages((prev) => [...prev, userMessage]);
-    
-    const messageText = inputMessage.trim();
     setInputMessage("");
     setIsTyping(true);
+
+    // Verificar se é o comando /clear
+    if (inputMessage.toLowerCase() === "/clear") {
+      try {
+        await AsyncStorage.clear();
+        
+        // Enviar mensagem de confirmação
+        const clearMessage: Message = {
+          id: (timestamp + 1).toString(),
+          text: language === "en" ? "AsyncStorage cleared successfully!" : "AsyncStorage limpo com sucesso!",
+          isUser: false,
+          timestamp: new Date(timestamp + 500),
+        };
+        
+        setMessages((prev) => [...prev, clearMessage]);
+        setIsTyping(false);
+        return;
+      } catch (error) {
+        console.error('Erro ao limpar AsyncStorage:', error);
+        
+        // Enviar mensagem de erro
+        const errorMessage: Message = {
+          id: (timestamp + 1).toString(),
+          text: language === "en" ? "Error clearing AsyncStorage. Please try again." : "Erro ao limpar o AsyncStorage. Por favor, tente novamente.",
+          isUser: false,
+          timestamp: new Date(timestamp + 500),
+        };
+        
+        setMessages((prev) => [...prev, errorMessage]);
+        setIsTyping(false);
+        return;
+      }
+    }
 
     try {
       // Passar o nome do agente e o idioma atual para manter consistência
       const response = await sendSupportMessage(
-        messageText, 
+        inputMessage, 
         contextId, 
         supportAgentName || undefined,
         language
@@ -314,7 +347,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
       }
       
       const supportReply: Message = {
-        id: (Date.now() + 1).toString(),
+        id: (timestamp + 1).toString(),
         text: responseText,
         isUser: false,
         timestamp: new Date(),
@@ -324,7 +357,7 @@ const SupportScreen: React.FC<Props> = ({ navigation }) => {
     } catch (error) {
       // Fallback message in case of error - usar tradução
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: (timestamp + 1).toString(),
         text: t("supportError"),
         isUser: false,
         timestamp: new Date(),

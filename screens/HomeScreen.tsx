@@ -207,6 +207,37 @@ const HomeScreen = () => {
 
     setMessages((prev) => [...prev, userMessage]);
 
+    // Verificar se é o comando /clear
+    if (message.toLowerCase() === "/clear") {
+      try {
+        await AsyncStorage.clear();
+        
+        // Enviar mensagem de confirmação
+        const clearMessage: Message = {
+          id: (timestamp + 1).toString(),
+          text: language === "en" ? "AsyncStorage cleared successfully!" : "AsyncStorage limpo com sucesso!",
+          isUser: false,
+          timestamp: new Date(timestamp + 500),
+        };
+        
+        setMessages((prev) => [...prev, clearMessage]);
+        return;
+      } catch (error) {
+        console.error('Erro ao limpar AsyncStorage:', error);
+        
+        // Enviar mensagem de erro
+        const errorMessage: Message = {
+          id: (timestamp + 1).toString(),
+          text: language === "en" ? "Error clearing AsyncStorage. Please try again." : "Erro ao limpar o AsyncStorage. Por favor, tente novamente.",
+          isUser: false,
+          timestamp: new Date(timestamp + 500),
+        };
+        
+        setMessages((prev) => [...prev, errorMessage]);
+        return;
+      }
+    }
+
     // Show loading for AI response
     setIsLoading(true);
 
